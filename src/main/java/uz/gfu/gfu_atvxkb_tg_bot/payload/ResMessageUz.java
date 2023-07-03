@@ -3,7 +3,7 @@ package uz.gfu.gfu_atvxkb_tg_bot.payload;
 public interface ResMessageUz {
     String START = "Assalomu aleykum Geologiya fanlari universitetining ATM bo'limiga murojaat yuborish bo'limiga hush kelibsiz";
     String FEEDBACK = "O'zingizning taklifingizni yozing";
-    String ENTER_NAME = "Iltimos familyangizni kiriting: ";
+    String ENTER_NAME = "Iltimos ismingizni kiriting: ";
     String ENTER_DEPARTMENT = "Bo'limingizni kiriting:";
     String ENTER_ROOM_NUMBER = "Xona raqamini kiriting:";
     String ENTER_PHONE_NUMBER = "Iltimos ichki telefon raqam\nYoki shaxsiy telefon raqamingizni kiriting";
@@ -17,4 +17,6 @@ public interface ResMessageUz {
     String HELLO = "Assalomu aleykum \n";
     String CHOOSE_LANG = "\nBotga xush kelibsiz\nIltimos tilni tanlang";
     String CHOOSE_SERVICE = "Servislardan birini tanlang\n\nAgar bu yerda muamongiz ko'rsatilmagan bo'lsa\n\nBoshqa: tugmasini bosing";
+    String CLICK_START = "Iltimos /start bosing ";
+    String ENTER_BLOCK = "Blokizi tanlang";
 }

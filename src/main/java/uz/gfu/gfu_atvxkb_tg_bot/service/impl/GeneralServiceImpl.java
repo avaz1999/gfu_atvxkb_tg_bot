@@ -9,8 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 
 import java.util.ArrayList;
@@ -22,11 +24,14 @@ public class GeneralServiceImpl implements GeneralService {
     private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
     private final FeedbackServiceImpl feedbackService;
+    private final BuildingService buildingService;
 
-    public GeneralServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, FeedbackServiceImpl feedbackService) {
+    public GeneralServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, FeedbackServiceImpl feedbackService, BuildingService buildingService) {
         this.feedBackRepository = feedBackRepository;
         this.userRepository = userRepository;
         this.feedbackService = feedbackService;
+
+        this.buildingService = buildingService;
     }
 
     @Override
@@ -42,13 +47,33 @@ public class GeneralServiceImpl implements GeneralService {
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         KeyboardRow row = new KeyboardRow();
         switch (user.getCurrentPage()) {
-            case 5:
+            case 0 -> {
+                KeyboardButton start = new KeyboardButton("/start");
+                row.add(start);
+                keyboardRows.add(row);
+            }
+            case 3 -> {
+                List<Building> allBuildings = buildingService.getAllBuildings();
+                for (int i = 0; i < allBuildings.size(); i++) {
+                    Building building = allBuildings.get(i);
+                    KeyboardButton button1 = new KeyboardButton(building.getName());
+                    row.add(button1);
+                    if (i % 2 == 0){
+                        keyboardRows.add(row);
+                    }else {
+                        row = new KeyboardRow();
+                    }
+                }
+                return replyKeyboardMarkup;
+            }
+            case 5 -> {
                 KeyboardButton shareContactButton = new KeyboardButton("☎ Share contact");
                 shareContactButton.setRequestContact(true);
                 row.add(shareContactButton);
                 keyboardRows.add(row);
                 return replyKeyboardMarkup;
-            case 7:
+            }
+            case 7 -> {
 //                for (FeedBack allFeedback : feedbackService.getAllFeedbacks()) {
 //                    KeyboardButton button = new KeyboardButton(allFeedback.getSubTitle());
 //                    row.add(button);
@@ -73,6 +98,7 @@ public class GeneralServiceImpl implements GeneralService {
                 keyboardRows.add(row2);
                 keyboardRows.add(row3);
                 return replyKeyboardMarkup;
+            }
         }
         return null;
     }
@@ -84,21 +110,18 @@ public class GeneralServiceImpl implements GeneralService {
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
         inlineKeyboardMarkup.setKeyboard(lists);
         switch (currentUser.getCurrentPage()) {
-            case 1:
+            case 1 -> {
                 InlineKeyboardButton inlineKeyboardButtonUz = new InlineKeyboardButton();
                 inlineKeyboardButtonUz.setText("\uD83C\uDDFA\uD83C\uDDFF Uz");
                 inlineKeyboardButtonUz.setCallbackData(BotQuery.UZ_SELECT);
                 inlineKeyboardButtonList1.add(inlineKeyboardButtonUz);
-
                 InlineKeyboardButton inlineKeyboardButtonRus = new InlineKeyboardButton();
                 inlineKeyboardButtonRus.setText("\uD83C\uDDF7\uD83C\uDDFA Ru");
                 inlineKeyboardButtonRus.setCallbackData(BotQuery.RU_SELECT);
                 inlineKeyboardButtonList1.add(inlineKeyboardButtonRus);
                 lists.add(inlineKeyboardButtonList1);
-                break;
-            case 6, 10:
-                doneAndEdit(inlineKeyboardButtonList1, lists);
-                break;
+            }
+            case 6, 10 -> doneAndEdit(inlineKeyboardButtonList1, lists);
         }
         return inlineKeyboardMarkup;
     }

@@ -20,18 +20,20 @@ public class ClientServiceImpl implements ClientService {
     private final UserService userService;
     private final GeneralService generalService;
     private final FeedbackService feedbackService;
+    private final BuildingService buildingService;
 
-    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService) {
+    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, BuildingService buildingService) {
         this.userService = userService;
         this.generalService = generalService;
         this.feedbackService = feedbackService;
+        this.buildingService = buildingService;
     }
 
     @Override
     public void clientHasMessage(BotUser client, Message message, String text, SendMessage sendMessage) {
         Long chatId = message.getChatId();
         BotUser currentUser = userService.getCurrentUser(chatId, message);
-        if (message.hasContact() && currentUser.getCurrentPage() == 6) {
+        if (message.hasContact() && currentUser.getCurrentPage() == 7) {
             try {
                 Contact contact = message.getContact();
                 userService.saveUserPhoneNumber(contact, currentUser.getId());
@@ -44,11 +46,8 @@ public class ClientServiceImpl implements ClientService {
                 throw new RuntimeException(e);
             }
         }
+
         switch (text) {
-            case START -> {
-                sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(client));
-            }
             case BotQuery.COMPUTER -> {
                 userService.nextPage(currentUser);
                 sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
@@ -98,14 +97,20 @@ public class ClientServiceImpl implements ClientService {
             case 3 -> {
                 userService.saveUserFirstname(text, userId);
                 userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+                sendMessage.setText(ResMessageUz.ENTER_BLOCK);
+                sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
             }
             case 4 -> {
+                buildingService.saveBuilding(text,userId);
+                userService.nextPage(currentUser);
+                sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+            }
+            case 5 -> {
                 userService.saveUserDepartmentName(text, userId);
                 userService.nextPage(currentUser);
                 sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
             }
-            case 5 -> {
+            case 6 -> {
                 userService.saveUserRoomNum(text, userId);
                 userService.nextPage(currentUser);
                 sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
@@ -133,7 +138,7 @@ public class ClientServiceImpl implements ClientService {
                     e.printStackTrace();
                 }
             }
-            case 7 -> {
+            case 8 -> {
                 switch (data) {
                     case BotQuery.DONE -> {
                         sendMessage.setText(ResMessageUz.DONE);

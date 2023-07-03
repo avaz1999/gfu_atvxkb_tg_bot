@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 public class FeedbackDto {
     private Long id;
-    private String title;
+    private String name;
     private List<String> message;
 }

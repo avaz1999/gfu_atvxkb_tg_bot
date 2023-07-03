@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
-import uz.gfu.gfu_atvxkb_tg_bot.role.Role;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,5 +33,7 @@ public class BotUser extends BaseEntity {
     private Role role;
     @OneToOne(cascade = CascadeType.ALL)
     private Department department;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Building building;
 
 }

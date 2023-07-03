@@ -8,7 +8,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Department;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.DepartmentRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.role.Role;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
 import java.util.*;
@@ -95,7 +95,6 @@ public class UserServiceImpl implements UserService {
             Optional<Department> optionalDepartment = departmentRepository.findById(user.getDepartment().getId());
             if (optionalDepartment.isPresent()) {
                 Department department = optionalDepartment.get();
-                department.setRoomNumber(text);
                 departmentRepository.save(department);
             }
         }
@@ -125,7 +124,7 @@ public class UserServiceImpl implements UserService {
                     "Ism: " + user.getFirstname() + "\n" +
                     "Familya: " + user.getLastname() + "\n" +
                     "Bo'lim: " + user.getDepartment().getName() + "\n" +
-                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
+//                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
                     "Tel Raqam: " + user.getDepartment().getInnerPhoneNumber();
         }
         return null;

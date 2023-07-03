@@ -1,13 +1,16 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
+
+import static uz.gfu.gfu_atvxkb_tg_bot.GfuAtvxkbTgBotApplication.bot;
 
 @Service
 public class BotServiceImpl implements BotService {
@@ -18,13 +21,14 @@ public class BotServiceImpl implements BotService {
     private final ClientService clientService;
     private final AdminService adminService;
     private static final String START = "/start";
-    private static final String FEEDBACK = "Takliflar";
+    private final GeneralService generalService;
 
-    public BotServiceImpl(UserServiceImpl userService, SuperAdminService superAdminService, ClientService clientService, AdminService adminService) {
+    public BotServiceImpl(UserServiceImpl userService, SuperAdminService superAdminService, ClientService clientService, AdminService adminService, GeneralService generalService) {
         this.userService = userService;
         this.superAdminService = superAdminService;
         this.clientService = clientService;
         this.adminService = adminService;
+        this.generalService = generalService;
     }
 
     @Override
@@ -37,6 +41,7 @@ public class BotServiceImpl implements BotService {
         }
     }
 
+    @SneakyThrows
     @Override
     public void updateHasMessage(Update update) {
         Message message = update.getMessage();
@@ -48,6 +53,14 @@ public class BotServiceImpl implements BotService {
         String text = message.getText();
 
         BotUser currentUser = userService.getCurrentUser(chatId, message);
+
+        if (text != null && text.equalsIgnoreCase(START)) {
+            sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
+            sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
+        } else {
+            sendMessage.setText(ResMessageUz.CLICK_START);
+            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+        }
 
         switch (currentUser.getRole()) {
             case CLIENT -> clientService.clientHasMessage(currentUser, message, text, sendMessage);
@@ -61,6 +74,6 @@ public class BotServiceImpl implements BotService {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         Long chatId = callbackQuery.getMessage().getChatId();
         BotUser currentUser = userService.getCurrentUser(chatId, callbackQuery.getMessage());
-        clientService.clientHasCallBackQuery(currentUser,callbackQuery);
+        clientService.clientHasCallBackQuery(currentUser, callbackQuery);
     }
 }

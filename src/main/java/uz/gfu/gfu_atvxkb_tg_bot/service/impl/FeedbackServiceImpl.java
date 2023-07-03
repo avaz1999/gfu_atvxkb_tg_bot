@@ -22,41 +22,16 @@ public class FeedbackServiceImpl implements FeedbackService {
         this.userRepository = userRepository;
     }
 
-    @Override
-    public  List<FeedbackDto> getAllFeedback() {
-        List<FeedbackDto> feedbackDtoList = new ArrayList<>();
-        FeedbackDto feedbackDto = new FeedbackDto();
-        List<FeedBack> allFeedbacks = feedBackRepository.findAll();
-        for (int i = 0; i < allFeedbacks.size(); i++) {
-            FeedBack feedBack = allFeedbacks.get(i);
-            feedbackDto.setId(feedBack.getId());
-            feedbackDto.setTitle(feedBack.getSubTitle());
-            feedbackDto.setMessage(feedBack.getMessages());
-            feedbackDtoList.add(feedbackDto);
-        }
-        return feedbackDtoList;
-    }
-    @Override
-    public List<FeedBack> getAllFeedbacks(){
-        return feedBackRepository.findAll();
-    }
 
-    @Override
-    public String addFeedback(FeedbackDto feedbackDto) {
-        FeedBack feedBack = new FeedBack();
-        feedBack.setSubTitle(feedbackDto.getTitle());
-        feedBack.setMessages(feedbackDto.getMessage());
-        feedBackRepository.save(feedBack);
-        return "Successfully added";
-    }
+
+
 
     @Override
     public void saveFeedback(String data, BotUser user) {
-        FeedBack feedBackBySubtitle = feedBackRepository.findBySubTitle(data);
+        FeedBack feedBackBySubtitle = feedBackRepository.findByName(data);
         FeedBack feedBack = new FeedBack();
         List<FeedBack> feedBackList = new ArrayList<>();
-        feedBack.setSubTitle(feedBackBySubtitle.getSubTitle());
-        feedBack.setMessages(feedBackBySubtitle.getMessages());
+        feedBack.setName(feedBackBySubtitle.getName());
         feedBackList.add(feedBack);
         user.setFeedBacks(feedBackList);
         userRepository.save(user);

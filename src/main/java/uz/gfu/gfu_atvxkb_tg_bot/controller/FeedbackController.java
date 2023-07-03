@@ -17,8 +17,5 @@ public class FeedbackController {
         this.feedbackService = feedbackService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> add(@RequestBody FeedbackDto feedbackDto) {
-        return ResponseEntity.ok(feedbackService.addFeedback(feedbackDto));
-    }
+
 }
