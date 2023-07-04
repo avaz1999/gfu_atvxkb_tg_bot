@@ -26,4 +26,6 @@ public interface UserService {
     void saveUserMessages(String text, Long chatId);
 
     BotUser back(BotUser currentUser);
+
+    void prev(BotUser currentUser);
 }

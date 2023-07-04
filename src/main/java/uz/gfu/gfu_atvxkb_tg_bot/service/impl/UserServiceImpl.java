@@ -162,4 +162,10 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+    @Override
+    public void prev(BotUser currentUser) {
+        currentUser.setCurrentPage(currentUser.getCurrentPage() - 1);
+        userRepository.save(currentUser);
+    }
 }

@@ -40,4 +40,9 @@ public class BuildingServiceImpl implements BuildingService {
     public List<Building> getAllBuildings() {
         return buildingRepository.findAll();
     }
+
+    @Override
+    public boolean checkBuilding(String text) {
+        return buildingRepository.existsByName(text);
+    }
 }

@@ -13,4 +13,5 @@ public interface FeedbackService {
     void saveFeedback(String data, BotUser user);
 
     String showFeedback(BotUser currentUser);
+
 }

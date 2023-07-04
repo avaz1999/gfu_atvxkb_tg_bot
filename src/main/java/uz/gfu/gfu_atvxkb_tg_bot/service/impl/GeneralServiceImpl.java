@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
@@ -58,45 +59,33 @@ public class GeneralServiceImpl implements GeneralService {
                     Building building = allBuildings.get(i);
                     KeyboardButton button1 = new KeyboardButton(building.getName());
                     row.add(button1);
-                    if (i % 2 == 0){
+                    if (i % 2 == 0) {
                         keyboardRows.add(row);
-                    }else {
+                    } else {
                         row = new KeyboardRow();
                     }
                 }
                 return replyKeyboardMarkup;
             }
-            case 5 -> {
+            case 6 -> {
                 KeyboardButton shareContactButton = new KeyboardButton("☎ Share contact");
                 shareContactButton.setRequestContact(true);
                 row.add(shareContactButton);
                 keyboardRows.add(row);
                 return replyKeyboardMarkup;
             }
-            case 7 -> {
-//                for (FeedBack allFeedback : feedbackService.getAllFeedbacks()) {
-//                    KeyboardButton button = new KeyboardButton(allFeedback.getSubTitle());
-//                    row.add(button);
-//                }
-//                keyboardRows.add(row);
-                KeyboardRow row1 = new KeyboardRow();
-                KeyboardRow row2 = new KeyboardRow();
-                KeyboardRow row3 = new KeyboardRow();
-                KeyboardButton internet = new KeyboardButton("\uD83C\uDF10 Internet");
-                KeyboardButton printer = new KeyboardButton("\uD83D\uDDA8 Printer");
-                KeyboardButton computer = new KeyboardButton("\uD83D\uDDA5 Kompyuter");
-                KeyboardButton telephone = new KeyboardButton("☎\uFE0F Telefon");
-//                KeyboardButton back = new KeyboardButton("◀\uFE0F Back");
-                KeyboardButton other = new KeyboardButton("\uD83D\uDCCE Boshqa");
-                row1.add(internet);
-                row1.add(printer);
-                row2.add(computer);
-                row2.add(telephone);
-//                row3.add(back);
-                row3.add(other);
-                keyboardRows.add(row1);
-                keyboardRows.add(row2);
-                keyboardRows.add(row3);
+            case 8 -> {
+                List<FeedBack> allFeedback = feedbackService.getAllFeedback();
+                for (int i = 0; i < allFeedback.size(); i++) {
+                    FeedBack feedBack = allFeedback.get(i);
+                    KeyboardButton button = new KeyboardButton(feedBack.getName());
+                    row.add(button);
+                    if (i % 2 == 0){
+                        keyboardRows.add(row);
+                    }else {
+                        row = new KeyboardRow();
+                    }
+                }
                 return replyKeyboardMarkup;
             }
         }
@@ -121,7 +110,7 @@ public class GeneralServiceImpl implements GeneralService {
                 inlineKeyboardButtonList1.add(inlineKeyboardButtonRus);
                 lists.add(inlineKeyboardButtonList1);
             }
-            case 6, 10 -> doneAndEdit(inlineKeyboardButtonList1, lists);
+            case 7, 10 -> doneAndEdit(inlineKeyboardButtonList1, lists);
         }
         return inlineKeyboardMarkup;
     }

@@ -41,39 +41,12 @@ public class ClientServiceImpl implements ClientService {
                 sendMessage.setText(ResMessageUz.SHOW_DATA + userService.showUserData(currentUser.getId(), chatId));
                 sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
                 sendMessage.setChatId(chatId);
-                bot.execute(sendMessage);
-            } catch (TelegramApiException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
-        switch (text) {
-            case BotQuery.COMPUTER -> {
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser, BotQuery.COMPUTER));
-            }
-            case BotQuery.INTERNET -> {
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser, BotQuery.INTERNET));
-            }
-            case BotQuery.PRINTER -> {
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser, BotQuery.PRINTER));
-            }
-            case BotQuery.TELEPHONE -> {
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser, BotQuery.TELEPHONE));
-            }
-            case BotQuery.OTHER -> {
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser,BotQuery.OTHER));
-            }
-        }
+
         sendMessage.setChatId(chatId);
         checkCurrentUserPages(currentUser, message, sendMessage, text, chatId);
 
@@ -101,9 +74,13 @@ public class ClientServiceImpl implements ClientService {
                 sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
             }
             case 4 -> {
-                buildingService.saveBuilding(text,userId);
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+                if (buildingService.checkBuilding(text)) {
+                    buildingService.saveBuilding(text,userId);
+                    userService.nextPage(currentUser);
+                    sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+                }else {
+                    userService.prev(currentUser);
+                }
             }
             case 5 -> {
                 userService.saveUserDepartmentName(text, userId);

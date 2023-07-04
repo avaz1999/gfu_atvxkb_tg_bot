@@ -37,6 +37,9 @@ public class FeedbackServiceImpl implements FeedbackService {
         userRepository.save(user);
     }
 
+    public List<FeedBack> getAllFeedback(){
+        return feedBackRepository.findAll();
+    }
     @Override
     public String showFeedback(BotUser currentUser) {
         Optional<BotUser> byId = userRepository.findById(currentUser.getId());

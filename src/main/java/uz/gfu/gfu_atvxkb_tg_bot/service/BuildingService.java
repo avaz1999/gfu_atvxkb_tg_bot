@@ -9,4 +9,7 @@ public interface BuildingService {
     void saveRoomNumber(String number);
 
     List<Building> getAllBuildings();
+
+    boolean checkBuilding(String text);
+
 }
