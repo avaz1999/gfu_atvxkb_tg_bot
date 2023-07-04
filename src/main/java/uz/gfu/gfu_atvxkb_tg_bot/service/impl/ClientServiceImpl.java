@@ -63,22 +63,37 @@ public class ClientServiceImpl implements ClientService {
         Long userId = currentUser.getId();
         switch (currentUser.getCurrentPage()) {
             case 2 -> {
+                if (text.equalsIgnoreCase(BotQuery.BACK)) {
+                    userService.back(currentUser);
+                    sendMessage.setText(ResMessageUz.CHOOSE_LANG);
+                }
                 userService.saveUserLastname(text, userId);
                 userService.nextPage(currentUser);
                 sendMessage.setText(ResMessageUz.ENTER_NAME);
-            }
-            case 3 -> {
-                userService.saveUserFirstname(text, userId);
-                userService.nextPage(currentUser);
-                sendMessage.setText(ResMessageUz.ENTER_BLOCK);
                 sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
             }
-            case 4 -> {
-                if (buildingService.checkBuilding(text)) {
-                    buildingService.saveBuilding(text,userId);
+            case 3 -> {
+                if (text.equalsIgnoreCase(BotQuery.BACK)) {
+                    userService.back(currentUser);
+                    sendMessage.setText(ResMessageUz.ENTER_LASTNAME);
+                } else {
+                    userService.saveUserFirstname(text, userId);
                     userService.nextPage(currentUser);
+                    sendMessage.setText(ResMessageUz.ENTER_BLOCK);
+                    sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+                }
+
+            }
+            case 4 -> {
+                if (text.equalsIgnoreCase(BotQuery.BACK)) {
+                    userService.back(currentUser);
+                    sendMessage.setText(ResMessageUz.ENTER_NAME);
+                } else if (buildingService.checkBuilding(text)) {
+                    buildingService.saveBuilding(text, userId);
+                    userService.nextPage(currentUser);
+                    sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
                     sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
-                }else {
+                } else {
                     userService.prev(currentUser);
                 }
             }
@@ -94,10 +109,10 @@ public class ClientServiceImpl implements ClientService {
                 sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
             }
             case 9 -> {
-                feedbackService.saveFeedback(text,currentUser);
+                feedbackService.saveFeedback(text, currentUser);
                 userService.nextPage(currentUser);
                 sendMessage.setText(ResMessageUz.SERVICE);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser,text));
+                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser, text));
             }
         }
     }
@@ -110,7 +125,10 @@ public class ClientServiceImpl implements ClientService {
         switch (client.getCurrentPage()) {
             case 1 -> {
                 switch (data) {
-                    case BotQuery.UZ_SELECT -> sendMessage.setText(ResMessageUz.ENTER_LASTNAME);
+                    case BotQuery.UZ_SELECT -> {
+                        sendMessage.setText(ResMessageUz.ENTER_LASTNAME);
+                        sendMessage.setReplyMarkup(generalService.getReplyKeyboard(client));
+                    }
                     case BotQuery.RU_SELECT -> sendMessage.setText(ResMessageRu.ENTER_LASTNAME);
                 }
                 try {

@@ -147,7 +147,6 @@ public class UserServiceImpl implements UserService {
         Optional<BotUser> byId = userRepository.findById(chatId);
         if (byId.isPresent()) {
             BotUser user = byId.get();
-            user.setMessages(messages);
             userRepository.save(user);
         }
     }
@@ -157,7 +156,7 @@ public class UserServiceImpl implements UserService {
         Optional<BotUser> byId = userRepository.findById(currentUser.getId());
         if (byId.isPresent()) {
             BotUser user = byId.get();
-            user.setCurrentPage(currentUser.getCurrentPage() - 2);
+            user.setCurrentPage(currentUser.getCurrentPage() - 1);
            return userRepository.save(user);
         }
         return null;

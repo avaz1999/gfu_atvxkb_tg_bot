@@ -23,7 +23,6 @@ public class BotUser extends BaseEntity {
     private Long chatId;
     private Long editMessageId;
     private int currentPage = 0;
-    private LinkedList<String> messages;
     @ManyToMany
     @JoinTable(name = "users_feedbacks",
             joinColumns = @JoinColumn(name = "user_id"),

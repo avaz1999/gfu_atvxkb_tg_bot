@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
@@ -54,13 +55,14 @@ public class BotServiceImpl implements BotService {
 
         BotUser currentUser = userService.getCurrentUser(chatId, message);
 
-         if (text != null && text.equalsIgnoreCase(START)) {
-            sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
-            sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
-        } else {
-            sendMessage.setText(ResMessageUz.CLICK_START);
-            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+        switch (text) {
+            case START -> {
+                sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
+                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
+            }
+            default -> sendMessage.setText(ResMessageUz.CLICK_START);
         }
+
 
         switch (currentUser.getRole()) {
             case CLIENT -> clientService.clientHasMessage(currentUser, message, text, sendMessage);

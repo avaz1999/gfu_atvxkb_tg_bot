@@ -17,6 +17,6 @@ public interface ResMessageUz {
     String HELLO = "Assalomu aleykum \n";
     String CHOOSE_LANG = "\nBotga xush kelibsiz\nIltimos tilni tanlang";
     String CHOOSE_SERVICE = "Servislardan birini tanlang\n\nAgar bu yerda muamongiz ko'rsatilmagan bo'lsa\n\nBoshqa: tugmasini bosing";
-    String CLICK_START = "Iltimos /start bosing ";
-    String ENTER_BLOCK = "Blokizi tanlang";
+    String CLICK_START = "Iltimos /start tugmasini  bosing ";
+    String ENTER_BLOCK = "Blokingizni tanlang";
 }
