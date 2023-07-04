@@ -29,10 +29,8 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public void saveFeedback(String data, BotUser user) {
         FeedBack feedBackBySubtitle = feedBackRepository.findByName(data);
-        FeedBack feedBack = new FeedBack();
         List<FeedBack> feedBackList = new ArrayList<>();
-        feedBack.setName(feedBackBySubtitle.getName());
-        feedBackList.add(feedBack);
+        feedBackList.add(feedBackBySubtitle);
         user.setFeedBacks(feedBackList);
         userRepository.save(user);
     }

@@ -93,6 +93,12 @@ public class ClientServiceImpl implements ClientService {
                 sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
                 sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
             }
+            case 9 -> {
+                feedbackService.saveFeedback(text,currentUser);
+                userService.nextPage(currentUser);
+                sendMessage.setText(ResMessageUz.SERVICE);
+                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButtonForService(currentUser,text));
+            }
         }
     }
 
@@ -131,7 +137,7 @@ public class ClientServiceImpl implements ClientService {
                     e.printStackTrace();
                 }
             }
-            case 9 -> {
+            case 10 -> {
                 switch (data) {
                     case BotQuery.ACTIVATION_WINDOWS -> {
                         userService.nextPage(client);

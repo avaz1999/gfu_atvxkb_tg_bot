@@ -54,7 +54,7 @@ public class BotServiceImpl implements BotService {
 
         BotUser currentUser = userService.getCurrentUser(chatId, message);
 
-        if (text != null && text.equalsIgnoreCase(START)) {
+         if (text != null && text.equalsIgnoreCase(START)) {
             sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
             sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
         } else {

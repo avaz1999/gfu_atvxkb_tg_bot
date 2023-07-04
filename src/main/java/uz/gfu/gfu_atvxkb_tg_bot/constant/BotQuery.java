@@ -20,4 +20,5 @@ public interface BotQuery {
     String COMPUTER = "\uD83D\uDDA5 Kompyuter";
     String TELEPHONE = "☎\uFE0F Telefon";
     String OTHER = "\uD83D\uDCCE Boshqa";
+    String SUB_FEEDBACK = "SUB_FEEDBACK";
 }

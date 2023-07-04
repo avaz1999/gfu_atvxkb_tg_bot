@@ -42,7 +42,7 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public boolean checkBuilding(String text) {
+    public boolean  checkBuilding(String text) {
         return buildingRepository.existsByName(text);
     }
 }

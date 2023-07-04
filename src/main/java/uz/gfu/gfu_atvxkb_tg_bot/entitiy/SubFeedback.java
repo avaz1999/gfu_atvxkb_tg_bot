@@ -1,7 +1,6 @@
 package uz.gfu.gfu_atvxkb_tg_bot.entitiy;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +14,6 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @Entity(name = "sub_feedback")
 public class SubFeedback extends BaseEntity {
     private String name;
-    @OneToOne
+    @ManyToOne
     private FeedBack feedBack;
 }
