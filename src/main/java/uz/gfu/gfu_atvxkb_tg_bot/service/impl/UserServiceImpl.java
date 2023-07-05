@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BotUser getCurrentUser( Message message) {
+    public BotUser getCurrentUser(Message message) {
         Long chatId = message.getChatId();
         for (BotUser user : userRepository.findAll()) {
             if (Objects.equals(user.getChatId(), chatId)) {
@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
     }
-
 
 
     @Override
@@ -121,11 +120,12 @@ public class UserServiceImpl implements UserService {
         Optional<BotUser> byId = userRepository.findById(userId);
         if (byId.isPresent()) {
             BotUser user = byId.get();
-            return "ID: " + chatId + "\n" +
+            return  "ID: " + chatId + "\n" +
                     "Ism: " + user.getFirstname() + "\n" +
                     "Familya: " + user.getLastname() + "\n" +
                     "Bo'lim: " + user.getDepartment().getName() + "\n" +
-//                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
+                    "Bino: " + user.getBuilding().getName() +
+                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
                     "Tel Raqam: " + user.getDepartment().getInnerPhoneNumber();
         }
         return null;
@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
         if (byId.isPresent()) {
             BotUser user = byId.get();
             user.setCurrentPage(currentUser.getCurrentPage() - 1);
-           return userRepository.save(user);
+            return userRepository.save(user);
         }
         return null;
     }

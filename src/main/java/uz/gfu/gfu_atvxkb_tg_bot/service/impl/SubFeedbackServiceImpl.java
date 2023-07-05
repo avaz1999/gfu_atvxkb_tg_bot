@@ -2,10 +2,13 @@ package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 import org.springframework.stereotype.Service;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.UserData;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.UserDataRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
 
 import java.util.List;
@@ -15,10 +18,12 @@ import java.util.Optional;
 public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final FeedBackRepository feedBackRepository;
     private final SubFeedbackRepository subFeedbackRepository;
+    private final UserDataRepository userDataRepository;
 
-    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository) {
+    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, UserDataRepository userDataRepository) {
         this.feedBackRepository = feedBackRepository;
         this.subFeedbackRepository = subFeedbackRepository;
+        this.userDataRepository = userDataRepository;
     }
 
     @Override
@@ -42,5 +47,13 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     public List<SubFeedback> findAllFeedback(String feedback) {
         FeedBack byName = feedBackRepository.findByName(feedback);
         return subFeedbackRepository.findAllByFeedBackId(byName.getId());
+    }
+
+    @Override
+    public void saveSubFeedback(String data, BotUser client) {
+        SubFeedback byName = subFeedbackRepository.findByName(data);
+        UserData byUserId = userDataRepository.findByUserId(client.getId());
+        byUserId.setSubFeedbackId(byName.getId());
+        userDataRepository.save(byUserId);
     }
 }

@@ -4,14 +4,12 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
 
-import static uz.gfu.gfu_atvxkb_tg_bot.GfuAtvxkbTgBotApplication.bot;
 
 @Service
 public class UserRoundsServiceImpl implements UserRoundsService {
@@ -19,12 +17,14 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     private final GeneralService generalService;
     private final BuildingService buildingService;
     private final FeedbackService feedbackService;
+    private final SubFeedbackService subFeedbackService;
 
-    public UserRoundsServiceImpl(UserService userService, GeneralService generalService, BuildingService buildingService, FeedbackService feedbackService) {
+    public UserRoundsServiceImpl(UserService userService, GeneralService generalService, BuildingService buildingService, FeedbackService feedbackService, SubFeedbackService subFeedbackService) {
         this.userService = userService;
         this.generalService = generalService;
         this.buildingService = buildingService;
         this.feedbackService = feedbackService;
+        this.subFeedbackService = subFeedbackService;
     }
 
     @Override
@@ -143,17 +143,8 @@ public class UserRoundsServiceImpl implements UserRoundsService {
 
     @Override
     public void getRound10(BotUser client, String data, SendMessage sendMessage) {
-        switch (data) {
-            case BotQuery.ACTIVATION_WINDOWS -> {
-                userService.nextPage(client);
-                sendMessage.setText(ResMessageUz.SUCCESS);
-            }
-            case BotQuery.BACK -> {
-                userService.back(client);
-                sendMessage.setText(ResMessageUz.SERVICE);
-                sendMessage.setReplyMarkup(generalService.getReplyKeyboard(client));
-            }
-        }
+        subFeedbackService.saveSubFeedback(data,client);
+        sendMessage.setText("SUCCESS");
     }
 
     private void back(BotUser currentUser, String msg, SendMessage sendMessage) {

@@ -159,7 +159,7 @@ public class GeneralServiceImpl implements GeneralService {
                 InlineKeyboardButton button = new InlineKeyboardButton();
                 SubFeedback subFeedback = allSubFeedbacks.get(i);
                 button.setText(subFeedback.getName());
-                button.setCallbackData(BotQuery.SUB_FEEDBACK);
+                button.setCallbackData(subFeedback.getName());
                 inlineKeyboardButtonList1.add(button);
                 if (i % 2 != 0) {
                     lists.add(inlineKeyboardButtonList1);
