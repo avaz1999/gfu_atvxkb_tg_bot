@@ -30,9 +30,9 @@ public class BotUser extends BaseEntity {
     private List<FeedBack> feedBacks;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Department department;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Building building;
 
 }

@@ -1,10 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.entitiy;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,11 +16,14 @@ import java.util.List;
 @Data
 @Entity(name = "department")
 public class Department extends BaseEntity {
-        private String name;
-        private String innerPhoneNumber;
-        private String roomNumber;
-        @OneToMany(mappedBy = "department",cascade = CascadeType.ALL)
-        private List<BotUser> userList;
-        @OneToOne
-        private Building building;
+    private String name;
+    private String innerPhoneNumber;
+    private String roomNumber;
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<BotUser> userList;
+    @ManyToMany
+    @JoinTable(name = "building_department",
+            joinColumns = @JoinColumn(name = "department_id"),
+            inverseJoinColumns = @JoinColumn(name = "building_id"))
+    private List<Building> buildings;
 }

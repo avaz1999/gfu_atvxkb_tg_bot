@@ -53,14 +53,13 @@ public class BotServiceImpl implements BotService {
 
         String text = message.getText();
 
-        BotUser currentUser = userService.getCurrentUser( message);
+        BotUser currentUser = userService.getCurrentUser(message);
 
-        switch (text) {
-            case START -> {
-                sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
-                sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
-            }
-            default -> sendMessage.setText(ResMessageUz.CLICK_START);
+        if (text != null && text.equals(START)) {
+            sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
+            sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
+        } else {
+            sendMessage.setText(ResMessageUz.CLICK_START);
         }
 
 

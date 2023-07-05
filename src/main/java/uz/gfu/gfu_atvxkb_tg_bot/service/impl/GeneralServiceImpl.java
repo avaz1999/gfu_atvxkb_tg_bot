@@ -50,15 +50,16 @@ public class GeneralServiceImpl implements GeneralService {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         KeyboardRow row = new KeyboardRow();
+        KeyboardRow rowBack = new KeyboardRow();
 
         switch (user.getCurrentPage()) {
-            case  2 -> {
+            case 2, 4 -> {
                 KeyboardButton button = new KeyboardButton(BotQuery.BACK);
                 row.add(button);
                 keyboardRows.add(row);
                 return replyKeyboardMarkup;
             }
-            case 3 -> {
+            case 3 , 5 -> {
                 List<Building> allBuildings = buildingService.getAllBuildings();
                 for (int i = 0; i < allBuildings.size(); i++) {
                     Building building = allBuildings.get(i);
@@ -70,6 +71,9 @@ public class GeneralServiceImpl implements GeneralService {
                         row = new KeyboardRow();
                     }
                 }
+                KeyboardButton button = new KeyboardButton(BotQuery.BACK);
+                rowBack.add(button);
+                keyboardRows.add(rowBack);
                 return replyKeyboardMarkup;
             }
             case 6 -> {
@@ -77,6 +81,11 @@ public class GeneralServiceImpl implements GeneralService {
                 shareContactButton.setRequestContact(true);
                 row.add(shareContactButton);
                 keyboardRows.add(row);
+
+                KeyboardButton button = new KeyboardButton(BotQuery.BACK);
+                rowBack.add(button);
+                keyboardRows.add(rowBack);
+
                 return replyKeyboardMarkup;
             }
             case 8 -> {
@@ -93,6 +102,23 @@ public class GeneralServiceImpl implements GeneralService {
                 }
                 return replyKeyboardMarkup;
             }
+        }
+        return null;
+    }
+
+    @Override
+    public ReplyKeyboard getBack(BotUser user) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        KeyboardRow row = new KeyboardRow();
+        if (user.getCurrentPage() == 5) {
+            KeyboardButton button = new KeyboardButton(BotQuery.BACK);
+            row.add(button);
+            keyboardRows.add(row);
+            return replyKeyboardMarkup;
         }
         return null;
     }

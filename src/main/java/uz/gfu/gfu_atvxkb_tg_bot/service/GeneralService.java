@@ -5,6 +5,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 public interface GeneralService {
     ReplyKeyboard getReplyKeyboard(BotUser user);
+    ReplyKeyboard getBack(BotUser user);
 
     ReplyKeyboard getInlineKeyboardButton(BotUser currentUser);
 

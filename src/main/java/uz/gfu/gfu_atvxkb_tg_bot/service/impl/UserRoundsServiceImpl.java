@@ -32,19 +32,19 @@ public class UserRoundsServiceImpl implements UserRoundsService {
         switch (data) {
             case BotQuery.UZ_SELECT -> {
                 sendMessage.setText(ResMessageUz.ENTER_LASTNAME);
-                sendMessage.setReplyMarkup(generalService.getReplyKeyboard(client));
             }
             case BotQuery.RU_SELECT -> sendMessage.setText(ResMessageRu.ENTER_LASTNAME);
         }
     }
 
     @Override
+    //Familyasini kiritganda ishlaydi
     public void getRound2(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
-            userService.saveUserLastname(text, userId);
-            userService.nextPage(currentUser);
-            sendMessage.setText(ResMessageUz.ENTER_NAME);
-            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+        userService.saveUserLastname(text, userId);
+        userService.nextPage(currentUser);
+        sendMessage.setText(ResMessageUz.ENTER_NAME);
+        sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
     }
 
     @Override
@@ -78,22 +78,35 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     @Override
     public void getRound5(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
-        userService.saveUserDepartmentName(text, userId);
-        userService.nextPage(currentUser);
-        sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
+        if (text.equalsIgnoreCase(BotQuery.BACK)) {
+            back(currentUser, ResMessageUz.ENTER_BLOCK, sendMessage);
+            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+        } else {
+            userService.saveUserDepartmentName(text, userId);
+            userService.nextPage(currentUser);
+            sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
+            sendMessage.setReplyMarkup(generalService.getBack(currentUser));
+        }
     }
 
     @Override
     public void getRound6(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
-        userService.saveUserRoomNum(text, userId);
-        userService.nextPage(currentUser);
-        sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
-        sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+        if (text.equalsIgnoreCase(BotQuery.BACK)) {
+            back(currentUser, ResMessageUz.ENTER_DEPARTMENT, sendMessage);
+        } else {
+            userService.saveUserRoomNum(text, userId);
+            userService.nextPage(currentUser);
+            sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
+            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
+        }
     }
 
     @Override
     public void getRound7(BotUser currentUser, Message message, SendMessage sendMessage) {
+        if (message.getText() != null && message.getText().equalsIgnoreCase(BotQuery.BACK)) {
+            back(currentUser, ResMessageUz.ENTER_ROOM_NUMBER, sendMessage);
+        }
         if (message.hasContact() && currentUser.getCurrentPage() == 7) {
             Long chatId = message.getChatId();
             try {
