@@ -52,7 +52,7 @@ public class GeneralServiceImpl implements GeneralService {
         KeyboardRow row = new KeyboardRow();
 
         switch (user.getCurrentPage()) {
-            case 2 -> {
+            case  2 -> {
                 KeyboardButton button = new KeyboardButton(BotQuery.BACK);
                 row.add(button);
                 keyboardRows.add(row);
@@ -135,7 +135,7 @@ public class GeneralServiceImpl implements GeneralService {
                 button.setText(subFeedback.getName());
                 button.setCallbackData(BotQuery.SUB_FEEDBACK);
                 inlineKeyboardButtonList1.add(button);
-                if (i % 2 != 0){
+                if (i % 2 != 0) {
                     lists.add(inlineKeyboardButtonList1);
                     inlineKeyboardButtonList1 = new ArrayList<>();
                 }

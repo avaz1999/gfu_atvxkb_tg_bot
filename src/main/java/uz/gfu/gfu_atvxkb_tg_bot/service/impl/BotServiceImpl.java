@@ -53,7 +53,7 @@ public class BotServiceImpl implements BotService {
 
         String text = message.getText();
 
-        BotUser currentUser = userService.getCurrentUser(chatId, message);
+        BotUser currentUser = userService.getCurrentUser( message);
 
         switch (text) {
             case START -> {
@@ -74,8 +74,7 @@ public class BotServiceImpl implements BotService {
     @Override
     public void updateHasCallBackQuery(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
-        Long chatId = callbackQuery.getMessage().getChatId();
-        BotUser currentUser = userService.getCurrentUser(chatId, callbackQuery.getMessage());
+        BotUser currentUser = userService.getCurrentUser(callbackQuery.getMessage());
         clientService.clientHasCallBackQuery(currentUser, callbackQuery);
     }
 }

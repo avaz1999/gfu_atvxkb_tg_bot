@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 public interface UserService {
-    BotUser getCurrentUser(Long chatId, Message message);
+    BotUser getCurrentUser( Message message);
 
     void nextPage(BotUser currentUser);
 

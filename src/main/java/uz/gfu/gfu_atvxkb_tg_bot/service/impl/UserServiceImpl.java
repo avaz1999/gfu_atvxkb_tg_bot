@@ -25,7 +25,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BotUser getCurrentUser(Long chatId, Message message) {
+    public BotUser getCurrentUser( Message message) {
+        Long chatId = message.getChatId();
         for (BotUser user : userRepository.findAll()) {
             if (Objects.equals(user.getChatId(), chatId)) {
                 return user;
