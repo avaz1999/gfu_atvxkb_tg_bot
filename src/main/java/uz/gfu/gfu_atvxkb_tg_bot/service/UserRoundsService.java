@@ -24,4 +24,6 @@ public interface UserRoundsService {
     void getRound9(BotUser user, String text, SendMessage sendMessage);
 
     void getRound10(BotUser user, String text, SendMessage sendMessage);
+
+    void getRound11(BotUser client, String data, SendMessage sendMessage);
 }

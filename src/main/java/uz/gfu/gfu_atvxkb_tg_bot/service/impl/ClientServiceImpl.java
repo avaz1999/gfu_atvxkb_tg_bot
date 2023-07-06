@@ -54,6 +54,7 @@ public class ClientServiceImpl implements ClientService {
             case 1 -> userRoundsService.getRound1(client, data, sendMessage);
             case 8 -> userRoundsService.getRound8(client, data, sendMessage);
             case 10 -> userRoundsService.getRound10(client, data, sendMessage);
+            case 11 -> userRoundsService.getRound11(client, data, sendMessage);
         }
         try {
             sendMessage.setChatId(chatId);

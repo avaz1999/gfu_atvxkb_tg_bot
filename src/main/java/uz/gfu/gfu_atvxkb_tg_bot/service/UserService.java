@@ -28,4 +28,8 @@ public interface UserService {
     BotUser back(BotUser currentUser);
 
     void prev(BotUser currentUser);
+
+    String getUserFeedback(BotUser client);
+
+    void deleteFeedback(BotUser client);
 }

@@ -48,6 +48,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Ismini kiritganda ishlaydi
     public void getRound3(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
         if (text.equalsIgnoreCase(BotQuery.BACK)) {
@@ -61,6 +62,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Blok ini kiritganda iahlaydi
     public void getRound4(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
         if (text.equalsIgnoreCase(BotQuery.BACK)) {
@@ -76,6 +78,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Bo'limini kiritganda ishlaydi
     public void getRound5(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
         if (text.equalsIgnoreCase(BotQuery.BACK)) {
@@ -90,6 +93,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Xona raqamini kiritganda ishlaydi
     public void getRound6(BotUser currentUser, String text, SendMessage sendMessage) {
         Long userId = currentUser.getId();
         if (text.equalsIgnoreCase(BotQuery.BACK)) {
@@ -103,6 +107,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Telefon raqamini kiritganda ishlayd
     public void getRound7(BotUser currentUser, Message message, SendMessage sendMessage) {
         if (message.getText() != null && message.getText().equalsIgnoreCase(BotQuery.BACK)) {
             back(currentUser, ResMessageUz.ENTER_ROOM_NUMBER, sendMessage);
@@ -123,6 +128,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    // Tasdiqlashni bosganda ishlaydi
     public void getRound8(BotUser client, String data, SendMessage sendMessage) {
         switch (data) {
             case BotQuery.DONE -> {
@@ -134,6 +140,7 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Service tanlaganda ishlaydi
     public void getRound9(BotUser currentUser, String text, SendMessage sendMessage) {
         feedbackService.saveFeedback(text, currentUser);
         userService.nextPage(currentUser);
@@ -142,9 +149,23 @@ public class UserRoundsServiceImpl implements UserRoundsService {
     }
 
     @Override
+    //Sub service tanlaganda ishlaydi
     public void getRound10(BotUser client, String data, SendMessage sendMessage) {
-        subFeedbackService.saveSubFeedback(data,client);
-        sendMessage.setText("SUCCESS");
+        subFeedbackService.saveSubFeedback(data, client);
+        sendMessage.setText(ResMessageUz.FEEDBACK + userService.getUserFeedback(client));
+        sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(client));
+    }
+
+    @Override
+    //Tasdiqlshni bosganda ishlaydi
+    public void getRound11(BotUser client, String data, SendMessage sendMessage) {
+        if (data.equalsIgnoreCase(BotQuery.DONE)) {
+            sendMessage.setText(ResMessageUz.SAVE_FEEDBACK);
+            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(client));
+        } else {
+            userService.deleteFeedback(client);
+            sendMessage.setText(ResMessageUz.REMOVE_FEEDBACK);
+        }
     }
 
     private void back(BotUser currentUser, String msg, SendMessage sendMessage) {

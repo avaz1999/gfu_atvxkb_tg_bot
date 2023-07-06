@@ -4,10 +4,8 @@ package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Department;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.DepartmentRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.*;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
@@ -18,10 +16,16 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
+    private final FeedBackRepository feedBackRepository;
+    private final UserDataRepository userDataRepository;
+    private final SubFeedbackRepository subFeedbackRepository;
 
-    public UserServiceImpl(UserRepository userRepository, DepartmentRepository departmentRepository) {
+    public UserServiceImpl(UserRepository userRepository, DepartmentRepository departmentRepository, FeedBackRepository feedBackRepository, UserDataRepository userDataRepository, SubFeedbackRepository subFeedbackRepository) {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
+        this.feedBackRepository = feedBackRepository;
+        this.userDataRepository = userDataRepository;
+        this.subFeedbackRepository = subFeedbackRepository;
     }
 
     @Override
@@ -115,21 +119,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public String showUserData(Long userId, Long chatId) {
-        Optional<BotUser> byId = userRepository.findById(userId);
-        if (byId.isPresent()) {
-            BotUser user = byId.get();
-            return  "ID: " + chatId + "\n" +
-                    "Ism: " + user.getFirstname() + "\n" +
-                    "Familya: " + user.getLastname() + "\n" +
-                    "Bo'lim: " + user.getDepartment().getName() + "\n" +
-                    "Bino: " + user.getBuilding().getName() +
-                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
-                    "Tel Raqam: " + user.getDepartment().getInnerPhoneNumber();
-        }
-        return null;
-    }
 
     @Override
     public void editData(Long userId) {
@@ -167,5 +156,40 @@ public class UserServiceImpl implements UserService {
     public void prev(BotUser currentUser) {
         currentUser.setCurrentPage(currentUser.getCurrentPage() - 1);
         userRepository.save(currentUser);
+    }
+
+    @Override
+    public String showUserData(Long userId, Long chatId) {
+        Optional<BotUser> byId = userRepository.findById(userId);
+        if (byId.isPresent()) {
+            BotUser user = byId.get();
+            return "ID: " + chatId + "\n" +
+                    "Ism: " + user.getFirstname() + "\n" +
+                    "Familya: " + user.getLastname() + "\n" +
+                    "Bo'lim: " + user.getDepartment().getName() + "\n" +
+                    "Bino: " + user.getBuilding().getName() +
+                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
+                    "Tel Raqam: " + user.getDepartment().getInnerPhoneNumber();
+        }
+        return null;
+    }
+
+    @Override
+    public String getUserFeedback(BotUser client) {
+        UserData userData = userDataRepository.findByUserId(client.getId());
+        Optional<FeedBack> feedBackById = feedBackRepository.findById(userData.getFeedbackId());
+        Optional<SubFeedback> subFeedbackById = subFeedbackRepository.findById(userData.getSubFeedbackId());
+        if (feedBackById.isPresent() && subFeedbackById.isPresent()) {
+            FeedBack feedBack = feedBackById.get();
+            SubFeedback subFeedback = subFeedbackById.get();
+            return "Shikoyat Turi: " + feedBack.getName() + "\n" +
+                    "Shikoyat: " + subFeedback.getName();
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteFeedback(BotUser client) {
+        userDataRepository.deleteByUserId(client.getId());
     }
 }

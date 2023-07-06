@@ -59,7 +59,7 @@ public class GeneralServiceImpl implements GeneralService {
                 keyboardRows.add(row);
                 return replyKeyboardMarkup;
             }
-            case 3 , 5 -> {
+            case 3, 5 -> {
                 List<Building> allBuildings = buildingService.getAllBuildings();
                 for (int i = 0; i < allBuildings.size(); i++) {
                     Building building = allBuildings.get(i);
@@ -88,7 +88,7 @@ public class GeneralServiceImpl implements GeneralService {
 
                 return replyKeyboardMarkup;
             }
-            case 8 -> {
+            case 8, 11 -> {
                 List<FeedBack> allFeedback = feedbackService.getAllFeedback();
                 for (int i = 0; i < allFeedback.size(); i++) {
                     FeedBack feedBack = allFeedback.get(i);
