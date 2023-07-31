@@ -10,7 +10,16 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity(name = "buildings")
-public class Building extends BaseEntity {
-    private String name;
+@Entity(name = "histories")
+public class History extends BaseEntity {
+    private Long userId;
+    private Long feedbackId;
+    private Long subFeedbackId;
+    private Long departmentId;
+    private Long buildId;
+
+    public History(Long userId, Long buildId) {
+        this.userId = userId;
+        this.buildId = buildId;
+    }
 }

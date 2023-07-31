@@ -8,7 +8,8 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import java.util.List;
 
 public interface FeedBackRepository extends JpaRepository<FeedBack,Long> {
-    FeedBack findByName(String subTitle);
+    List<FeedBack> findAllByDeletedFalse();
+    FeedBack findByNameAndDeletedFalse(String subTitle);
 
 
 

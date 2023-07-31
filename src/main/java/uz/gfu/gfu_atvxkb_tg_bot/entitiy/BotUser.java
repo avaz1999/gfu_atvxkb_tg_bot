@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class BotUser extends BaseEntity {
     private String phoneNumber;
     private Long chatId;
     private Long editMessageId;
+    @Enumerated(EnumType.STRING)
+    private UserState state;
     private int currentPage = 0;
     private LinkedList<String> messages;
     @ManyToMany
@@ -36,4 +39,11 @@ public class BotUser extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     private Building building;
 
+    public BotUser(String firstName, String lastName, Long chatId, UserState userState, Role role) {
+        this.firstname = firstName;
+        this.lastname = lastName;
+        this.chatId = chatId;
+        this.state = userState;
+        this.role = role;
+    }
 }

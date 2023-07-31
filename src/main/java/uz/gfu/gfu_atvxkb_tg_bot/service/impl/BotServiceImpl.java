@@ -6,11 +6,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
-import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
-
-import static uz.gfu.gfu_atvxkb_tg_bot.GfuAtvxkbTgBotApplication.bot;
 
 @Service
 public class BotServiceImpl implements BotService {
@@ -32,18 +30,18 @@ public class BotServiceImpl implements BotService {
     }
 
     @Override
-    public void updateReceived(Update update) {
+    public void updateReceived(Update update, AbsSender sender) {
         if (update.hasMessage()) {
-            updateHasMessage(update);
+            updateHasMessage(update, sender);
         }
         if (update.hasCallbackQuery()) {
-            updateHasCallBackQuery(update);
+            updateHasCallBackQuery(update,sender);
         }
     }
 
     @SneakyThrows
     @Override
-    public void updateHasMessage(Update update) {
+    public void updateHasMessage(Update update,AbsSender sender) {
         Message message = update.getMessage();
         Long chatId = message.getChatId();
 
@@ -52,28 +50,20 @@ public class BotServiceImpl implements BotService {
 
         String text = message.getText();
 
-        BotUser currentUser = userService.getCurrentUser(chatId, message);
-
-         if (text != null && text.equalsIgnoreCase(START)) {
-            sendMessage.setText(ResMessageUz.HELLO + message.getFrom().getFirstName() + ResMessageUz.CHOOSE_LANG);
-            sendMessage.setReplyMarkup(generalService.getInlineKeyboardButton(currentUser));
-        } else {
-            sendMessage.setText(ResMessageUz.CLICK_START);
-            sendMessage.setReplyMarkup(generalService.getReplyKeyboard(currentUser));
-        }
+        BotUser currentUser = userService.register(chatId, message);
 
         switch (currentUser.getRole()) {
-            case CLIENT -> clientService.clientHasMessage(currentUser, message, text, sendMessage);
+            case CLIENT -> clientService.clientHasMessage(currentUser, message, sendMessage,sender);
             case ADMIN -> adminService.adminHasMessage(currentUser, message, text, sendMessage);
             case SUPER_ADMIN -> superAdminService.superAdminHasMessage(currentUser, message, text, sendMessage);
         }
     }
 
     @Override
-    public void updateHasCallBackQuery(Update update) {
+    public void updateHasCallBackQuery(Update update, AbsSender sender) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         Long chatId = callbackQuery.getMessage().getChatId();
-        BotUser currentUser = userService.getCurrentUser(chatId, callbackQuery.getMessage());
-        clientService.clientHasCallBackQuery(currentUser, callbackQuery);
+        BotUser currentUser = userService.register(chatId, callbackQuery.getMessage());
+        clientService.clientHasCallBackQuery(currentUser, callbackQuery,sender);
     }
 }

@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 public interface UserService {
-    BotUser getCurrentUser(Long chatId, Message message);
+    BotUser register(Long chatId, Message message);
 
     void nextPage(BotUser currentUser);
 
@@ -28,4 +28,10 @@ public interface UserService {
     BotUser back(BotUser currentUser);
 
     void prev(BotUser currentUser);
+
+    void saveState(BotUser client);
+
+    void saveBlock(String text, Long chatId);
+
+    void changStateFeedback(BotUser client);
 }

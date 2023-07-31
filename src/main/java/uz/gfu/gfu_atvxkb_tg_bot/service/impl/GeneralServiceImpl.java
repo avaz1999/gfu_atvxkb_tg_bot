@@ -40,86 +40,6 @@ public class GeneralServiceImpl implements GeneralService {
     }
 
     @Override
-    public ReplyKeyboard getReplyKeyboard(BotUser user) {
-        Optional<BotUser> byId = userRepository.findById(user.getId());
-        if (byId.isEmpty()) {
-            return null;
-        }
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        replyKeyboardMarkup.setKeyboard(keyboardRows);
-        KeyboardRow row = new KeyboardRow();
-        switch (user.getCurrentPage()) {
-            case 0 -> {
-                KeyboardButton start = new KeyboardButton("/start");
-                row.add(start);
-                keyboardRows.add(row);
-            }
-            case 3 -> {
-                List<Building> allBuildings = buildingService.getAllBuildings();
-                for (int i = 0; i < allBuildings.size(); i++) {
-                    Building building = allBuildings.get(i);
-                    KeyboardButton button1 = new KeyboardButton(building.getName());
-                    row.add(button1);
-                    if (i % 2 == 0) {
-                        keyboardRows.add(row);
-                    } else {
-                        row = new KeyboardRow();
-                    }
-                }
-                return replyKeyboardMarkup;
-            }
-            case 6 -> {
-                KeyboardButton shareContactButton = new KeyboardButton("☎ Share contact");
-                shareContactButton.setRequestContact(true);
-                row.add(shareContactButton);
-                keyboardRows.add(row);
-                return replyKeyboardMarkup;
-            }
-            case 8 -> {
-                List<FeedBack> allFeedback = feedbackService.getAllFeedback();
-                for (int i = 0; i < allFeedback.size(); i++) {
-                    FeedBack feedBack = allFeedback.get(i);
-                    KeyboardButton button = new KeyboardButton(feedBack.getName());
-                    row.add(button);
-                    if (i % 2 == 0){
-                        keyboardRows.add(row);
-                    }else {
-                        row = new KeyboardRow();
-                    }
-                }
-                return replyKeyboardMarkup;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public ReplyKeyboard getInlineKeyboardButton(BotUser currentUser) {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
-        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
-        inlineKeyboardMarkup.setKeyboard(lists);
-        switch (currentUser.getCurrentPage()) {
-            case 1 -> {
-                InlineKeyboardButton inlineKeyboardButtonUz = new InlineKeyboardButton();
-                inlineKeyboardButtonUz.setText("\uD83C\uDDFA\uD83C\uDDFF Uz");
-                inlineKeyboardButtonUz.setCallbackData(BotQuery.UZ_SELECT);
-                inlineKeyboardButtonList1.add(inlineKeyboardButtonUz);
-                InlineKeyboardButton inlineKeyboardButtonRus = new InlineKeyboardButton();
-                inlineKeyboardButtonRus.setText("\uD83C\uDDF7\uD83C\uDDFA Ru");
-                inlineKeyboardButtonRus.setCallbackData(BotQuery.RU_SELECT);
-                inlineKeyboardButtonList1.add(inlineKeyboardButtonRus);
-                lists.add(inlineKeyboardButtonList1);
-            }
-            case 7, 10 -> doneAndEdit(inlineKeyboardButtonList1, lists);
-        }
-        return inlineKeyboardMarkup;
-    }
-
-    @Override
     public ReplyKeyboard getInlineKeyboardButtonForService(BotUser currentUser, String text) {
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -147,90 +67,76 @@ public class GeneralServiceImpl implements GeneralService {
             }
             lists.add(inlineKeyboardButtonList1);
 
-//            switch (text) {
-//                case "\uD83C\uDF10 Internet":
-//                    InlineKeyboardButton internetSpeed = new InlineKeyboardButton();
-//                    internetSpeed.setText("⚡️ Tezlik past");
-//                    internetSpeed.setCallbackData(BotQuery.SPEED);
-//                    inlineKeyboardButtonList1.add(internetSpeed);
-//
-//                    InlineKeyboardButton settingInternet = new InlineKeyboardButton();
-//                    settingInternet.setText("\uD83D\uDD27 Ishlamayabti");
-//                    settingInternet.setCallbackData(BotQuery.SETTING);
-//                    inlineKeyboardButtonList1.add(settingInternet);
-//
-//                    InlineKeyboardButton wifi = new InlineKeyboardButton();
-//                    wifi.setText("\uD83D\uDCF6 Wifi");
-//                    wifi.setCallbackData(BotQuery.WIFI);
-//                    inlineKeyboardButtonList2.add(wifi);
-//
-//                    other.setText("\uD83D\uDCCE Boshqa");
-//                    other.setCallbackData(BotQuery.OTHER);
-//                    inlineKeyboardButtonList2.add(other);
-//
-//                    lists.add(inlineKeyboardButtonList1);
-//                    lists.add(inlineKeyboardButtonList2);
-//                    break;
-//                case "\uD83D\uDDA8 Printer":
-//                    InlineKeyboardButton toner = new InlineKeyboardButton();
-//                    toner.setText("\uD83D\uDEE2 Zapravka");
-//                    toner.setCallbackData(BotQuery.ZAPRAVKA);
-//                    inlineKeyboardButtonList1.add(toner);
-//
-//                    InlineKeyboardButton set = new InlineKeyboardButton();
-//                    set.setText("\uD83D\uDCE1 Ulash");
-//                    set.setCallbackData(BotQuery.CONNECT);
-//                    inlineKeyboardButtonList1.add(set);
-//
-//                    InlineKeyboardButton setting = new InlineKeyboardButton();
-//                    setting.setText("\uD83D\uDEE0 Tuzatish");
-//                    setting.setCallbackData(BotQuery.SETTING);
-//                    inlineKeyboardButtonList2.add(setting);
-//
-//                    other.setText("\uD83D\uDCCE Boshqa");
-//                    other.setCallbackData(BotQuery.OTHER);
-//                    inlineKeyboardButtonList2.add(other);
-//
-//                    lists.add(inlineKeyboardButtonList1);
-//                    lists.add(inlineKeyboardButtonList2);
-//                    break;
-//                case "\uD83D\uDDA5 Kompyuter":
-//                    InlineKeyboardButton reinstall = new InlineKeyboardButton();
-//                    reinstall.setText("\uD83D\uDCC0 Pereustanovka");
-//                    reinstall.setCallbackData(BotQuery.REINSTALL);
-//                    inlineKeyboardButtonList1.add(reinstall);
-//
-//                    InlineKeyboardButton diagnostic = new InlineKeyboardButton();
-//                    diagnostic.setText("⚙️ Diagnostika");
-//                    diagnostic.setCallbackData(BotQuery.DIAGNOSTIC);
-//                    inlineKeyboardButtonList1.add(diagnostic);
-//
-//                    InlineKeyboardButton activationWindows = new InlineKeyboardButton();
-//                    activationWindows.setText("\uD83D\uDCBB Activatsiya Windows");
-//                    activationWindows.setCallbackData(BotQuery.ACTIVATION_WINDOWS);
-//                    inlineKeyboardButtonList2.add(activationWindows);
-//
-//                    InlineKeyboardButton activationOffice = new InlineKeyboardButton();
-//                    activationOffice.setText("\uD83D\uDCC2 Activatsiya Office");
-//                    activationOffice.setCallbackData(BotQuery.ACTIVATION_OFFICE);
-//                    inlineKeyboardButtonList2.add(activationOffice);
-//
-//                    other.setText("\uD83D\uDCCE Boshqa");
-//                    other.setCallbackData(BotQuery.OTHER);
-//                    inlineKeyboardButtonList2.add(other);
-//
-//
-//                    lists.add(inlineKeyboardButtonList1);
-//                    lists.add(inlineKeyboardButtonList2);
-//                    break;
-//                case "☎\uFE0F Telefon":
-//
-//            }
         }
         return inlineKeyboardMarkup;
     }
 
-    private static void doneAndEdit(List<InlineKeyboardButton> inlineKeyboardButtonList, List<List<InlineKeyboardButton>> lists) {
+    @Override
+    public ReplyKeyboard getChooseLang() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        inlineKeyboardMarkup.setKeyboard(lists);
+
+        InlineKeyboardButton uz = new InlineKeyboardButton();
+        uz.setText("\uD83C\uDDFA\uD83C\uDDFF Uz");
+        uz.setCallbackData(BotQuery.UZ_SELECT);
+        row.add(uz);
+
+        InlineKeyboardButton rus = new InlineKeyboardButton();
+        rus.setText("\uD83C\uDDF7\uD83C\uDDFA Ru");
+        rus.setCallbackData(BotQuery.RU_SELECT);
+        row.add(rus);
+        lists.add(row);
+        return inlineKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard getBlock() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        KeyboardRow row = new KeyboardRow();
+
+        List<Building> allBuildings = buildingService.getAllBuildings();
+        for (int i = 0; i < allBuildings.size(); i++) {
+            Building building = allBuildings.get(i);
+            KeyboardButton button1 = new KeyboardButton(building.getName());
+            row.add(button1);
+            if (i % 2 == 0) {
+                keyboardRows.add(row);
+            } else {
+                row = new KeyboardRow();
+            }
+        }
+        return replyKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard getPhoneNumber() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        KeyboardRow keyboardRow = new KeyboardRow();
+        KeyboardButton sharePhoneNumberButton = new KeyboardButton("☎️ Share Phone Number");
+        sharePhoneNumberButton.setRequestContact(true);
+        keyboardRow.add(sharePhoneNumberButton);
+
+        keyboardRows.add(keyboardRow);
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+
+        return replyKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard getRegisterDone() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<InlineKeyboardButton> inlineKeyboardButtonList = new ArrayList<>();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        inlineKeyboardMarkup.setKeyboard(lists);
         InlineKeyboardButton inlineKeyboardButtonSave = new InlineKeyboardButton();
         inlineKeyboardButtonSave.setText("✅ Tasdiqlash");
         inlineKeyboardButtonSave.setCallbackData(BotQuery.DONE);
@@ -241,6 +147,51 @@ public class GeneralServiceImpl implements GeneralService {
         inlineKeyboardButtonCancel.setCallbackData(BotQuery.EDIT);
         inlineKeyboardButtonList.add(inlineKeyboardButtonCancel);
         lists.add(inlineKeyboardButtonList);
+        return inlineKeyboardMarkup;
     }
+
+    @Override
+    public ReplyKeyboard getFeedbacks() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        KeyboardRow row = new KeyboardRow();
+        List<FeedBack> allFeedback = feedbackService.getAllFeedback();
+        for (int i = 0; i < allFeedback.size(); i++) {
+            FeedBack feedBack = allFeedback.get(i);
+            KeyboardButton button = new KeyboardButton(feedBack.getName());
+            row.add(button);
+            if (i % 2 == 0){
+                keyboardRows.add(row);
+            }else {
+                row = new KeyboardRow();
+            }
+        }
+        return replyKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard getSubFeedbacks(String text) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
+        inlineKeyboardMarkup.setKeyboard(lists);
+        List<SubFeedback> allSubFeedbacks = subFeedbackService.findAllFeedback(text);
+        for (int i = 0; i < allSubFeedbacks.size(); i++) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            SubFeedback subFeedback = allSubFeedbacks.get(i);
+            button.setText(subFeedback.getName());
+            button.setCallbackData(subFeedback.getName());
+            inlineKeyboardButtonList1.add(button);
+            if (i % 2 != 0) {
+                lists.add(inlineKeyboardButtonList1);
+                inlineKeyboardButtonList1 = new ArrayList<>();
+            }
+        }
+        return inlineKeyboardMarkup;
+    }
+
 
 }
