@@ -26,7 +26,6 @@ public class BotUser extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserState state;
     private int currentPage = 0;
-    private LinkedList<String> messages;
     @ManyToMany
     @JoinTable(name = "users_feedbacks",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -34,9 +33,9 @@ public class BotUser extends BaseEntity {
     private List<FeedBack> feedBacks;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Department department;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Building building;
 
     public BotUser(String firstName, String lastName, Long chatId, UserState userState, Role role) {
