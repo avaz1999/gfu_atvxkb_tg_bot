@@ -10,6 +10,7 @@ import java.util.List;
 public interface FeedBackRepository extends JpaRepository<FeedBack,Long> {
     List<FeedBack> findAllByDeletedFalse();
     FeedBack findByNameAndDeletedFalse(String subTitle);
+    FeedBack findByIdAndDeletedFalse(Long id);
 
 
 

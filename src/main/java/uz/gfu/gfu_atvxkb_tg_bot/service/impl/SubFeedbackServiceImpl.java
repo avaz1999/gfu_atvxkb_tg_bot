@@ -4,8 +4,10 @@ import org.springframework.stereotype.Service;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.History;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.HistoryRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
@@ -18,11 +20,13 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
     private final SubFeedbackRepository subFeedbackRepository;
+    private final HistoryRepository historyRepository;
 
-    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository) {
+    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, HistoryRepository historyRepository) {
         this.feedBackRepository = feedBackRepository;
         this.userRepository = userRepository;
         this.subFeedbackRepository = subFeedbackRepository;
+        this.historyRepository = historyRepository;
     }
 
     @Override
@@ -56,7 +60,11 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         if (user != null) {
             SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
             if (subFeedback != null) {
-
+                History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+                if (history != null) {
+                    history.setSubFeedbackId(subFeedback.getId());
+                    historyRepository.save(history);
+                }
             }
         }
     }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface SubFeedbackRepository extends JpaRepository<SubFeedback,Long> {
     List<SubFeedback> findAllByFeedBackIdAndDeletedFalse(Long feedbackId);
     SubFeedback findByNameAndDeletedFalse(String name);
+    SubFeedback findByIdAndDeletedFalse(Long id);
 }

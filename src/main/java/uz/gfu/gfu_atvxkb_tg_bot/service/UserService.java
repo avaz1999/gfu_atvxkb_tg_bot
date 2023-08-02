@@ -34,4 +34,6 @@ public interface UserService {
     void saveBlock(String text, Long chatId);
 
     void changStateFeedback(BotUser client);
+
+    String doneService(BotUser client);
 }

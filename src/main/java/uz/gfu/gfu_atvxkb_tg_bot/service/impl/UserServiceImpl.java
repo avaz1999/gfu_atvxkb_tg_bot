@@ -4,15 +4,9 @@ package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Department;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.History;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.BuildingRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.DepartmentRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.HistoryRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
@@ -24,13 +18,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final BuildingRepository buildingRepository;
-    private final HistoryRepository historiyRepository;
+    private final HistoryRepository historyRepository;
+    private final FeedBackRepository feedBackRepository;
+    private final SubFeedbackRepository subFeedbackRepository;
 
-    public UserServiceImpl(UserRepository userRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository) {
+    public UserServiceImpl(UserRepository userRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository) {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.buildingRepository = buildingRepository;
-        this.historiyRepository = historyRepository;
+        this.historyRepository = historyRepository;
+        this.feedBackRepository = feedBackRepository;
+        this.subFeedbackRepository = subFeedbackRepository;
     }
 
     @Override
@@ -79,12 +77,12 @@ public class UserServiceImpl implements UserService {
     public void saveBlock(String text, Long chatId) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
         Building byName = buildingRepository.findByName(text);
-        if (byName!= null) {
+        if (byName != null) {
             user.setState(UserState.GET_DEPARTMENT);
             userRepository.save(user);
         }
         assert byName != null;
-        historiyRepository.save(new History(user.getId(),byName.getId()));
+        historyRepository.save(new History(user.getId(), byName.getId()));
     }
 
     @Override
@@ -92,6 +90,16 @@ public class UserServiceImpl implements UserService {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
         user.setState(UserState.GET_FEEDBACK);
         userRepository.save(user);
+    }
+
+    @Override
+    public String doneService(BotUser client) {
+        BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
+        History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
+        FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
+        SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
+        return "Ariza beruvchi: "+ user.getFirstname() + " "+user.getLastname() != null ? user.getLastname() : " "+"\n" +
+                "Xizmat turi:";
     }
 
     @Override
@@ -114,8 +122,6 @@ public class UserServiceImpl implements UserService {
         user.setState(UserState.SHARE_PHONE_NUMBER);
         departmentRepository.save(department);
         userRepository.save(user);
-
-
     }
 
     @Override
@@ -136,7 +142,7 @@ public class UserServiceImpl implements UserService {
                 "Ism: " + user.getFirstname() + "\n" +
                 "Familya: " + user.getLastname() + "\n" +
                 "Bo'lim: " + user.getDepartment().getName() + "\n" +
-//                    "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
+                "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
                 "Tel Raqam: " + user.getDepartment().getInnerPhoneNumber();
 
     }

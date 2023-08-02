@@ -152,7 +152,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void stateSubFeedback(String data, SendMessage sendMessage, BotUser client) {
-        subFeedbackService.saveSubFeedback(data,client);
+        subFeedbackService.saveSubFeedback(data, client);
+        sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.doneService(client));
+        sendMessage.setReplyMarkup(generalService.getRegisterDone());
     }
 
 }
