@@ -40,4 +40,6 @@ public interface UserService {
     String clientShowFeedback(BotUser client);
 
     List<BotUser> getAllAdmins();
+
+    void changeStateGetFeedback(BotUser client);
 }

@@ -5,5 +5,6 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 
 public interface BuildingRepository extends JpaRepository<Building, Long> {
     Building findByName(String name);
+    Building findByIdAndDeletedFalse(Long id);
     boolean existsByName(String name);
 }

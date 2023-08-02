@@ -7,9 +7,9 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 public interface AdminService {
-    void adminHasMessage(BotUser admin, Message message, SendMessage sendMessage);
+    void adminHasMessage(BotUser admin, String message, SendMessage sendMessage,AbsSender sender);
     void adminHasCallBackQuery(BotUser admin, CallbackQuery callbackQuery);
-    void shareAdminMessage(String message,Long chatId,SendMessage sendMessage);
+    void shareAdminMessage(String message,Long chatId,SendMessage sendMessage,AbsSender sender);
 
     void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender);
 }

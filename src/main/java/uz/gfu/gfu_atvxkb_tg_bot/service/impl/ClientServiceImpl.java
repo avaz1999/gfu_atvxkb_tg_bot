@@ -65,13 +65,14 @@ public class ClientServiceImpl implements ClientService {
             case BotQuery.UZ_SELECT -> sendMessage.setText(ResMessageUz.ENTER_LASTNAME);
             case BotQuery.RU_SELECT -> sendMessage.setText(ResMessageRu.ENTER_LASTNAME);
         }
-        if (client.getState().equals(UserState.REGISTER_DONE)) {
+        if (client.getState().equals(UserState.REGISTER_DONE) ||
+                client.getState().equals(UserState.SAVE_SUB_FEEDBACK)) {
             switch (data) {
-                case BotQuery.DONE -> stateDone(callbackQuery, sendMessage, client);
+                case BotQuery.DONE -> stateDone(callbackQuery, sendMessage, client,sender);
                 case BotQuery.EDIT -> stateEdit(callbackQuery, sendMessage, client);
             }
         }
-        if (data != null &&client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
+        if (client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
             stateSubFeedback(data, sendMessage, client);
         }
         try {
@@ -135,14 +136,17 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateDone(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client) {
-        if (client.getState() == UserState.GET_SUB_FEEDBACK){
+    public void stateDone(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client,AbsSender sender) {
+        if (client.getState() == UserState.SAVE_SUB_FEEDBACK) {
+            String message = userService.clientShowFeedback(client);
+            for (BotUser admins : userService.getAllAdmins()) {
+                adminService.adminHasMessage(admins,message,sendMessage,sender);
+            }
+            userService.changeStateGetFeedback(client);
             sendMessage.setText(ResMessageUz.SUCCESS);
             sendMessage.setReplyMarkup(generalService.getFeedbacks());
-            for (BotUser admins : userService.getAllAdmins()) {
-                adminService.adminHasMessage(admins,callbackQuery.getMessage(),sendMessage );
-            }
-        }else {
+            sendMessage.setChatId(client.getChatId());
+        } else {
             sendMessage.setText(ResMessageUz.DONE);
             sendMessage.setReplyMarkup(generalService.getFeedbacks());
             userService.changStateFeedback(client);

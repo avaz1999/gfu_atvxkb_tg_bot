@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private final SubFeedbackRepository subFeedbackRepository;
     private final DepartmentRepository departmentRepository;
     private final BuildingRepository buildingRepository;
-    private final HistoryRepository historiyRepository;
+    private final HistoryRepository historyRepository;
 
     public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository) {
         this.userRepository = userRepository;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
         this.subFeedbackRepository = subFeedbackRepository;
         this.departmentRepository = departmentRepository;
         this.buildingRepository = buildingRepository;
-        this.historiyRepository = historyRepository;
+        this.historyRepository = historyRepository;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
         assert byName != null;
-        historiyRepository.save(new History(user.getId(), byName.getId()));
+        historyRepository.save(new History(user.getId(), byName.getId()));
     }
 
     @Override
@@ -94,17 +94,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String clientShowFeedback(BotUser client) {
-        History history = historiyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+        History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
         FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
         SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
+        Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
+        Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
         return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() +"\n" +
+                "<b>Bino: </b>"+ building.getName()+"\n"+
+                "<b>Bo'lim: </b>"+ department.getName()+"\n"+
+                "<b>Xona: </b>"+ department.getRoomNumber()+"\n"+
                 "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
                 "<b>Muammo: </b>" + subFeedback.getName();
     }
 
     @Override
     public List<BotUser> getAllAdmins() {
-        return userRepository.findAllByRoleAndDeletedFalse("ADMIN");
+        return userRepository.findAllByRoleAndDeletedFalse(Role.ADMIN);
+    }
+
+    @Override
+    public void changeStateGetFeedback(BotUser client) {
+        BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
+        user.setState(UserState.GET_FEEDBACK);
+        userRepository.save(user);
     }
 
     @Override
@@ -115,6 +127,9 @@ public class UserServiceImpl implements UserService {
         Department saveDepartment = departmentRepository.save(department);
         user.setDepartment(saveDepartment);
         user.setState(UserState.GET_ROOM_NUM);
+        History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
+        history.setDepartmentId(saveDepartment.getId());
+        historyRepository.save(history);
         userRepository.save(user);
     }
 

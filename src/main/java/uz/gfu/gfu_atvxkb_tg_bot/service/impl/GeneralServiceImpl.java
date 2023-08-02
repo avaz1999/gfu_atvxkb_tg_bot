@@ -161,23 +161,46 @@ public class GeneralServiceImpl implements GeneralService {
     @Override
     public ReplyKeyboard serviceDone() {
         Result result = getResult();
-        result.inlineKeyboardButtonSave().setText("✅ Bajarildi");
-        result.inlineKeyboardButtonSave().setCallbackData(BotQuery.ADMIN_DONE);
-        result.inlineKeyboardButtonList().add(result.inlineKeyboardButtonSave());
 
+        // "Bajarildi" tugmasini yaratish
+        InlineKeyboardButton inlineKeyboardButtonSave = new InlineKeyboardButton();
+        inlineKeyboardButtonSave.setText("✅ Bajarildi");
+        inlineKeyboardButtonSave.setCallbackData(BotQuery.ADMIN_DONE);
+        result.inlineKeyboardButtonList().add(inlineKeyboardButtonSave);
+
+        // "Bajarilmadi" tugmasini yaratish
         InlineKeyboardButton inlineKeyboardButtonCancel = new InlineKeyboardButton();
         inlineKeyboardButtonCancel.setText("❌ Bajarilmadi");
         inlineKeyboardButtonCancel.setCallbackData(BotQuery.ADMIN_FAILED);
         result.inlineKeyboardButtonList().add(inlineKeyboardButtonCancel);
+
+        // Buttonlar ro'yxatini "lists" ga qo'shish
         result.lists().add(result.inlineKeyboardButtonList());
 
+        // "Bajarilmoqda" tugmasini yangi qator (pastga) qo'shish
         InlineKeyboardButton inlineKeyboardButtonInProcess = new InlineKeyboardButton();
         inlineKeyboardButtonInProcess.setText("⚠️ Bajarilmoqda");
         inlineKeyboardButtonInProcess.setCallbackData(BotQuery.ADMIN_IN_PROCESS);
-        result.inlineKeyboardButtonList().add(inlineKeyboardButtonInProcess);
-        result.lists().add(result.inlineKeyboardButtonList());
+
+        // "Bajarilmoqda" tugmasini alohida qator (pastga) qo'shish
+        List<InlineKeyboardButton> inProcessRow = new ArrayList<>();
+        inProcessRow.add(inlineKeyboardButtonInProcess);
+        result.lists().add(inProcessRow);
+
+        // "Bajarildi" tugmasini "Save" deb yangilab olish
+        result.inlineKeyboardButtonSave().setText("✅ Bajarildi");
+        result.inlineKeyboardButtonSave().setCallbackData(BotQuery.ADMIN_DONE);
+
         return result.inlineKeyboardMarkup();
     }
+
+// getResult() va Result klasslarini oldin bir xil qoldirish mumkin
+
+// ...
+
+    private record Result(InlineKeyboardMarkup inlineKeyboardMarkup, List<InlineKeyboardButton> inlineKeyboardButtonList, List<List<InlineKeyboardButton>> lists, InlineKeyboardButton inlineKeyboardButtonSave) {
+    }
+
 
     private static Result getResult() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -188,8 +211,7 @@ public class GeneralServiceImpl implements GeneralService {
         return new Result(inlineKeyboardMarkup, inlineKeyboardButtonList, lists, inlineKeyboardButtonSave);
     }
 
-    private record Result(InlineKeyboardMarkup inlineKeyboardMarkup, List<InlineKeyboardButton> inlineKeyboardButtonList, List<List<InlineKeyboardButton>> lists, InlineKeyboardButton inlineKeyboardButtonSave) {
-    }
+
 
 
 }

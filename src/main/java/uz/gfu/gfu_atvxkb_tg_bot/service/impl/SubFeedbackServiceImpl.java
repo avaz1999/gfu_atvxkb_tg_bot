@@ -6,6 +6,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.History;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.HistoryRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
@@ -64,6 +65,8 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
                 if (history != null) {
                     history.setSubFeedbackId(subFeedback.getId());
                     historyRepository.save(history);
+                    user.setState(UserState.SAVE_SUB_FEEDBACK);
+                    userRepository.save(user);
                 }
             }
         }

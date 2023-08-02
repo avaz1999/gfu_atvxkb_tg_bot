@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import uz.gfu.gfu_atvxkb_tg_bot.bot.Bot;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.service.AdminService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
@@ -22,9 +23,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void adminHasMessage(BotUser admin, Message message, SendMessage sendMessage) {
+    public void adminHasMessage(BotUser admin, String message, SendMessage sendMessage,AbsSender sender) {
         switch (admin.getState()) {
-            case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message.getText(),admin.getChatId(),sendMessage);
+            case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message,admin.getChatId(),sendMessage,sender);
         }
     }
 
@@ -34,15 +35,20 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void shareAdminMessage(String message,Long chatId,SendMessage sendMessage) {
+    public void shareAdminMessage(String message,Long chatId,SendMessage sendMessage,AbsSender sender) {
         sendMessage.setText(message);
-        sendMessage.setChatId(chatId);
         sendMessage.setReplyMarkup(generalService.serviceDone());
+        sendMessage.setChatId(chatId);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender) {
-        adminHasMessage(currentUser,message,sendMessage);
+        adminHasMessage(currentUser,message.getText(),sendMessage,sender);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

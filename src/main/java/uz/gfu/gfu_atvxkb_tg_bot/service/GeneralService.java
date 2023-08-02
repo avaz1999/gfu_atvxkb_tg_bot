@@ -18,4 +18,5 @@ public interface GeneralService {
     ReplyKeyboard getSubFeedbacks(String text);
 
     ReplyKeyboard serviceDone();
+
 }

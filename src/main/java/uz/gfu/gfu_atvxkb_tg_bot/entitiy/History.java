@@ -16,6 +16,7 @@ public class History extends BaseEntity {
     private Long feedbackId;
     private Long subFeedbackId;
     private Long buildId;
+    private Long departmentId;
     private Boolean finished = false;
 
     public History(Long userId, Long buildId) {
