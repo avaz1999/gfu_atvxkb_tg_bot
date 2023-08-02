@@ -4,7 +4,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 public interface GeneralService {
-    ReplyKeyboard getInlineKeyboardButtonForService(BotUser currentUser, String text);
 
     ReplyKeyboard getChooseLang();
 
@@ -18,4 +17,5 @@ public interface GeneralService {
 
     ReplyKeyboard getSubFeedbacks(String text);
 
+    ReplyKeyboard serviceDone();
 }

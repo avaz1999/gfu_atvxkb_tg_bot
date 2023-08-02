@@ -40,38 +40,6 @@ public class GeneralServiceImpl implements GeneralService {
     }
 
     @Override
-    public ReplyKeyboard getInlineKeyboardButtonForService(BotUser currentUser, String text) {
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
-        List<InlineKeyboardButton> inlineKeyboardButtonList2 = new ArrayList<>();
-        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
-        inlineKeyboardMarkup.setKeyboard(lists);
-        if (currentUser.getCurrentPage() == 9) {
-            InlineKeyboardButton other = new InlineKeyboardButton();
-            InlineKeyboardButton back = new InlineKeyboardButton();
-            back.setText("◀️ Back");
-            back.setCallbackData(BotQuery.BACK);
-            inlineKeyboardButtonList2.add(back);
-            List<SubFeedback> allSubFeedbacks = subFeedbackService.findAllFeedback(text);
-            for (int i = 0; i < allSubFeedbacks.size(); i++) {
-                SubFeedback subFeedback = allSubFeedbacks.get(i);
-                InlineKeyboardButton button = new InlineKeyboardButton();
-                button.setText(subFeedback.getName());
-                button.setCallbackData(BotQuery.SUB_FEEDBACK);
-                if (i % 2 ==0){
-                    inlineKeyboardButtonList1.add(button);
-                }else {
-                    inlineKeyboardButtonList1 = new ArrayList<>();
-                }
-            }
-            lists.add(inlineKeyboardButtonList1);
-
-        }
-        return inlineKeyboardMarkup;
-    }
-
-    @Override
     public ReplyKeyboard getChooseLang() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
@@ -133,21 +101,18 @@ public class GeneralServiceImpl implements GeneralService {
 
     @Override
     public ReplyKeyboard getRegisterDone() {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<InlineKeyboardButton> inlineKeyboardButtonList = new ArrayList<>();
-        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
-        inlineKeyboardMarkup.setKeyboard(lists);
-        InlineKeyboardButton inlineKeyboardButtonSave = new InlineKeyboardButton();
-        inlineKeyboardButtonSave.setText("✅ Tasdiqlash");
-        inlineKeyboardButtonSave.setCallbackData(BotQuery.DONE);
-        inlineKeyboardButtonList.add(inlineKeyboardButtonSave);
+        Result result = getResult();
+        result.inlineKeyboardButtonSave().setText("✅ Tasdiqlash");
+        result.inlineKeyboardButtonSave().setCallbackData(BotQuery.DONE);
+        result.inlineKeyboardButtonList().add(result.inlineKeyboardButtonSave());
 
         InlineKeyboardButton inlineKeyboardButtonCancel = new InlineKeyboardButton();
         inlineKeyboardButtonCancel.setText("❌ Tahrirlash");
         inlineKeyboardButtonCancel.setCallbackData(BotQuery.EDIT);
-        inlineKeyboardButtonList.add(inlineKeyboardButtonCancel);
-        lists.add(inlineKeyboardButtonList);
-        return inlineKeyboardMarkup;
+        result.inlineKeyboardButtonList().add(inlineKeyboardButtonCancel);
+        result.lists().add(result.inlineKeyboardButtonList());
+
+        return result.inlineKeyboardMarkup;
     }
 
     @Override
@@ -191,6 +156,39 @@ public class GeneralServiceImpl implements GeneralService {
             }
         }
         return inlineKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard serviceDone() {
+        Result result = getResult();
+        result.inlineKeyboardButtonSave().setText("✅ Bajarildi");
+        result.inlineKeyboardButtonSave().setCallbackData(BotQuery.ADMIN_DONE);
+        result.inlineKeyboardButtonList().add(result.inlineKeyboardButtonSave());
+
+        InlineKeyboardButton inlineKeyboardButtonCancel = new InlineKeyboardButton();
+        inlineKeyboardButtonCancel.setText("❌ Bajarilmadi");
+        inlineKeyboardButtonCancel.setCallbackData(BotQuery.ADMIN_FAILED);
+        result.inlineKeyboardButtonList().add(inlineKeyboardButtonCancel);
+        result.lists().add(result.inlineKeyboardButtonList());
+
+        InlineKeyboardButton inlineKeyboardButtonInProcess = new InlineKeyboardButton();
+        inlineKeyboardButtonInProcess.setText("⚠️ Bajarilmoqda");
+        inlineKeyboardButtonInProcess.setCallbackData(BotQuery.ADMIN_IN_PROCESS);
+        result.inlineKeyboardButtonList().add(inlineKeyboardButtonInProcess);
+        result.lists().add(result.inlineKeyboardButtonList());
+        return result.inlineKeyboardMarkup();
+    }
+
+    private static Result getResult() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<InlineKeyboardButton> inlineKeyboardButtonList = new ArrayList<>();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        inlineKeyboardMarkup.setKeyboard(lists);
+        InlineKeyboardButton inlineKeyboardButtonSave = new InlineKeyboardButton();
+        return new Result(inlineKeyboardMarkup, inlineKeyboardButtonList, lists, inlineKeyboardButtonSave);
+    }
+
+    private record Result(InlineKeyboardMarkup inlineKeyboardMarkup, List<InlineKeyboardButton> inlineKeyboardButtonList, List<List<InlineKeyboardButton>> lists, InlineKeyboardButton inlineKeyboardButtonSave) {
     }
 
 

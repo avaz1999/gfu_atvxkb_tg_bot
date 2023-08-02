@@ -4,6 +4,8 @@ import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
+import java.util.List;
+
 public interface UserService {
     BotUser register(Long chatId, Message message);
 
@@ -35,5 +37,7 @@ public interface UserService {
 
     void changStateFeedback(BotUser client);
 
-    String doneService(BotUser client);
+    String clientShowFeedback(BotUser client);
+
+    List<BotUser> getAllAdmins();
 }

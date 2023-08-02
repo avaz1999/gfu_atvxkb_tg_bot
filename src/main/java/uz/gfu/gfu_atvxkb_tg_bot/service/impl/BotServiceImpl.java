@@ -54,7 +54,7 @@ public class BotServiceImpl implements BotService {
 
         switch (currentUser.getRole()) {
             case CLIENT -> clientService.clientHasMessage(currentUser, message, sendMessage,sender);
-            case ADMIN -> adminService.adminHasMessage(currentUser, message, text, sendMessage);
+            case ADMIN -> adminService.callAdminService(currentUser, message, sendMessage,sender);
             case SUPER_ADMIN -> superAdminService.superAdminHasMessage(currentUser, message, text, sendMessage);
         }
     }

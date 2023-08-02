@@ -9,7 +9,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 public interface ClientService {
     void clientHasMessage(BotUser client, Message message, SendMessage sendMessage, AbsSender sender);
     void clientHasCallBackQuery(BotUser client, CallbackQuery callbackQuery,AbsSender sender);
-    void stateStart(String text,SendMessage sendMessage,BotUser client);
+    void stateStart(Message message,SendMessage sendMessage,BotUser client);
     void stateLastName(Message message, SendMessage sendMessage, BotUser client);
     void stateName(Message message, SendMessage sendMessage, BotUser client);
     void stateBlock(Message message, SendMessage sendMessage, BotUser client);

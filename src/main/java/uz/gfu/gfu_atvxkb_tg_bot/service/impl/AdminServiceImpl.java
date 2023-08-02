@@ -4,17 +4,49 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.service.AdminService;
+import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
+import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
+
 @Service
 public class AdminServiceImpl implements AdminService {
-    @Override
-    public void adminHasMessage(BotUser admin, Message message, String text, SendMessage sendMessage) {
+    private final UserService userService;
+    private final GeneralService generalService;
 
+    public AdminServiceImpl(UserService userService, GeneralService generalService) {
+        this.userService = userService;
+        this.generalService = generalService;
+    }
+
+    @Override
+    public void adminHasMessage(BotUser admin, Message message, SendMessage sendMessage) {
+        switch (admin.getState()) {
+            case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message.getText(),admin.getChatId(),sendMessage);
+        }
     }
 
     @Override
     public void adminHasCallBackQuery(BotUser admin, CallbackQuery callbackQuery) {
 
+    }
+
+    @Override
+    public void shareAdminMessage(String message,Long chatId,SendMessage sendMessage) {
+        sendMessage.setText(message);
+        sendMessage.setChatId(chatId);
+        sendMessage.setReplyMarkup(generalService.serviceDone());
+    }
+
+    @Override
+    public void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender) {
+        adminHasMessage(currentUser,message,sendMessage);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

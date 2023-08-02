@@ -12,5 +12,6 @@ public enum UserState {
     BLOCK,
     GET_ROOM_NUM,
     REGISTER_DONE,
-    GET_FEEDBACK
+    GET_FEEDBACK,
+    ADMIN_FOR_FEEDBACK
 }

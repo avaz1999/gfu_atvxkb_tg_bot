@@ -21,20 +21,23 @@ public class ClientServiceImpl implements ClientService {
     private final GeneralService generalService;
     private final FeedbackService feedbackService;
     private final SubFeedbackService subFeedbackService;
+    private final AdminService adminService;
     private final BuildingService buildingService;
 
-    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, SubFeedbackService subFeedbackService, BuildingService buildingService) {
+    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, SubFeedbackService subFeedbackService, AdminService adminService, BuildingService buildingService) {
         this.userService = userService;
         this.generalService = generalService;
         this.feedbackService = feedbackService;
         this.subFeedbackService = subFeedbackService;
+        this.adminService = adminService;
         this.buildingService = buildingService;
     }
 
     @Override
     public void clientHasMessage(BotUser client, Message message, SendMessage sendMessage, AbsSender sender) {
+        sendMessage.enableHtml(true);
         switch (client.getState()) {
-            case START -> stateStart(message.getText(), sendMessage, client);
+            case START -> stateStart(message, sendMessage, client);
             case LAST_NAME -> stateLastName(message, sendMessage, client);
             case NAME -> stateName(message, sendMessage, client);
             case BLOCK -> stateBlock(message, sendMessage, client);
@@ -68,7 +71,7 @@ public class ClientServiceImpl implements ClientService {
                 case BotQuery.EDIT -> stateEdit(callbackQuery, sendMessage, client);
             }
         }
-        if (client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
+        if (data != null &&client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
             stateSubFeedback(data, sendMessage, client);
         }
         try {
@@ -79,8 +82,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateStart(String text, SendMessage sendMessage, BotUser client) {
-        if (text != null && text.equalsIgnoreCase(START)) {
+    public void stateStart(Message message, SendMessage sendMessage, BotUser client) {
+        if (message.getText() != null && message.getText().equalsIgnoreCase(START)) {
             userService.saveState(client);
             sendMessage.setText(ResMessageUz.START);
             sendMessage.setReplyMarkup(generalService.getChooseLang());
@@ -125,6 +128,7 @@ public class ClientServiceImpl implements ClientService {
     public void statePhoneNumber(Message message, SendMessage sendMessage, BotUser client) {
         Contact contact = message.getContact();
         userService.saveUserPhoneNumber(contact, client.getChatId());
+        sendMessage.enableHtml(true);
         sendMessage.setText(ResMessageUz.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
         sendMessage.setReplyMarkup(generalService.getRegisterDone());
         sendMessage.setChatId(client.getChatId());
@@ -132,9 +136,17 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void stateDone(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client) {
-        sendMessage.setText(ResMessageUz.DONE);
-        sendMessage.setReplyMarkup(generalService.getFeedbacks());
-        userService.changStateFeedback(client);
+        if (client.getState() == UserState.GET_SUB_FEEDBACK){
+            sendMessage.setText(ResMessageUz.SUCCESS);
+            sendMessage.setReplyMarkup(generalService.getFeedbacks());
+            for (BotUser admins : userService.getAllAdmins()) {
+                adminService.adminHasMessage(admins,callbackQuery.getMessage(),sendMessage );
+            }
+        }else {
+            sendMessage.setText(ResMessageUz.DONE);
+            sendMessage.setReplyMarkup(generalService.getFeedbacks());
+            userService.changStateFeedback(client);
+        }
     }
 
     @Override
@@ -153,7 +165,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void stateSubFeedback(String data, SendMessage sendMessage, BotUser client) {
         subFeedbackService.saveSubFeedback(data, client);
-        sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.doneService(client));
+        sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client));
         sendMessage.setReplyMarkup(generalService.getRegisterDone());
     }
 

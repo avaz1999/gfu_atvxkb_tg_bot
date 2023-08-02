@@ -16,19 +16,19 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final DepartmentRepository departmentRepository;
-    private final BuildingRepository buildingRepository;
-    private final HistoryRepository historyRepository;
     private final FeedBackRepository feedBackRepository;
     private final SubFeedbackRepository subFeedbackRepository;
+    private final DepartmentRepository departmentRepository;
+    private final BuildingRepository buildingRepository;
+    private final HistoryRepository historiyRepository;
 
-    public UserServiceImpl(UserRepository userRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository) {
+    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository) {
         this.userRepository = userRepository;
-        this.departmentRepository = departmentRepository;
-        this.buildingRepository = buildingRepository;
-        this.historyRepository = historyRepository;
         this.feedBackRepository = feedBackRepository;
         this.subFeedbackRepository = subFeedbackRepository;
+        this.departmentRepository = departmentRepository;
+        this.buildingRepository = buildingRepository;
+        this.historiyRepository = historyRepository;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
         assert byName != null;
-        historyRepository.save(new History(user.getId(), byName.getId()));
+        historiyRepository.save(new History(user.getId(), byName.getId()));
     }
 
     @Override
@@ -93,13 +93,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String doneService(BotUser client) {
-        BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
-        History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
+    public String clientShowFeedback(BotUser client) {
+        History history = historiyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
         FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
         SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
-        return "Ariza beruvchi: "+ user.getFirstname() + " "+user.getLastname() != null ? user.getLastname() : " "+"\n" +
-                "Xizmat turi:";
+        return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() +"\n" +
+                "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
+                "<b>Muammo: </b>" + subFeedback.getName();
+    }
+
+    @Override
+    public List<BotUser> getAllAdmins() {
+        return userRepository.findAllByRoleAndDeletedFalse("ADMIN");
     }
 
     @Override
@@ -138,12 +143,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public String showUserData(Long userId, Long chatId) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
-        return "ID: " + chatId + "\n" +
-                "Ism: " + user.getFirstname() + "\n" +
-                "Familya: " + user.getLastname() + "\n" +
-                "Bo'lim: " + user.getDepartment().getName() + "\n" +
-                "Xona: " + user.getDepartment().getRoomNumber() + "\n" +
-                "Tel Raqam: " + user.getDepartment().getInnerPhoneNumber();
+        return "<b>ID</b>: " + chatId + "\n" +
+                "<b>Ism:</b> " + user.getFirstname() + "\n" +
+                "<b>Familya:</b> " + user.getLastname() + "\n" +
+                "<b>Bo'lim: </b>" + user.getDepartment().getName() + "\n" +
+                "<b>Xona: </b>" + user.getDepartment().getRoomNumber() + "\n" +
+                "<b>Tel Raqam: </b>" + user.getDepartment().getInnerPhoneNumber();
 
     }
 

@@ -21,4 +21,7 @@ public interface BotQuery {
     String TELEPHONE = "☎\uFE0F Telefon";
     String OTHER = "\uD83D\uDCCE Boshqa";
     String SUB_FEEDBACK = "SUB_FEEDBACK";
+    String ADMIN_IN_PROCESS = "ADMIN_IN_PROCESS";
+    String ADMIN_FAILED = "ADMIN_FAILED";
+    String ADMIN_DONE = "ADMIN_DONE";
 }
