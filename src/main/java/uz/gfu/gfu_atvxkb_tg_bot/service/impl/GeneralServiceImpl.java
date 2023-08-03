@@ -123,7 +123,7 @@ public class GeneralServiceImpl implements GeneralService {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         KeyboardRow menu = new KeyboardRow();
-        KeyboardButton menuButton = new KeyboardButton("❗️ XIZMAT TURINI TANLANG");
+        KeyboardButton menuButton = new KeyboardButton(BotQuery.GET_SERVICE);
         menu.add(menuButton);
         keyboardRows.add(menu);
         KeyboardRow row = new KeyboardRow();

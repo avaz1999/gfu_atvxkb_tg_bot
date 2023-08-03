@@ -22,4 +22,8 @@ public interface ResMessageUz {
     String CLICK_START = "<b>Iltimos /start bosing </b>";
     String ENTER_BLOCK = "<b>Blokizi tanlang</b>";
     String DONE_SERVICE = "<b>Hammasi o'z o'rnida bo'lsa tasdiqlash tugmasini bosing\n</b>";
+    String OTHER_PHONE_NUMBER = "<b>Boshqa foydalanuvchini telefon raqamini kirita olmaysiz</b>";
+    String ERROR_CHOOSE_LANG = "<b>Xato xabar kiritdingiz! Tilni Tanlang\n" +
+            "Вы ввели неверное сообщение! Выберите язык</b>";
+    String ERROR_BUILD_NAME = "<b>Kiritilgan bino  topilmadi</b>";
 }

@@ -1,6 +1,6 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service;
 
-import org.telegram.telegrambots.meta.api.objects.Contact;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface UserService {
     BotUser register(Long chatId, Message message);
-
-    void nextPage(BotUser currentUser);
 
     void saveUserLastname(String text, Long chatId);
 
@@ -19,21 +17,14 @@ public interface UserService {
 
     void saveUserRoomNum(String text, Long userId);
 
-    void saveUserPhoneNumber(Contact contact, Long userId);
+    void saveUserPhoneNumber(String contact, Long userId);
 
     String showUserData(Long userId,Long chatId);
 
-    void editData(Long userId);
-
-    void saveUserMessages(String text, Long chatId);
-
-    BotUser back(BotUser currentUser);
-
-    void prev(BotUser currentUser);
 
     void saveState(BotUser client);
 
-    void saveBlock(String text, Long chatId);
+    void saveBlock(String text, Long chatId, SendMessage sendMessage);
 
     void changStateFeedback(BotUser client);
 
@@ -42,4 +33,6 @@ public interface UserService {
     List<BotUser> getAllAdmins();
 
     void changeStateGetFeedback(BotUser client);
+
+    void saveLang(BotUser client, String data);
 }

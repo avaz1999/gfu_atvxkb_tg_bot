@@ -5,23 +5,8 @@ public interface BotQuery {
     String RU_SELECT = "RU_SELECT";
     String DONE = "DONE";
     String EDIT = "EDIT";
-    String WIFI = "WIFI";
-    String SETTING = "SETTING";
-    String SPEED = "SPEED";
-    String ZAPRAVKA = "ZAPRAVKA";
-    String CONNECT = "CONNECT";
-    String REINSTALL = "REINSTALL";
-    String DIAGNOSTIC = "DIAGNOSTIC";
-    String ACTIVATION_WINDOWS = "ACTIVATION_WINDOWS";
-    String ACTIVATION_OFFICE = "ACTIVATION_OFFICE";
-    String BACK = "BACK";
-    String INTERNET = "\uD83C\uDF10 Internet";
-    String PRINTER = "\uD83D\uDDA8 Printer";
-    String COMPUTER = "\uD83D\uDDA5 Kompyuter";
-    String TELEPHONE = "☎\uFE0F Telefon";
-    String OTHER = "\uD83D\uDCCE Boshqa";
-    String SUB_FEEDBACK = "SUB_FEEDBACK";
     String ADMIN_IN_PROCESS = "ADMIN_IN_PROCESS";
     String ADMIN_FAILED = "ADMIN_FAILED";
     String ADMIN_DONE = "ADMIN_DONE";
+    String GET_SERVICE = "❗️ XIZMAT TURINI TANLANG";
 }

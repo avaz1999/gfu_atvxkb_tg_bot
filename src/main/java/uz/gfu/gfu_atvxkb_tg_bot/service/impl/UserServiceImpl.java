@@ -2,12 +2,16 @@ package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.Contact;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
+import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
 import java.util.*;
@@ -21,14 +25,16 @@ public class UserServiceImpl implements UserService {
     private final DepartmentRepository departmentRepository;
     private final BuildingRepository buildingRepository;
     private final HistoryRepository historyRepository;
+    private final GeneralService generalService;
 
-    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository) {
+    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository, GeneralService generalService) {
         this.userRepository = userRepository;
         this.feedBackRepository = feedBackRepository;
         this.subFeedbackRepository = subFeedbackRepository;
         this.departmentRepository = departmentRepository;
         this.buildingRepository = buildingRepository;
         this.historyRepository = historyRepository;
+        this.generalService = generalService;
     }
 
     @Override
@@ -40,17 +46,6 @@ public class UserServiceImpl implements UserService {
             String lastName = message.getFrom().getLastName() != null ? message.getFrom().getLastName() : " ";
             BotUser newUser = new BotUser(firstName, lastName, chatId, UserState.START, Role.CLIENT);
             return userRepository.save(newUser);
-        }
-    }
-
-
-    @Override
-    public void nextPage(BotUser currentUser) {
-        Optional<BotUser> byId = userRepository.findById(currentUser.getId());
-        if (byId.isPresent()) {
-            BotUser user = byId.get();
-            user.setCurrentPage(currentUser.getCurrentPage() + 1);
-            userRepository.save(user);
         }
     }
 
@@ -74,15 +69,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveBlock(String text, Long chatId) {
+    public void saveBlock(String text, Long chatId, SendMessage sendMessage) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
         Building byName = buildingRepository.findByName(text);
-        if (byName != null) {
+        sendMessage.setChatId(user.getChatId());
+        if (byName == null) {
+            if (user.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.ERROR_BUILD_NAME);
+            else sendMessage.setChatId(ResMessageRu.ERROR_BUILD_NAME);
+            sendMessage.setReplyMarkup(generalService.getBlock());
+        } else {
             user.setState(UserState.GET_DEPARTMENT);
             userRepository.save(user);
+            sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+            historyRepository.save(new History(user.getId(), byName.getId()));
         }
-        assert byName != null;
-        historyRepository.save(new History(user.getId(), byName.getId()));
     }
 
     @Override
@@ -99,10 +100,10 @@ public class UserServiceImpl implements UserService {
         SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
         Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
         Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
-        return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() +"\n" +
-                "<b>Bino: </b>"+ building.getName()+"\n"+
-                "<b>Bo'lim: </b>"+ department.getName()+"\n"+
-                "<b>Xona: </b>"+ department.getRoomNumber()+"\n"+
+        return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Bino: </b>" + building.getName() + "\n" +
+                "<b>Bo'lim: </b>" + department.getName() + "\n" +
+                "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
                 "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
                 "<b>Muammo: </b>" + subFeedback.getName();
     }
@@ -117,6 +118,13 @@ public class UserServiceImpl implements UserService {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
         user.setState(UserState.GET_FEEDBACK);
         userRepository.save(user);
+    }
+
+    @Override
+    public void saveLang(BotUser client, String data) {
+        client.setState(UserState.LAST_NAME);
+        client.setLanguage(data);
+        userRepository.save(client);
     }
 
     @Override
@@ -145,12 +153,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUserPhoneNumber(Contact contact, Long chatId) {
+    public void saveUserPhoneNumber(String contact, Long chatId) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
         Department department = departmentRepository.findByIdAndDeletedFalse(user.getDepartment().getId());
-        user.setPhoneNumber(contact.getPhoneNumber());
+        user.setPhoneNumber(contact);
         user.setState(UserState.REGISTER_DONE);
-        department.setInnerPhoneNumber(contact.getPhoneNumber());
+        department.setInnerPhoneNumber(contact);
         departmentRepository.save(department);
         userRepository.save(user);
     }
@@ -168,47 +176,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editData(Long userId) {
-        Optional<BotUser> byId = userRepository.findById(userId);
-        if (byId.isPresent()) {
-            BotUser user = byId.get();
-            user.setCurrentPage(1);
-            userRepository.save(user);
-        }
-    }
-
-    @Override
-    public void saveUserMessages(String text, Long chatId) {
-        LinkedList<String> messages = new LinkedList<>();
-        messages.add(text);
-        Optional<BotUser> byId = userRepository.findById(chatId);
-        if (byId.isPresent()) {
-            BotUser user = byId.get();
-//            user.setMessages(messages);
-            userRepository.save(user);
-        }
-    }
-
-    @Override
-    public BotUser back(BotUser currentUser) {
-        Optional<BotUser> byId = userRepository.findById(currentUser.getId());
-        if (byId.isPresent()) {
-            BotUser user = byId.get();
-            user.setCurrentPage(currentUser.getCurrentPage() - 2);
-            return userRepository.save(user);
-        }
-        return null;
-    }
-
-    @Override
-    public void prev(BotUser currentUser) {
-        currentUser.setCurrentPage(currentUser.getCurrentPage() - 1);
-        userRepository.save(currentUser);
-    }
-
-    @Override
     public void saveState(BotUser client) {
-        client.setState(UserState.LAST_NAME);
+        client.setState(UserState.CHOOSE_LANG);
         userRepository.save(client);
     }
 
