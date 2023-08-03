@@ -122,6 +122,10 @@ public class GeneralServiceImpl implements GeneralService {
         replyKeyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         replyKeyboardMarkup.setKeyboard(keyboardRows);
+        KeyboardRow menu = new KeyboardRow();
+        KeyboardButton menuButton = new KeyboardButton("❗️ XIZMAT TURINI TANLANG");
+        menu.add(menuButton);
+        keyboardRows.add(menu);
         KeyboardRow row = new KeyboardRow();
         List<FeedBack> allFeedback = feedbackService.getAllFeedback();
         for (int i = 0; i < allFeedback.size(); i++) {
