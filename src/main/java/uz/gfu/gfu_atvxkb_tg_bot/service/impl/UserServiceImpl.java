@@ -1,6 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final DepartmentRepository departmentRepository;
     private final BuildingRepository buildingRepository;
     private final HistoryRepository historyRepository;
+    @Lazy
     private final GeneralService generalService;
 
     public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository, GeneralService generalService) {
@@ -76,12 +78,17 @@ public class UserServiceImpl implements UserService {
         if (byName == null) {
             if (user.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_BUILD_NAME);
-            else sendMessage.setChatId(ResMessageRu.ERROR_BUILD_NAME);
+            else{
+                sendMessage.setText(ResMessageRu.ERROR_BUILD_NAME);
+            }
+            sendMessage.setChatId(chatId);
             sendMessage.setReplyMarkup(generalService.getBlock());
         } else {
             user.setState(UserState.GET_DEPARTMENT);
             userRepository.save(user);
-            sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+            if (user.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
+            else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ENTER_DEPARTMENT);
             historyRepository.save(new History(user.getId(), byName.getId()));
         }
     }
@@ -100,12 +107,22 @@ public class UserServiceImpl implements UserService {
         SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
         Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
         Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
-        return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-                "<b>Bino: </b>" + building.getName() + "\n" +
-                "<b>Bo'lim: </b>" + department.getName() + "\n" +
-                "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
-                "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
-                "<b>Muammo: </b>" + subFeedback.getName();
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
+            return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                    "<b>Bino: </b>" + building.getName() + "\n" +
+                    "<b>Bo'lim: </b>" + department.getName() + "\n" +
+                    "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
+                    "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
+                    "<b>Muammo: </b>" + subFeedback.getName();
+        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+            return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                    "<b>Здание: </b>" + building.getName() + "\n" +
+                    "<b>Отделение: </b>" + department.getName() + "\n" +
+                    "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
+                    "<b>Тип Заявка: </b>" + feedback.getName() + "\n" +
+                    "<b>Проблема: </b>" + subFeedback.getName();
+        }
+        return "ERROR";
     }
 
     @Override
@@ -166,12 +183,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public String showUserData(Long userId, Long chatId) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
-        return "<b>ID</b>: " + chatId + "\n" +
-                "<b>Ism:</b> " + user.getFirstname() + "\n" +
-                "<b>Familya:</b> " + user.getLastname() + "\n" +
-                "<b>Bo'lim: </b>" + user.getDepartment().getName() + "\n" +
-                "<b>Xona: </b>" + user.getDepartment().getRoomNumber() + "\n" +
-                "<b>Tel Raqam: </b>" + user.getDepartment().getInnerPhoneNumber();
+        if (user.getLanguage().equals(BotQuery.UZ_SELECT)) {
+            return "<b>ID</b>: " + chatId + "\n" +
+                    "<b>Ism:</b> " + user.getFirstname() + "\n" +
+                    "<b>Familya:</b> " + user.getLastname() + "\n" +
+                    "<b>Bo'lim: </b>" + user.getDepartment().getName() + "\n" +
+                    "<b>Xona: </b>" + user.getDepartment().getRoomNumber() + "\n" +
+                    "<b>Tel Raqam: </b>" + user.getDepartment().getInnerPhoneNumber();
+        } else
+            return "<b>ID</b>: " + chatId + "\n" +
+                    "<b>Имя:</b> " + user.getFirstname() + "\n" +
+                    "<b>Фамиля:</b> " + user.getLastname() + "\n" +
+                    "<b>Отдель: </b>" + user.getDepartment().getName() + "\n" +
+                    "<b>Комната: </b>" + user.getDepartment().getRoomNumber() + "\n" +
+                    "<b>Тел. номер: </b>" + user.getDepartment().getInnerPhoneNumber();
 
     }
 

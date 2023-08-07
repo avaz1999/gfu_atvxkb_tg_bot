@@ -11,9 +11,9 @@ public interface GeneralService {
 
     ReplyKeyboard getPhoneNumber();
 
-    ReplyKeyboard getRegisterDone();
+    ReplyKeyboard getRegisterDone(BotUser client);
 
-    ReplyKeyboard getFeedbacks();
+    ReplyKeyboard getFeedbacks(BotUser client);
 
     ReplyKeyboard getSubFeedbacks(String text);
 

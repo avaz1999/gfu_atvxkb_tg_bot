@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import uz.gfu.gfu_atvxkb_tg_bot.bot.Bot;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
@@ -82,8 +83,8 @@ public class ClientServiceImpl implements ClientService {
         sendMessage.setChatId(chatId.toString());
 
         switch (data) {
-            case BotQuery.UZ_SELECT -> uzSelect(client, data, sendMessage);
-            case BotQuery.RU_SELECT -> ruSelect(client, data, sendMessage);
+            case BotQuery.UZ_SELECT -> uzSelect(client, data, sendMessage,sender);
+            case BotQuery.RU_SELECT -> ruSelect(client, data, sendMessage,sender);
         }
         if (client.getState().equals(UserState.REGISTER_DONE) ||
                 client.getState().equals(UserState.SAVE_SUB_FEEDBACK)) {
@@ -95,6 +96,11 @@ public class ClientServiceImpl implements ClientService {
         if (client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
             stateSubFeedback(data, sendMessage, client,sender);
         }
+    }
+
+    private void ruSelect(BotUser client, String data, SendMessage sendMessage, AbsSender sender) {
+        userService.saveLang(client, data);
+        sendMessage.setText(ResMessageRu.ENTER_LASTNAME);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -102,14 +108,14 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-    private void ruSelect(BotUser client, String data, SendMessage sendMessage) {
-        userService.saveLang(client, data);
-        sendMessage.setText(ResMessageRu.ENTER_LASTNAME);
-    }
-
-    private void uzSelect(BotUser client, String data, SendMessage sendMessage) {
+    private void uzSelect(BotUser client, String data, SendMessage sendMessage, AbsSender sender) {
         userService.saveLang(client, data);
         sendMessage.setText(ResMessageUz.ENTER_LASTNAME);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -130,8 +136,12 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void stateLastName(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
+            sendMessage.setText(ResMessageUz.ENTER_NAME);
+        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+            sendMessage.setText(ResMessageRu.ENTER_NAME);
+        }
         userService.saveUserLastname(message.getText(), client.getChatId());
-        sendMessage.setText(ResMessageUz.ENTER_NAME);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -141,8 +151,12 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void stateName(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
+            sendMessage.setText(ResMessageUz.ENTER_BLOCK);
+        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+            sendMessage.setText(ResMessageRu.ENTER_BLOCK);
+        }
         userService.saveUserFirstname(message.getText(), client.getChatId());
-        sendMessage.setText(ResMessageUz.ENTER_BLOCK);
         sendMessage.setReplyMarkup(generalService.getBlock());
         try {
             sender.execute(sendMessage);
@@ -164,7 +178,8 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void stateDepartment(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
         userService.saveUserDepartmentName(message.getText(), client.getChatId());
-        sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
+        else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.ENTER_ROOM_NUMBER);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -175,7 +190,8 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void stateRoomNumber(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
         userService.saveUserRoomNum(message.getText(), client.getChatId());
-        sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
+        if(client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
+        else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.ENTER_PHONE_NUMBER);
         sendMessage.setReplyMarkup(generalService.getPhoneNumber());
         try {
             sender.execute(sendMessage);
@@ -192,8 +208,7 @@ public class ClientServiceImpl implements ClientService {
         sendMessage.setChatId(client.getChatId());
         if (message.hasContact()){
             userService.saveUserPhoneNumber(contact.getPhoneNumber(), client.getChatId());
-            sendMessage.setText(ResMessageUz.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
-            sendMessage.setReplyMarkup(generalService.getRegisterDone());
+            sharePhoneNumberForLang(sendMessage, client);
         }else if (!checkPhoneNumber(message.getText()) ||
                 !phoneNumber.startsWith("+998") ||
                 !phoneNumber.startsWith("998") ||
@@ -207,13 +222,22 @@ public class ClientServiceImpl implements ClientService {
             else sendMessage.setText(ResMessageRu.OTHER_PHONE_NUMBER);
         }else {
             userService.saveUserPhoneNumber(phoneNumber, client.getChatId());
-            sendMessage.setText(ResMessageUz.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
-            sendMessage.setReplyMarkup(generalService.getRegisterDone());
+            sharePhoneNumberForLang(sendMessage, client);
         }
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void sharePhoneNumberForLang(SendMessage sendMessage, BotUser client) {
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
+            sendMessage.setText(ResMessageUz.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
+            sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+            sendMessage.setText(ResMessageRu.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
+            sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
         }
     }
 
@@ -237,11 +261,11 @@ public class ClientServiceImpl implements ClientService {
             }
             userService.changeStateGetFeedback(client);
             sendMessage.setText(ResMessageUz.SUCCESS);
-            sendMessage.setReplyMarkup(generalService.getFeedbacks());
+            sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             sendMessage.setChatId(client.getChatId());
         } else {
             sendMessage.setText(ResMessageUz.DONE);
-            sendMessage.setReplyMarkup(generalService.getFeedbacks());
+            sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             userService.changStateFeedback(client);
         }
         try {
@@ -259,21 +283,35 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void stateFeedback(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
         if (message.getText().equals(BotQuery.GET_SERVICE)) {
-            sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-            sendMessage.setReplyMarkup(generalService.getFeedbacks());
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
+                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
+                sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+            }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+                sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
+                sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+            }
         } else {
             feedbackService.saveFeedback(message.getText(), client);
             sendMessage.setChatId(client.getChatId().toString());
-            sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
             sendMessage.setReplyMarkup(generalService.getSubFeedbacks(message.getText()));
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void stateSubFeedback(String data, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        subFeedbackService.saveSubFeedback(data, client);
-        sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client));
-        sendMessage.setReplyMarkup(generalService.getRegisterDone());
+        subFeedbackService.saveSubFeedback(data, client,sendMessage);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

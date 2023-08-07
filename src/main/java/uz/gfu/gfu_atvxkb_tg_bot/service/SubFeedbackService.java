@@ -1,5 +1,6 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
@@ -10,5 +11,5 @@ public interface SubFeedbackService {
     String addFeedback(SubFeedDto dto);
     List<SubFeedback> findAllFeedback(String feedback);
 
-    void saveSubFeedback(String data, BotUser client);
+    void saveSubFeedback(String data, BotUser client, SendMessage sendMessage);
 }

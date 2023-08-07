@@ -41,8 +41,11 @@ public class FeedbackServiceImpl implements FeedbackService {
         historyRepository.save(history);
     }
 
-    public List<FeedBack> getAllFeedback(){
-        return feedBackRepository.findAllByDeletedFalse();
+    public List<FeedBack> getAllFeedbackUZ(){
+        return feedBackRepository.findAllByLangFalseAndDeletedFalse();
+    }
+    public List<FeedBack> getAllFeedbackRU(){
+        return feedBackRepository.findAllByLangTrueAndDeletedFalse();
     }
     @Override
     public String showFeedback(BotUser currentUser) {

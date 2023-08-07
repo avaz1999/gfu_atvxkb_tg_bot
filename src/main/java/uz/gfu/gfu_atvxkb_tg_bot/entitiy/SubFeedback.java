@@ -14,6 +14,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @Entity(name = "sub_feedback")
 public class SubFeedback extends BaseEntity {
     private String name;
+    private boolean lang = false;  // default uz
     @ManyToOne
     private FeedBack feedBack;
 }

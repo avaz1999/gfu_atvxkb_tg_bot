@@ -1,17 +1,25 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.History;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.HistoryRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
+import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +30,10 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final UserRepository userRepository;
     private final SubFeedbackRepository subFeedbackRepository;
     private final HistoryRepository historyRepository;
+    @Autowired @Lazy
+    UserService userService;
+    @Autowired @Lazy
+     GeneralService generalService;
 
     public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, HistoryRepository historyRepository) {
         this.feedBackRepository = feedBackRepository;
@@ -56,7 +68,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     }
 
     @Override
-    public void saveSubFeedback(String data, BotUser client) {
+    public void saveSubFeedback(String data, BotUser client, SendMessage sendMessage) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
         if (user != null) {
             SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
@@ -67,6 +79,13 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
                     historyRepository.save(history);
                     user.setState(UserState.SAVE_SUB_FEEDBACK);
                     userRepository.save(user);
+                    if (user.getLanguage().equals(BotQuery.UZ_SELECT)) {
+                        sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client));
+                        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+                    } else if (user.getLanguage().equals(BotQuery.RU_SELECT)) {
+                        sendMessage.setText(ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client));
+                        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+                    }
                 }
             }
         }

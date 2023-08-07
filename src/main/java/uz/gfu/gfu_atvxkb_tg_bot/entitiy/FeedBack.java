@@ -19,6 +19,7 @@ import java.util.List;
 @Entity(name = "feedbacks")
 public class FeedBack extends BaseEntity {
     private String name;
+    private boolean lang = false; // default uz
     @OneToMany(mappedBy = "feedBack",cascade = CascadeType.ALL)
     private List<SubFeedback> subFeedbacks;
 
