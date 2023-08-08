@@ -49,7 +49,20 @@ public class ClientServiceImpl implements ClientService {
             case GET_ROOM_NUM -> stateRoomNumber(message, sendMessage, client,sender);
             case SHARE_PHONE_NUMBER -> statePhoneNumber(message, sendMessage, client,sender);
             case GET_FEEDBACK -> stateFeedback(message, sendMessage, client,sender);
+            case GET_SUB_FEEDBACK -> stateTextSubFeedback(client,message,sendMessage,sender);
             case REGISTER_DONE -> stateRegisterDone(sendMessage,client,sender);
+        }
+    }
+
+    private void stateTextSubFeedback(BotUser client,Message message, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ERROR_SERVICE);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_SERVICE);
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -192,7 +205,7 @@ public class ClientServiceImpl implements ClientService {
         userService.saveUserRoomNum(message.getText(), client.getChatId());
         if(client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
         else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.ENTER_PHONE_NUMBER);
-        sendMessage.setReplyMarkup(generalService.getPhoneNumber());
+        sendMessage.setReplyMarkup(generalService.getPhoneNumber(client));
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -210,17 +223,11 @@ public class ClientServiceImpl implements ClientService {
             userService.saveUserPhoneNumber(contact.getPhoneNumber(), client.getChatId());
             sharePhoneNumberForLang(sendMessage, client);
         }else if (!checkPhoneNumber(message.getText()) ||
-                !phoneNumber.startsWith("+998") ||
-                !phoneNumber.startsWith("998") ||
-                (phoneNumber.length() != 12)) {
+                !phoneNumber.startsWith("+998") || phoneNumber.length()!=13) {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
-        }else if (!Objects.equals(client.getFirstname(), message.getFrom().getFirstName())){
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.OTHER_PHONE_NUMBER);
-            else sendMessage.setText(ResMessageRu.OTHER_PHONE_NUMBER);
-        }else {
+        } else {
             userService.saveUserPhoneNumber(phoneNumber, client.getChatId());
             sharePhoneNumberForLang(sendMessage, client);
         }
@@ -260,11 +267,13 @@ public class ClientServiceImpl implements ClientService {
                 adminService.adminHasMessage(admins, message, sendMessage, sender);
             }
             userService.changeStateGetFeedback(client);
-            sendMessage.setText(ResMessageUz.SUCCESS);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.SUCCESS);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.SUCCESS);
             sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             sendMessage.setChatId(client.getChatId());
         } else {
-            sendMessage.setText(ResMessageUz.DONE);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.DONE);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.DONE);
             sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             userService.changStateFeedback(client);
         }
@@ -291,11 +300,7 @@ public class ClientServiceImpl implements ClientService {
                 sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             }
         } else {
-            feedbackService.saveFeedback(message.getText(), client);
-            sendMessage.setChatId(client.getChatId().toString());
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
-            sendMessage.setReplyMarkup(generalService.getSubFeedbacks(message.getText()));
+            feedbackService.saveFeedback(message.getText(), client,sendMessage);
         }
         try {
             sender.execute(sendMessage);

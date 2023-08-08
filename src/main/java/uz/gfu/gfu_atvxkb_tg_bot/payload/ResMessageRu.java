@@ -15,6 +15,12 @@ public interface ResMessageRu {
     String CHOOSE_SERVICE = "<b>Выберите одну из услуг\n"+
             "Если вашей проблемы нет в списке\n" +
             "Щелкните Другое:</b>";
-    String DONE_SERVICE = "<b>Hammasi o'z o'rnida bo'lsa tasdiqlash tugmasini bosing</b>\n\n";
+    String DONE_SERVICE = "<b>Если все на месте, нажмите кнопку подтверждения</b>\n\n";
+    String ERROR_SERVICE ="Вы выбрали неверный тип услуги" ;
+    String DONE = "<b>Постановка на учет\n" +
+            "Успешно завершено ✅\n" +
+            "Выберите тип услуги</b>";
+    String SUCCESS = "<b>Успешное завершение ✅\n Наши сотрудники свяжутся с вами \uD83D\uDC68\u200D\uD83D\uDCBB\n" +
+            "Если вы хотите отправить запрос повторно, \nВыберите один из Сервисов \uD83D\uDCC3</b>";
 }
 

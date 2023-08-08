@@ -14,7 +14,8 @@ public interface ResMessageUz {
     String ENTER_LASTNAME = "<b>Iltimos familyangizni kiriting</b>";
     String DONE = "<b>Ro'yhatdan o'tish \nMuvofaqiyatli yakunalndi ✅ \nXizmat turini  tanlang</b>";
     String EDIT = "<b>Qaytadan kiriting</b>";
-    String SUCCESS = "<b>Muvofaqiyatli amalga oshdi\n</b>";
+    String SUCCESS = "<b>Muvofaqiyatli amalga oshdi ✅\nXodimlarimiz siz bilan siz bilan bog'lanadi \uD83D\uDC68\u200D\uD83D\uDCBB\n" +
+            "Agar yana so'rov yubormoqchi bo'lsangiz \nServiclardan birini tanlang \uD83D\uDCC3</b>";
     String SERVICE = "<b>Servislardan birini tanlang\n\nAgar bu yerda muamongiz ko'rsatilmagan bo'lsa\n\nBoshqa: tugmasini bosing</b>";
     String HELLO = "<b>Assalomu aleykum </b>\n";
     String CHOOSE_LANG = "<b>\nBotga xush kelibsiz\nIltimos tilni tanlang</b>";
@@ -26,4 +27,5 @@ public interface ResMessageUz {
     String ERROR_CHOOSE_LANG = "<b>Xato xabar kiritdingiz! Tilni Tanlang\n" +
             "Вы ввели неверное сообщение! Выберите язык</b>";
     String ERROR_BUILD_NAME = "<b>Kiritilgan bino  topilmadi</b>";
+    String ERROR_SERVICE = "Xato xizmat turini tanldiz";
 }

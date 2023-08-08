@@ -78,20 +78,30 @@ public class GeneralServiceImpl implements GeneralService {
     }
 
     @Override
-    public ReplyKeyboard getPhoneNumber() {
+    public ReplyKeyboard getPhoneNumber(BotUser client) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboardRows = new ArrayList<>();
-        KeyboardRow keyboardRow = new KeyboardRow();
-        KeyboardButton sharePhoneNumberButton = new KeyboardButton("☎️ Share Phone Number");
-        sharePhoneNumberButton.setRequestContact(true);
-        keyboardRow.add(sharePhoneNumberButton);
+        KeyboardRow keyboardRow = getSharePhoneKeyBoardButton(client);
 
         keyboardRows.add(keyboardRow);
         replyKeyboardMarkup.setKeyboard(keyboardRows);
 
         return replyKeyboardMarkup;
+    }
+
+    private static KeyboardRow getSharePhoneKeyBoardButton(BotUser client) {
+        KeyboardRow keyboardRow = new KeyboardRow();
+        KeyboardButton sharePhoneNumberButton = new KeyboardButton();
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
+            sharePhoneNumberButton.setText("☎️ Telefon raqam ulashish");
+        } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
+            sharePhoneNumberButton.setText("☎️ Поделитесь номером телефона");
+        }
+        sharePhoneNumberButton.setRequestContact(true);
+        keyboardRow.add(sharePhoneNumberButton);
+        return keyboardRow;
     }
 
     @Override
@@ -130,7 +140,12 @@ public class GeneralServiceImpl implements GeneralService {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         KeyboardRow menu = new KeyboardRow();
-        KeyboardButton menuButton = new KeyboardButton(BotQuery.GET_SERVICE);
+        KeyboardButton menuButton = new KeyboardButton();
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
+            menuButton.setText(BotQuery.GET_SERVICE);
+        } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
+            menuButton.setText(BotQuery.GET_SERVICE_RU);
+        }
         menu.add(menuButton);
         keyboardRows.add(menu);
         KeyboardRow row = new KeyboardRow();
@@ -217,6 +232,11 @@ public class GeneralServiceImpl implements GeneralService {
         result.inlineKeyboardButtonSave().setCallbackData(BotQuery.ADMIN_DONE);
 
         return result.inlineKeyboardMarkup();
+    }
+
+    @Override
+    public ReplyKeyboard getSettingForSuperAdmin(BotUser superAdmin) {
+        return null;
     }
 
 // getResult() va Result klasslarini oldin bir xil qoldirish mumkin

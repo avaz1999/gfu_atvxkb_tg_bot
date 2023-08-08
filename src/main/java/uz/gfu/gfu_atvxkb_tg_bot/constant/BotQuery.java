@@ -13,4 +13,6 @@ public interface BotQuery {
     String GET_SERVICE = "❗️ XIZMAT TURINI TANLANG";
     String OTHER_UZ = "Boshqa";
     String OTHER_RU = "Другой";
+    String GET_SERVICE_RU = "️❗️ ВЫБЕРИТЕ ВИД УСЛУГИ";
+    String SETTING = "/setting";
 }

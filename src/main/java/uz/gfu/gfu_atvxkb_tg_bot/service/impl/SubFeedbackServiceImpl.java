@@ -30,10 +30,12 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final UserRepository userRepository;
     private final SubFeedbackRepository subFeedbackRepository;
     private final HistoryRepository historyRepository;
-    @Autowired @Lazy
+    @Autowired
+    @Lazy
     UserService userService;
-    @Autowired @Lazy
-     GeneralService generalService;
+    @Autowired
+    @Lazy
+    GeneralService generalService;
 
     public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, HistoryRepository historyRepository) {
         this.feedBackRepository = feedBackRepository;
@@ -70,22 +72,24 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     @Override
     public void saveSubFeedback(String data, BotUser client, SendMessage sendMessage) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
-        if (user != null) {
-            SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
-            if (subFeedback != null) {
-                History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
-                if (history != null) {
-                    history.setSubFeedbackId(subFeedback.getId());
-                    historyRepository.save(history);
-                    user.setState(UserState.SAVE_SUB_FEEDBACK);
-                    userRepository.save(user);
-                    if (user.getLanguage().equals(BotQuery.UZ_SELECT)) {
-                        sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client));
-                        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
-                    } else if (user.getLanguage().equals(BotQuery.RU_SELECT)) {
-                        sendMessage.setText(ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client));
-                        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
-                    }
+        SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
+        if (subFeedback == null) {
+            if (user.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        }
+        else {
+            History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+            if (history != null) {
+                history.setSubFeedbackId(subFeedback.getId());
+                historyRepository.save(history);
+                user.setState(UserState.SAVE_SUB_FEEDBACK);
+                userRepository.save(user);
+                if (user.getLanguage().equals(BotQuery.UZ_SELECT)) {
+                    sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client));
+                    sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+                } else if (user.getLanguage().equals(BotQuery.RU_SELECT)) {
+                    sendMessage.setText(ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client));
+                    sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
                 }
             }
         }

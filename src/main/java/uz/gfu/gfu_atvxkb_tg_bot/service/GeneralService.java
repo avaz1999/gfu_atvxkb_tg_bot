@@ -9,7 +9,7 @@ public interface GeneralService {
 
     ReplyKeyboard getBlock();
 
-    ReplyKeyboard getPhoneNumber();
+    ReplyKeyboard getPhoneNumber(BotUser client);
 
     ReplyKeyboard getRegisterDone(BotUser client);
 
@@ -19,4 +19,5 @@ public interface GeneralService {
 
     ReplyKeyboard serviceDone();
 
+    ReplyKeyboard getSettingForSuperAdmin(BotUser superAdmin);
 }
