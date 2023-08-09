@@ -145,6 +145,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void changeStateSuperAdminCRUD(BotUser superAdmin) {
+        superAdmin.setState(UserState.SUPER_ADMIN_CRUD);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateBuilding(BotUser superAdmin) {
+        superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateForSetting(BotUser superAdmin) {
+        superAdmin.setState(UserState.SETTING);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
     public void saveUserDepartmentName(String text, Long chatId) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
         Department department = new Department();

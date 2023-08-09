@@ -236,12 +236,113 @@ public class GeneralServiceImpl implements GeneralService {
 
     @Override
     public ReplyKeyboard getSettingForSuperAdmin(BotUser superAdmin) {
-        return null;
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+
+        KeyboardRow row = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+
+        KeyboardButton button1 = new KeyboardButton();
+        button1.setText(BotQuery.CRUD_BUILDING);
+        row.add(button1);
+
+        KeyboardButton button2 = new KeyboardButton();
+        button2.setText(BotQuery.CRUD_FEEDBACK);
+        row.add(button2);
+
+        KeyboardButton button3 = new KeyboardButton();
+        button3.setText(BotQuery.CRUD_SUB_FEEDBACK);
+        row2.add(button3);
+
+        KeyboardButton button4 = new KeyboardButton();
+        button4.setText(BotQuery.CRUD_ADMIN);
+        row2.add(button4);
+
+        keyboardRows.add(row);
+        keyboardRows.add(row2);
+
+        return replyKeyboardMarkup;
     }
 
-// getResult() va Result klasslarini oldin bir xil qoldirish mumkin
+    @Override
+    public ReplyKeyboard crudBuilding() {
+        String add = BotQuery.ADD_BUILDING;
+        String remove = BotQuery.REMOVE_BUILDING;
+        String list = BotQuery.ALL_BUILDING;
+        String update = BotQuery.UPDATE_BUILDING;
+        return allCrud(add,remove,list,update);
+    }
 
-// ...
+    @Override
+    public ReplyKeyboard crudFeedback() {
+        String add = BotQuery.ADD_FEEDBACK;
+        String remove = BotQuery.REMOVE_FEEDBACK;
+        String list = BotQuery.ALL_FEEDBACK;
+        String update = BotQuery.UPDATE_FEEDBACK;
+        return allCrud(add,remove,list,update);
+    }
+
+    @Override
+    public ReplyKeyboard crudSubFeedback() {
+        String add = BotQuery.ADD_SUB_FEEDBACK;
+        String remove = BotQuery.REMOVE_SUB_FEEDBACK;
+        String list = BotQuery.ALL_SUB_FEEDBACK;
+        String update = BotQuery.UPDATE_SUB_FEEDBACK;
+        return allCrud(add,remove,list,update);
+    }
+
+    @Override
+    public ReplyKeyboard crudAdmin() {
+        String add = BotQuery.ADD_ADMIN;
+        String remove = BotQuery.REMOVE_ADMIN;
+        String list = BotQuery.ALL_ADMIN;
+        String update = BotQuery.UPDATE_ADMIN;
+        return allCrud(add,remove,list,update);
+    }
+
+    private static ReplyKeyboardMarkup allCrud(String add, String remove, String list, String update) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+
+        KeyboardRow row = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+
+        KeyboardButton button1 = new KeyboardButton();
+        button1.setText(add);
+        row.add(button1);
+
+        KeyboardButton button2 = new KeyboardButton();
+        button2.setText(remove);
+        row.add(button2);
+
+        KeyboardButton button3 = new KeyboardButton();
+        button3.setText(list);
+        row2.add(button3);
+
+        KeyboardButton button4 = new KeyboardButton();
+        button4.setText(update);
+        row2.add(button4);
+
+        KeyboardButton button5 = new KeyboardButton();
+        button5.setText(BotQuery.MENU);
+        row3.add(button5);
+
+        keyboardRows.add(row);
+        keyboardRows.add(row2);
+        keyboardRows.add(row3);
+
+        return replyKeyboardMarkup;
+    }
+
 
     private record Result(InlineKeyboardMarkup inlineKeyboardMarkup,
                           List<InlineKeyboardButton> inlineKeyboardButtonList, List<List<InlineKeyboardButton>> lists,

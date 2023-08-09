@@ -20,4 +20,12 @@ public interface GeneralService {
     ReplyKeyboard serviceDone();
 
     ReplyKeyboard getSettingForSuperAdmin(BotUser superAdmin);
+
+    ReplyKeyboard crudBuilding();
+
+    ReplyKeyboard crudFeedback();
+
+    ReplyKeyboard crudSubFeedback();
+
+    ReplyKeyboard crudAdmin();
 }

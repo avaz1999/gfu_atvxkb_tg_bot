@@ -24,7 +24,7 @@ public class BotUser extends BaseEntity {
     private Long chatId;
     private Long editMessageId;
     @Enumerated(EnumType.STRING)
-    private UserState state = UserState.START;
+    private UserState state;
     private String language;
     @ManyToMany
     @JoinTable(name = "users_feedbacks",

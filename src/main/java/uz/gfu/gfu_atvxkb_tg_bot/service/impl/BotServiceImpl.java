@@ -48,7 +48,6 @@ public class BotServiceImpl implements BotService {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
 
-        String text = message.getText();
 
         BotUser currentUser = userService.register(chatId, message);
 

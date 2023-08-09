@@ -28,4 +28,9 @@ public interface ResMessageUz {
             "Вы ввели неверное сообщение! Выберите язык</b>";
     String ERROR_BUILD_NAME = "<b>Kiritilgan bino  topilmadi</b>";
     String ERROR_SERVICE = "Xato xizmat turini tanldiz";
+    String ADMIN_CRUD_SERVICE = "<b>O'zgartirmoqchi bo'lgan xizmat turini tanlang \uD83D\uDDD2</b>";
+    String BUILDING_CRUD = "<b>Binoga tegishli o'zgarishlarni tanlang</b>";
+    String FEEDBACK_CRUD = "<b>Service ga tegishli o'zgarishlarni tanlang</b>";
+    String SUB_FEEDBACK_CRUD = "<b>Service turi ga tegishli o'zgarishlarni tanlang</b>";
+    String ADMIN_CRUD = "<b>Adminga tegishli xizmatni tanlang</b>";
 }

@@ -35,4 +35,10 @@ public interface UserService {
     void changeStateGetFeedback(BotUser client);
 
     void saveLang(BotUser client, String data);
+
+    void changeStateSuperAdminCRUD(BotUser superAdmin);
+
+    void changeStateBuilding(BotUser superAdmin);
+
+    void changeStateForSetting(BotUser superAdmin);
 }

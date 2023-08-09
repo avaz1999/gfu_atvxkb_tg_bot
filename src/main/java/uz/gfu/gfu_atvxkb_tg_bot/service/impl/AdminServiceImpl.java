@@ -49,10 +49,5 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender) {
         adminHasMessage(currentUser,message.getText(),sendMessage,sender);
-        try {
-            sender.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

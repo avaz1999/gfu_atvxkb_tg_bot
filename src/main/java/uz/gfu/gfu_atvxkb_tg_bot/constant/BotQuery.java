@@ -15,4 +15,25 @@ public interface BotQuery {
     String OTHER_RU = "Другой";
     String GET_SERVICE_RU = "️❗️ ВЫБЕРИТЕ ВИД УСЛУГИ";
     String SETTING = "/setting";
+    String ADD_BUILDING = "✅ Здание";
+    String ADD_FEEDBACK = "✅ Услуга";
+    String ADD_SUB_FEEDBACK = "✅ Услуга типа";
+    String ADD_ADMIN = "✅ Админ";
+    String CRUD_BUILDING = "\uD83C\uDFE2 Здание";
+    String CRUD_FEEDBACK = "\uD83D\uDEE0 Услуга";
+    String CRUD_SUB_FEEDBACK = "\uD83D\uDD28 Услуга типа";
+    String CRUD_ADMIN = "\uD83E\uDDD1\u200D\uD83D\uDCBB Админ";
+    String REMOVE_BUILDING = "❌ Здание";
+    String UPDATE_BUILDING = "✏️ Здание";
+    String ALL_BUILDING = "\uD83E\uDDFE Все здание";
+    String MENU = "\uD83D\uDCCC MENU";
+    String REMOVE_FEEDBACK = "❌ Услуга";
+    String ALL_FEEDBACK = "✏️ Услуга";
+    String UPDATE_FEEDBACK = "\uD83E\uDDFE Все Услуга";
+    String REMOVE_SUB_FEEDBACK = "❌ Услуга типа";
+    String ALL_SUB_FEEDBACK = "\uD83E\uDDFE Услуга типа";
+    String UPDATE_SUB_FEEDBACK = "✏️ Услуга типа";
+    String REMOVE_ADMIN = "❌ Админ";
+    String ALL_ADMIN = "\uD83E\uDDFE Все Админ";
+    String UPDATE_ADMIN = "✏️ Админ";
 }
