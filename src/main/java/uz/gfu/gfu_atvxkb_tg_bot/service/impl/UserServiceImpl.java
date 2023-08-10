@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveBlock(String text, Long chatId, SendMessage sendMessage) {
         BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
-        Building byName = buildingRepository.findByName(text);
+        Building byName = buildingRepository.findByNameAndDeletedFalse(text);
         sendMessage.setChatId(user.getChatId());
         if (byName == null) {
             if (user.getLanguage().equals(BotQuery.UZ_SELECT))
@@ -160,6 +160,12 @@ public class UserServiceImpl implements UserService {
     public void changeStateForSetting(BotUser superAdmin) {
         superAdmin.setState(UserState.SETTING);
         userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateAddBuilding(BotUser superAdmin) {
+    superAdmin.setState(UserState.ADD_BUILDING_STATE);
+    userRepository.save(superAdmin);
     }
 
     @Override

@@ -41,4 +41,6 @@ public interface UserService {
     void changeStateBuilding(BotUser superAdmin);
 
     void changeStateForSetting(BotUser superAdmin);
+
+    void changeStateAddBuilding(BotUser superAdmin);
 }

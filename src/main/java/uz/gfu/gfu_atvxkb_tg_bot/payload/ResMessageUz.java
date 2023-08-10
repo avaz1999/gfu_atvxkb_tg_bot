@@ -33,4 +33,8 @@ public interface ResMessageUz {
     String FEEDBACK_CRUD = "<b>Service ga tegishli o'zgarishlarni tanlang</b>";
     String SUB_FEEDBACK_CRUD = "<b>Service turi ga tegishli o'zgarishlarni tanlang</b>";
     String ADMIN_CRUD = "<b>Adminga tegishli xizmatni tanlang</b>";
+    String ADD_BUILDING_NAME = "<b>Yangi bino nomini kiriting</b>";
+    String EXIST_BUILDING_NAME = "<b>Bunday bino nomi mavjud</b>";
+    String SUCCESS_ADD_BUILDING = "<b>Muvofaqiyatli qo'shildi\n\n</b>";
+    String EDIT_BUILDING = "<b>O'zgartirmoqchi bo'lgan binoni tanlang\n\n</b>";
 }

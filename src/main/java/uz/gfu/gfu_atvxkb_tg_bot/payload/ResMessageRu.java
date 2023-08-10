@@ -27,5 +27,9 @@ public interface ResMessageRu {
     String FEEDBACK_CRUD = "<b>Выберите изменения, связанные с Сервисом</b>";
     String SUB_FEEDBACK_CRUD = "<b>Выберите изменения, связанные с типом услуги</b>";
     String ADMIN_CRUD = "<b>Выберите сервис, принадлежащий администратору</b>";
+    String ADD_BUILDING_NAME = "<b>Введите название здание</b>";
+    String EXIST_BUILDING_NAME = "<b>У такого здания есть имя</b>";
+    String SUCCESS_ADD_BUILDING = "<b>Добавлено успешно\n\n</b>"
+            ;
 }
 

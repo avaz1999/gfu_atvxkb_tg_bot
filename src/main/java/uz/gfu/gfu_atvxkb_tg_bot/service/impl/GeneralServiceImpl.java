@@ -197,6 +197,26 @@ public class GeneralServiceImpl implements GeneralService {
         }
         return inlineKeyboardMarkup;
     }
+    @Override
+    public ReplyKeyboard getBuildingNumber(String getBuildings) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
+        inlineKeyboardMarkup.setKeyboard(lists);
+        List<Building> building = buildingService.findAllBuildingsByName(getBuildings);
+        for (int i = 0; i < building.size(); i++) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            Building subFeedback = building.get(i);
+            button.setText(String.valueOf(i+1));
+            button.setCallbackData(subFeedback.getName());
+            inlineKeyboardButtonList1.add(button);
+            if (i % 2 != 0) {
+                lists.add(inlineKeyboardButtonList1);
+                inlineKeyboardButtonList1 = new ArrayList<>();
+            }
+        }
+        return inlineKeyboardMarkup;
+    }
 
     @Override
     public ReplyKeyboard serviceDone() {
@@ -303,6 +323,7 @@ public class GeneralServiceImpl implements GeneralService {
         String update = BotQuery.UPDATE_ADMIN;
         return allCrud(add,remove,list,update);
     }
+
 
     private static ReplyKeyboardMarkup allCrud(String add, String remove, String list, String update) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();

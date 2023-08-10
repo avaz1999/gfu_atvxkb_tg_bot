@@ -28,4 +28,6 @@ public interface GeneralService {
     ReplyKeyboard crudSubFeedback();
 
     ReplyKeyboard crudAdmin();
+
+    ReplyKeyboard getBuildingNumber(String getBuildings);
 }
