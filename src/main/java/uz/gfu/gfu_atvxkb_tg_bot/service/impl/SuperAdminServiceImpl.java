@@ -229,8 +229,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     }
     private void editBuilding( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         String getBuildings = buildingService.getDtoBuildings(superAdmin);
-        sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
-        sendMessage.setReplyMarkup(generalService.getBuildingNumber(getBuildings));
+                         sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
+        sendMessage.setReplyMarkup(generalService.getBuildingNumber());
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

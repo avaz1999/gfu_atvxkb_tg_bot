@@ -1,6 +1,8 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -141,7 +143,7 @@ public class GeneralServiceImpl implements GeneralService {
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         KeyboardRow menu = new KeyboardRow();
         KeyboardButton menuButton = new KeyboardButton();
-        if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             menuButton.setText(BotQuery.GET_SERVICE);
         } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
             menuButton.setText(BotQuery.GET_SERVICE_RU);
@@ -197,26 +199,28 @@ public class GeneralServiceImpl implements GeneralService {
         }
         return inlineKeyboardMarkup;
     }
+
     @Override
-    public ReplyKeyboard getBuildingNumber(String getBuildings) {
+    public ReplyKeyboard getBuildingNumber() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
         List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
         inlineKeyboardMarkup.setKeyboard(lists);
-        List<Building> building = buildingService.findAllBuildingsByName(getBuildings);
+        List<Building> building = buildingService.getAllBuildings();
         for (int i = 0; i < building.size(); i++) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-            Building subFeedback = building.get(i);
+            Building buildingButton = building.get(i);
             button.setText(String.valueOf(i+1));
-            button.setCallbackData(subFeedback.getName());
+            button.setCallbackData(buildingButton.getName());
             inlineKeyboardButtonList1.add(button);
-            if (i % 2 != 0) {
-                lists.add(inlineKeyboardButtonList1);
+            if (i + 1 == 5) {
                 inlineKeyboardButtonList1 = new ArrayList<>();
             }
         }
+        lists.add(inlineKeyboardButtonList1);
         return inlineKeyboardMarkup;
     }
+
 
     @Override
     public ReplyKeyboard serviceDone() {
@@ -294,7 +298,7 @@ public class GeneralServiceImpl implements GeneralService {
         String remove = BotQuery.REMOVE_BUILDING;
         String list = BotQuery.ALL_BUILDING;
         String update = BotQuery.UPDATE_BUILDING;
-        return allCrud(add,remove,list,update);
+        return allCrud(add, remove, list, update);
     }
 
     @Override
@@ -303,7 +307,7 @@ public class GeneralServiceImpl implements GeneralService {
         String remove = BotQuery.REMOVE_FEEDBACK;
         String list = BotQuery.ALL_FEEDBACK;
         String update = BotQuery.UPDATE_FEEDBACK;
-        return allCrud(add,remove,list,update);
+        return allCrud(add, remove, list, update);
     }
 
     @Override
@@ -312,7 +316,7 @@ public class GeneralServiceImpl implements GeneralService {
         String remove = BotQuery.REMOVE_SUB_FEEDBACK;
         String list = BotQuery.ALL_SUB_FEEDBACK;
         String update = BotQuery.UPDATE_SUB_FEEDBACK;
-        return allCrud(add,remove,list,update);
+        return allCrud(add, remove, list, update);
     }
 
     @Override
@@ -321,7 +325,7 @@ public class GeneralServiceImpl implements GeneralService {
         String remove = BotQuery.REMOVE_ADMIN;
         String list = BotQuery.ALL_ADMIN;
         String update = BotQuery.UPDATE_ADMIN;
-        return allCrud(add,remove,list,update);
+        return allCrud(add, remove, list, update);
     }
 
 

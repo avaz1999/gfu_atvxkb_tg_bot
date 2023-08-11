@@ -29,5 +29,5 @@ public interface GeneralService {
 
     ReplyKeyboard crudAdmin();
 
-    ReplyKeyboard getBuildingNumber(String getBuildings);
+    ReplyKeyboard getBuildingNumber();
 }

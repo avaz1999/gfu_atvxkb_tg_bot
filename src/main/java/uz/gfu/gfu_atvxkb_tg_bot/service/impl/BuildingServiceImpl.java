@@ -1,6 +1,9 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
@@ -66,7 +69,7 @@ public class BuildingServiceImpl implements BuildingService {
         StringBuilder sb = new StringBuilder();
         short i = 1;
         for (BuildingDto building : shareBuildings) {
-            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? "<b>" + i + " Bino: </b>" : "<b>Здания: </b>").append(building.getName()).append("\n");
+            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? "<b>" + i + " \uD83C\uDFE2 Bino: </b>" : "<b>Здания: </b>").append(building.getName()).append("\n");
             i++;
         }
         return sb;
@@ -98,4 +101,8 @@ public class BuildingServiceImpl implements BuildingService {
     public List<Building> findAllBuildingsByName(String getBuildings) {
         return buildingRepository.findAll();
     }
+
+
+
+
 }

@@ -1,7 +1,10 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import uz.gfu.gfu_atvxkb_tg_bot.dto.BuildingDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 
@@ -21,4 +24,5 @@ public interface BuildingService {
     void createNewBuilding(String text, BotUser superAdmin, SendMessage sendMessage);
 
     List<Building> findAllBuildingsByName(String getBuildings);
+
 }
