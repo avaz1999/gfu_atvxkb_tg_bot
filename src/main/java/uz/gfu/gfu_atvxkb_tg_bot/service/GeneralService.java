@@ -30,4 +30,6 @@ public interface GeneralService {
     ReplyKeyboard crudAdmin();
 
     ReplyKeyboard getBuildingNumber();
+
+    ReplyKeyboard getBack(BotUser superAdmin);
 }

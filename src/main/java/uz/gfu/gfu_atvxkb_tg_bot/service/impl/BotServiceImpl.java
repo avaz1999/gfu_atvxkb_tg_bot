@@ -63,6 +63,11 @@ public class BotServiceImpl implements BotService {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         Long chatId = callbackQuery.getMessage().getChatId();
         BotUser currentUser = userService.register(chatId, callbackQuery.getMessage());
-        clientService.clientHasCallBackQuery(currentUser, callbackQuery,sender);
+
+        switch (currentUser.getRole()) {
+            case CLIENT -> clientService.clientHasCallBackQuery(currentUser, callbackQuery,sender);
+//            case ADMIN -> adminService.callAdminService(currentUser, message, sendMessage,sender);
+            case SUPER_ADMIN -> superAdminService.superAdminHasCallBackQuery(currentUser, callbackQuery,sender );
+        }
     }
 }

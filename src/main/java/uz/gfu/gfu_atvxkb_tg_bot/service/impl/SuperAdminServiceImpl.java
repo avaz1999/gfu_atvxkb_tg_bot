@@ -34,12 +34,10 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             case SETTING -> superAdminStateSetting(message, superAdmin, sendMessage, sender);
             case SUPER_ADMIN_CRUD -> crudSuperAdminState(message, superAdmin, sendMessage, sender);
             case SUPER_ADMIN_BUILDING -> crudBuilding(message, superAdmin, sendMessage, sender);
-            case ADD_BUILDING_STATE -> createNewBuilding(message,superAdmin,sendMessage,sender);
-            case EDIT_BUILDING_STATE -> editBuilding(superAdmin,sendMessage,sender);
+            case ADD_BUILDING_STATE -> createNewBuilding(message, superAdmin, sendMessage, sender);
+            case EDIT_BUILDING_STATE -> editBuilding(message,superAdmin, sendMessage, sender);
         }
     }
-
-
 
 
     private void superAdminStateSetting(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
@@ -55,9 +53,9 @@ public class SuperAdminServiceImpl implements SuperAdminService {
                 } else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) {
                     sendMessage.setText(ResMessageRu.ADMIN_CRUD_SERVICE);
                 }
-                if (!text.equalsIgnoreCase(BotQuery.SETTING)){
-                    crudSuperAdminState(message,superAdmin,sendMessage,sender);
-                }else {
+                if (!text.equalsIgnoreCase(BotQuery.SETTING)) {
+                    crudSuperAdminState(message, superAdmin, sendMessage, sender);
+                } else {
                     userService.changeStateSuperAdminCRUD(superAdmin);
                     sendMessage.setChatId(superAdmin.getChatId());
                     sendMessage.setReplyMarkup(generalService.getSettingForSuperAdmin(superAdmin));
@@ -154,11 +152,11 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         if (message.hasText()) {
             String text = message.getText();
             switch (text) {
-                case BotQuery.ADD_BUILDING -> addBuilding( superAdmin, sendMessage, sender);
+                case BotQuery.ADD_BUILDING -> addBuilding(superAdmin, sendMessage, sender);
                 case BotQuery.REMOVE_BUILDING -> removeBuilding(message, superAdmin, sendMessage, sender);
-                case BotQuery.UPDATE_BUILDING -> updateBuilding(message, superAdmin, sendMessage, sender);
+                case BotQuery.UPDATE_BUILDING -> updateBuilding( superAdmin, sendMessage, sender);
                 case BotQuery.ALL_BUILDING -> allBuilding(superAdmin, sendMessage, sender);
-                case BotQuery.MENU -> menu( superAdmin, sendMessage, sender);
+                case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
 
                 default -> {
                     if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
@@ -176,7 +174,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
     }
 
-    private void menu( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    private void menu(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
             sendMessage.setText(ResMessageUz.ADMIN_CRUD_SERVICE);
         } else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) {
@@ -196,8 +194,16 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     }
 
-    private void updateBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-    editBuilding(superAdmin,sendMessage,sender);
+    private void updateBuilding( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String getBuildings = buildingService.getDtoBuildings(superAdmin);
+        userService.changeStateEditBuilding(superAdmin);
+        sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
+        sendMessage.setReplyMarkup(generalService.getBuildingNumber());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void removeBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
@@ -205,7 +211,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     private void addBuilding(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ADD_BUILDING_NAME);
-        else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ADD_BUILDING_NAME);
+        else sendMessage.setText(ResMessageRu.ADD_BUILDING_NAME);
         userService.changeStateAddBuilding(superAdmin);
         try {
             sender.execute(sendMessage);
@@ -213,13 +219,16 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             throw new RuntimeException(e);
         }
     }
+
     private void createNewBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         if (message.hasText()) {
+            crudBuilding(message,superAdmin,sendMessage,sender);
             String text = message.getText();
-            buildingService.createNewBuilding(text,superAdmin,sendMessage);
-        }else {
+            buildingService.createNewBuilding(text, superAdmin, sendMessage);
+        } else {
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         }
         try {
             sender.execute(sendMessage);
@@ -227,10 +236,21 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             throw new RuntimeException(e);
         }
     }
-    private void editBuilding( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-        String getBuildings = buildingService.getDtoBuildings(superAdmin);
-                         sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
-        sendMessage.setReplyMarkup(generalService.getBuildingNumber());
+
+    private void editBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()){
+            String text = message.getText();
+            if (text.equals(BotQuery.BACK)){
+                userService.back(superAdmin);
+                sendMessage.setText(ResMessageUz.BUILDING_CRUD);
+                sendMessage.setReplyMarkup(generalService.crudBuilding());
+            } else if (text.equals(BotQuery.UPDATE_BUILDING)) {
+                String getBuildings = buildingService.getDtoBuildings(superAdmin);
+                userService.changeStateEditBuilding(superAdmin);
+                sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
+                sendMessage.setReplyMarkup(generalService.getBuildingNumber());
+            }
+        }
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -240,7 +260,24 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
 
     @Override
-    public void superAdminHasCallBackQuery(BotUser superAdmin, CallbackQuery callbackQuery) {
+    public void superAdminHasCallBackQuery(BotUser superAdmin, CallbackQuery callbackQuery, AbsSender sender) {
+        String data = callbackQuery.getData();
 
+        SendMessage sendMessage = new SendMessage();
+        switch (data){
+            case BotQuery.BACK -> back(superAdmin,sendMessage,sender);
+        }
+    }
+
+    private void back(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        userService.back(superAdmin);
+        sendMessage.setText(ResMessageUz.SUCCESS_ADD_BUILDING);
+        sendMessage.setChatId(superAdmin.getChatId());
+        sendMessage.setReplyMarkup(generalService.getBack(superAdmin));
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

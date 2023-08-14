@@ -165,6 +165,21 @@ public class GeneralServiceImpl implements GeneralService {
         return replyKeyboardMarkup;
     }
 
+    @Override
+    public ReplyKeyboard getBack(BotUser superAdmin) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        KeyboardRow back = new KeyboardRow();
+        KeyboardButton backButton = new KeyboardButton();
+        backButton.setText(BotQuery.BACK);
+        back.add(backButton);
+        keyboardRows.add(back);
+        return replyKeyboardMarkup;
+    }
+
     private KeyboardRow getKeyboardButtonsByLang(List<KeyboardRow> keyboardRows, KeyboardRow row, List<FeedBack> allFeedbackUz) {
         for (int i = 0; i < allFeedbackUz.size(); i++) {
             FeedBack feedBack = allFeedbackUz.get(i);
@@ -205,19 +220,30 @@ public class GeneralServiceImpl implements GeneralService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
         List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
-        inlineKeyboardMarkup.setKeyboard(lists);
+        List<InlineKeyboardButton> inlineKeyboardButtonList2 = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList3 = new ArrayList<>();
+        InlineKeyboardButton back = new InlineKeyboardButton();
         List<Building> building = buildingService.getAllBuildings();
         for (int i = 0; i < building.size(); i++) {
             InlineKeyboardButton button = new InlineKeyboardButton();
             Building buildingButton = building.get(i);
-            button.setText(String.valueOf(i+1));
+            button.setText(String.valueOf(i + 1));
             button.setCallbackData(buildingButton.getName());
-            inlineKeyboardButtonList1.add(button);
-            if (i + 1 == 5) {
-                inlineKeyboardButtonList1 = new ArrayList<>();
+            if (i == 5) {
+                inlineKeyboardButtonList2.add(button);
+            } else {
+                inlineKeyboardButtonList1.add(button);
             }
         }
+        back.setText(BotQuery.BACK);
+        back.setCallbackData(BotQuery.BACK);
+        inlineKeyboardButtonList3.add(back);
         lists.add(inlineKeyboardButtonList1);
+        lists.add(inlineKeyboardButtonList2);
+        lists.add(inlineKeyboardButtonList3);
+        inlineKeyboardMarkup.setKeyboard(lists);
+
+
         return inlineKeyboardMarkup;
     }
 

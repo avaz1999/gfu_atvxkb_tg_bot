@@ -36,4 +36,5 @@ public interface BotQuery {
     String REMOVE_ADMIN = "❌ Админ";
     String ALL_ADMIN = "\uD83E\uDDFE Все Админ";
     String UPDATE_ADMIN = "✏️ Админ";
+    String BACK = "⬅️ Назад";
 }
