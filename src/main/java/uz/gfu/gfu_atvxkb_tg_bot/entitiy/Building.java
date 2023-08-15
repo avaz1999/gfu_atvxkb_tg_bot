@@ -13,4 +13,5 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @Entity(name = "buildings")
 public class Building extends BaseEntity {
     private String name;
+    private boolean edited;
 }

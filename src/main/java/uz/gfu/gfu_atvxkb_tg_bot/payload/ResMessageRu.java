@@ -29,7 +29,11 @@ public interface ResMessageRu {
     String ADMIN_CRUD = "<b>Выберите сервис, принадлежащий администратору</b>";
     String ADD_BUILDING_NAME = "<b>Введите название здание</b>";
     String EXIST_BUILDING_NAME = "<b>У такого здания есть имя</b>";
-    String SUCCESS_ADD_BUILDING = "<b>Добавлено успешно\n\n</b>"
-            ;
+    String SUCCESS_ADD_BUILDING = "<b>Добавлено успешно\n\n</b>";
+    String ENTER_NEW_BLOCK = "\nВведите название блок";
+    String SUCCESS_EDITED = "Изменено успешно\n\n";
+    String DELETED_SUCCESS = "<b>Удалено успешно</b>";
+    String ALL_BUILDINGS = "<b>Список всех зданий, имеющихся в базе данных\n\n</b>";
+    String BACK = "<b>Выберите одну из услуг</b>";
 }
 

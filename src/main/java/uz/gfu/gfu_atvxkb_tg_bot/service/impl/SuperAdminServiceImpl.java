@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
@@ -35,7 +36,15 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             case SUPER_ADMIN_CRUD -> crudSuperAdminState(message, superAdmin, sendMessage, sender);
             case SUPER_ADMIN_BUILDING -> crudBuilding(message, superAdmin, sendMessage, sender);
             case ADD_BUILDING_STATE -> createNewBuilding(message, superAdmin, sendMessage, sender);
-            case EDIT_BUILDING_STATE -> editBuilding(message,superAdmin, sendMessage, sender);
+            case EDIT_BUILDING_STATE -> editBuilding(message, superAdmin, sendMessage, sender);
+            case EDIT_BUILDING_STATE_1 -> editBuilding1(message, superAdmin, sendMessage, sender);
+        }
+    }
+
+    private void editBuilding1(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            String text = message.getText();
+            buildingService.editBuilding(text, superAdmin, sender, sendMessage);
         }
     }
 
@@ -153,8 +162,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             String text = message.getText();
             switch (text) {
                 case BotQuery.ADD_BUILDING -> addBuilding(superAdmin, sendMessage, sender);
-                case BotQuery.REMOVE_BUILDING -> removeBuilding(message, superAdmin, sendMessage, sender);
-                case BotQuery.UPDATE_BUILDING -> updateBuilding( superAdmin, sendMessage, sender);
+                case BotQuery.REMOVE_BUILDING -> removeBuilding(superAdmin, sendMessage, sender);
+                case BotQuery.UPDATE_BUILDING -> updateAndRemoveBuilding(superAdmin, sendMessage, sender);
                 case BotQuery.ALL_BUILDING -> allBuilding(superAdmin, sendMessage, sender);
                 case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
 
@@ -191,10 +200,21 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     }
 
     private void allBuilding(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String getBuildings = buildingService.getDtoBuildings(superAdmin);
+        sendMessage.setChatId(superAdmin.getChatId());
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+            sendMessage.setText(ResMessageUz.ALL_BUILDING + getBuildings);
+        else sendMessage.setText(ResMessageRu.ALL_BUILDINGS + getBuildings);
+        sendMessage.setReplyMarkup(generalService.crudBuilding());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
-    private void updateBuilding( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    private void updateAndRemoveBuilding(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         String getBuildings = buildingService.getDtoBuildings(superAdmin);
         userService.changeStateEditBuilding(superAdmin);
         sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
@@ -206,7 +226,16 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
     }
 
-    private void removeBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    private void removeBuilding(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String getBuildings = buildingService.getDtoBuildings(superAdmin);
+        userService.changeStateRemoveBuilding(superAdmin);
+        sendMessage.setText(ResMessageUz.REMOVE_BUILDING + getBuildings);
+        sendMessage.setReplyMarkup(generalService.getBuildingNumber());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void addBuilding(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
@@ -222,7 +251,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     private void createNewBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         if (message.hasText()) {
-            crudBuilding(message,superAdmin,sendMessage,sender);
+            crudBuilding(message, superAdmin, sendMessage, sender);
             String text = message.getText();
             buildingService.createNewBuilding(text, superAdmin, sendMessage);
         } else {
@@ -238,18 +267,10 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     }
 
     private void editBuilding(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-        if (message.hasText()){
-            String text = message.getText();
-            if (text.equals(BotQuery.BACK)){
-                userService.back(superAdmin);
-                sendMessage.setText(ResMessageUz.BUILDING_CRUD);
-                sendMessage.setReplyMarkup(generalService.crudBuilding());
-            } else if (text.equals(BotQuery.UPDATE_BUILDING)) {
-                String getBuildings = buildingService.getDtoBuildings(superAdmin);
-                userService.changeStateEditBuilding(superAdmin);
-                sendMessage.setText(ResMessageUz.EDIT_BUILDING + getBuildings);
-                sendMessage.setReplyMarkup(generalService.getBuildingNumber());
-            }
+        sendMessage.enableHtml(true);
+        if (message.hasText()) {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         }
         try {
             sender.execute(sendMessage);
@@ -264,16 +285,24 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         String data = callbackQuery.getData();
 
         SendMessage sendMessage = new SendMessage();
-        switch (data){
-            case BotQuery.BACK -> back(superAdmin,sendMessage,sender);
+        if (superAdmin.getState().equals(UserState.ADD_BUILDING_STATE) ||
+                superAdmin.getState().equals(UserState.EDIT_BUILDING_STATE) ||
+                superAdmin.getState().equals(UserState.REMOVE_BUILDING_STATE)) {
+            switch (data) {
+                case BotQuery.BACK -> back(superAdmin, sendMessage, sender);
+                default -> buildingService.getBuildingByName(superAdmin, sendMessage, data, sender);
+            }
         }
     }
 
     private void back(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         userService.back(superAdmin);
-        sendMessage.setText(ResMessageUz.SUCCESS_ADD_BUILDING);
+        sendMessage.enableHtml(true);
         sendMessage.setChatId(superAdmin.getChatId());
-        sendMessage.setReplyMarkup(generalService.getBack(superAdmin));
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.BACK);
+        else sendMessage.setText(ResMessageRu.BACK);
+        sendMessage.setReplyMarkup(generalService.crudBuilding());
+        userService.back(superAdmin);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

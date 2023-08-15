@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
         if (byName == null) {
             if (user.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_BUILD_NAME);
-            else{
+            else {
                 sendMessage.setText(ResMessageRu.ERROR_BUILD_NAME);
             }
             sendMessage.setChatId(chatId);
@@ -107,14 +107,14 @@ public class UserServiceImpl implements UserService {
         SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
         Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
         Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
-        if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
                     "<b>Bino: </b>" + building.getName() + "\n" +
                     "<b>Bo'lim: </b>" + department.getName() + "\n" +
                     "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
                     "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
                     "<b>Muammo: </b>" + subFeedback.getName();
-        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+        } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
             return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
                     "<b>Здание: </b>" + building.getName() + "\n" +
                     "<b>Отделение: </b>" + department.getName() + "\n" +
@@ -164,8 +164,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeStateAddBuilding(BotUser superAdmin) {
-    superAdmin.setState(UserState.ADD_BUILDING_STATE);
-    userRepository.save(superAdmin);
+        superAdmin.setState(UserState.ADD_BUILDING_STATE);
+        userRepository.save(superAdmin);
     }
 
     @Override
@@ -177,8 +177,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void back(BotUser superAdmin) {
         switch (superAdmin.getState()) {
-            case EDIT_BUILDING_STATE -> superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+            case EDIT_BUILDING_STATE,
+                    REMOVE_BUILDING_STATE-> superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
         }
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateRemoveBuilding(BotUser superAdmin) {
+        superAdmin.setState(UserState.REMOVE_BUILDING_STATE);
         userRepository.save(superAdmin);
     }
 

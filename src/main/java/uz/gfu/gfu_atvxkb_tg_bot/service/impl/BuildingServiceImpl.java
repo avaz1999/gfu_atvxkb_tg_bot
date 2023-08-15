@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.BuildingDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
@@ -25,7 +27,8 @@ import java.util.Optional;
 public class BuildingServiceImpl implements BuildingService {
     private final BuildingRepository buildingRepository;
     private final UserRepository userRepository;
-    @Autowired @Lazy
+    @Autowired
+    @Lazy
     GeneralService generalService;
 
     public BuildingServiceImpl(BuildingRepository buildingRepository, UserRepository userRepository) {
@@ -35,7 +38,7 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public void saveBuilding(String text,Long userId) {
+    public void saveBuilding(String text, Long userId) {
         Optional<BotUser> byId = userRepository.findById(userId);
         if (byId.isPresent()) {
             Building byNameBlock = buildingRepository.findByNameAndDeletedFalse(text);
@@ -52,7 +55,7 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     public List<Building> getAllBuildings() {
-        return buildingRepository.findAll();
+        return buildingRepository.findAllByDeletedFalse();
     }
 
     @Override
@@ -79,7 +82,7 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public boolean  checkBuilding(String text) {
+    public boolean checkBuilding(String text) {
         return buildingRepository.existsByNameAndDeletedFalse(text);
     }
 
@@ -87,19 +90,23 @@ public class BuildingServiceImpl implements BuildingService {
     @Transactional
     public void createNewBuilding(String text, BotUser superAdmin, SendMessage sendMessage) {
         if (buildingRepository.existsByNameAndDeletedFalse(text)) {
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.EXIST_BUILDING_NAME);
-            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.EXIST_BUILDING_NAME);
-        }
-        else {
-            buildingRepository.save(new Building(text));
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.EXIST_BUILDING_NAME);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.EXIST_BUILDING_NAME);
+        } else {
+            buildingRepository.save(new Building(text,false));
             superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
             userRepository.save(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.BUILDING_CRUD);
-            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.BUILDING_CRUD);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.BUILDING_CRUD);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.BUILDING_CRUD);
             sendMessage.setReplyMarkup(generalService.crudBuilding());
             StringBuilder sb = getBuildingDto(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.SUCCESS_ADD_BUILDING + sb);
-            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.SUCCESS_ADD_BUILDING +sb);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.SUCCESS_ADD_BUILDING + sb);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.SUCCESS_ADD_BUILDING + sb);
         }
     }
 
@@ -108,7 +115,72 @@ public class BuildingServiceImpl implements BuildingService {
         return buildingRepository.findAll();
     }
 
+    @Override
+    public void getBuildingByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
+        Building building = buildingRepository.findByNameAndDeletedFalse(data);
+        sendMessage.enableHtml(true);
+        if (building == null) {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        } else if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            if (superAdmin.getState().equals(UserState.EDIT_BUILDING_STATE)) {
+                building.setEdited(true);
+                buildingRepository.save(building);
+                sendMessage.setText(building.getName() + ResMessageUz.ENTER_NEW_BLOCK);
+                superAdmin.setState(UserState.EDIT_BUILDING_STATE_1);
+            } else if (superAdmin.getState().equals(UserState.REMOVE_BUILDING_STATE)) {
+                building.setDeleted(true);
+                building.setDeletedBy(superAdmin.getId());
+                buildingRepository.save(building);
+                if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DELETED_SUCCESS);
+                else sendMessage.setText(ResMessageRu.DELETED_SUCCESS);
+                superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+                sendMessage.setReplyMarkup(generalService.crudBuilding());
+            }
+            userRepository.save(superAdmin);
+        } else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) {
+            building.setEdited(true);
+            buildingRepository.save(building);
+            sendMessage.setChatId(superAdmin.getChatId());
+            sendMessage.setText(building.getName() + ResMessageRu.ENTER_NEW_BLOCK);
+            superAdmin.setState(UserState.EDIT_BUILDING_STATE_1);
+            userRepository.save(superAdmin);
+        }
 
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-
+    @Override
+    public void editBuilding(String text, BotUser superAdmin, AbsSender sender, SendMessage sendMessage) {
+        sendMessage.enableHtml(true);
+        if (buildingRepository.existsByNameAndDeletedFalse(text)) {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.EXIST_BUILDING_NAME);
+            else sendMessage.setText(ResMessageRu.EXIST_BUILDING_NAME);
+        } else {
+            Building building = buildingRepository.findByEditedTrueAndDeletedFalse();
+            building.setModifiedBy(superAdmin.getId());
+            building.setName(text);
+            building.setEdited(false);
+            superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+            userRepository.save(superAdmin);
+            buildingRepository.save(building);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.SUCCESS_EDITED + getDtoBuildings(superAdmin));
+            else sendMessage.setText(ResMessageRu.SUCCESS_EDITED + getDtoBuildings(superAdmin));
+            sendMessage.setReplyMarkup(generalService.crudBuilding());
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

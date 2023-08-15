@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface BuildingRepository extends JpaRepository<Building, Long> {
     Building findByNameAndDeletedFalse(String name);
+    Building findByEditedTrueAndDeletedFalse();
     Building findByIdAndDeletedFalse(Long id);
     boolean existsByNameAndDeletedFalse(String name);
     List<Building> findAllByDeletedFalse();

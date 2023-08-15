@@ -37,4 +37,10 @@ public interface ResMessageUz {
     String EXIST_BUILDING_NAME = "<b>Bunday bino nomi mavjud</b>";
     String SUCCESS_ADD_BUILDING = "<b>Muvofaqiyatli qo'shildi\n\n</b>";
     String EDIT_BUILDING = "<b>O'zgartirmoqchi bo'lgan binoni tanlang\n\n</b>";
+    String ENTER_NEW_BLOCK = "<b>\nYangi bino nomini kiriting</b>";
+    String SUCCESS_EDITED = "<b>Muvofaqiyatli o'zgartirildi\n\n</b>";
+    String REMOVE_BUILDING = "<b>O'chirmoqchi bo'lgan binoni tanlang\n\n</b>";
+    String DELETED_SUCCESS = "<b>Muvofaqiyatli o'chirildi</b>";
+    String ALL_BUILDING = "<b>Bazada mavjud hamma binolar ro'yxati\n\n</b>";
+    String BACK = "<b>Servicelardan birini tanlang</b>";
 }

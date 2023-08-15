@@ -47,4 +47,6 @@ public interface UserService {
     void changeStateEditBuilding(BotUser superAdmin);
 
     void back(BotUser superAdmin);
+
+    void changeStateRemoveBuilding(BotUser superAdmin);
 }
