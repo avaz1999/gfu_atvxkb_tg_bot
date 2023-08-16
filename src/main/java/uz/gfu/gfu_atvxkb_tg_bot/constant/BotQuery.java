@@ -37,4 +37,6 @@ public interface BotQuery {
     String ALL_ADMIN = "\uD83E\uDDFE Все Админ";
     String UPDATE_ADMIN = "✏️ Админ";
     String BACK = "⬅️ Назад";
+    String START_WORK_UZ = "ISHNI BOSHLASH";
+    String START_WORK_RU = "НАЧАТЬ РАБОТА";
 }

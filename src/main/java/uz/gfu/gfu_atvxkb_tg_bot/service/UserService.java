@@ -2,6 +2,7 @@ package uz.gfu.gfu_atvxkb_tg_bot.service;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 import java.util.List;
@@ -49,4 +50,12 @@ public interface UserService {
     void back(BotUser superAdmin);
 
     void changeStateRemoveBuilding(BotUser superAdmin);
+
+    void changeStateAdmin(BotUser superAdmin);
+
+    void createNewAdmin(String text, BotUser superAdmin, SendMessage sendMessage, AbsSender sender);
+
+    void changeAddNewAdminState(BotUser superAdmin);
+
+    String getDtoBuildings(BotUser superAdmin);
 }

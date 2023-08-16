@@ -43,4 +43,9 @@ public interface ResMessageUz {
     String DELETED_SUCCESS = "<b>Muvofaqiyatli o'chirildi</b>";
     String ALL_BUILDING = "<b>Bazada mavjud hamma binolar ro'yxati\n\n</b>";
     String BACK = "<b>Servicelardan birini tanlang</b>";
+    String ENTER_NEW_ADMIN_PHONE_NUMBER = "<b>Yangi adminning telefon raqamini kiriting (9989********) shu ko'rinishda</b>";
+    String ERROR_PHONE_NUMBER = "<b>Xato telefon raqam kiritdingiz:\nNamunaga e'tibor qiling</b>";
+    String CREATED_NEW_ADMIN = "<b>Yangi Admin yaratildi</b>";
+    String YOUR_ADMIN = "<b>Tabriklaymiz siz Admin bo'ldingiz:</b>";
+    String START_WORK = "Ishni boshlash";
 }

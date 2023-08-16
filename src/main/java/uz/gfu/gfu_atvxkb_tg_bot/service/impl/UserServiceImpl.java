@@ -5,7 +5,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
+import uz.gfu.gfu_atvxkb_tg_bot.dto.UserDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
@@ -178,7 +181,7 @@ public class UserServiceImpl implements UserService {
     public void back(BotUser superAdmin) {
         switch (superAdmin.getState()) {
             case EDIT_BUILDING_STATE,
-                    REMOVE_BUILDING_STATE-> superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+                    REMOVE_BUILDING_STATE -> superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
         }
         userRepository.save(superAdmin);
     }
@@ -187,6 +190,94 @@ public class UserServiceImpl implements UserService {
     public void changeStateRemoveBuilding(BotUser superAdmin) {
         superAdmin.setState(UserState.REMOVE_BUILDING_STATE);
         userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateAdmin(BotUser superAdmin) {
+        superAdmin.setState(UserState.CRUD_ADMIN);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void createNewAdmin(String text, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        BotUser admin = userRepository.findByPhoneNumberAndDeletedFalse(text);
+        if (admin == null) {
+            BotUser newAdmin = new BotUser();
+            newAdmin.setPhoneNumber(text);
+            newAdmin.setRole(Role.ADMIN);
+            newAdmin.setState(UserState.SETTING);
+            userRepository.save(newAdmin);
+            superAdmin.setState(UserState.CRUD_ADMIN);
+            userRepository.save(superAdmin);
+            sendMessage.setChatId(superAdmin.getChatId());
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
+                sendMessage.setText(ResMessageUz.CREATED_NEW_ADMIN);
+            } else sendMessage.setText(ResMessageRu.CREATED_NEW_ADMIN);
+            sendMessage.setReplyMarkup(generalService.crudAdmin());
+        } else {
+            admin.setRole(Role.ADMIN);
+            admin.setState(UserState.SETTING);
+            userRepository.save(admin);
+            superAdmin.setState(UserState.CRUD_ADMIN);
+            userRepository.save(superAdmin);
+            sendMessage.setChatId(superAdmin.getChatId());
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.CREATED_NEW_ADMIN);
+            else sendMessage.setText(ResMessageRu.CREATED_NEW_ADMIN);
+            sendMessage.setReplyMarkup(generalService.crudAdmin());
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+            sendMessage.setChatId(admin.getChatId());
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.YOUR_ADMIN);
+            else sendMessage.setText(ResMessageRu.YOUR_ADMIN);
+            sendMessage.setReplyMarkup(generalService.startWork(admin));
+        }
+    }
+
+    @Override
+    public void changeAddNewAdminState(BotUser superAdmin) {
+        superAdmin.setState(UserState.ADD_ADMIN_STATE);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public String getDtoBuildings(BotUser superAdmin) {
+        List<BotUser> getAllAdmin = userRepository.findAllByRoleAndDeletedFalse(Role.ADMIN);
+        List<UserDto> userDtoList = new ArrayList<>();
+        for (BotUser botUser : getAllAdmin) {
+            UserDto dto = new UserDto();
+            dto.setId(botUser.getId());
+            dto.setFirstname(botUser.getFirstname());
+            dto.setLastname(botUser.getLastname());
+            dto.setPhoneNumber(botUser.getPhoneNumber());
+            userDtoList.add(dto);
+        }
+        StringBuilder sb = new StringBuilder();
+        short i = 1;
+        for (UserDto dto : userDtoList) {
+            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? "<b>" + i + " \uD83E\uDDD1\u200D\uD83D\uDCBB ADMIN: \n" +
+                            "ID: \n" +
+                            "ISM: \n" +
+                            "FAMILIYA: \n" +
+                            "TEL RAQAM: \n</b>" : " " +
+                            "<b>\uD83E\uDDD1\u200D\uD83D\uDCBB АДМИН: \n" +
+                            "ИД: \n" +
+                            "ИМЯ: \n" +
+                            "ФАМИЛИЯ: \n" +
+                            "ТЕЛ НОМЕР: \n" +
+                            "</b>").append(dto.getId())
+                    .append("\n")
+                    .append(dto.getFirstname())
+                    .append("\n")
+                    .append(dto.getLastname())
+                    .append("\n")
+                    .append(dto.getPhoneNumber())
+                    .append("\n");
+        }
+        return sb.toString();
     }
 
     @Override

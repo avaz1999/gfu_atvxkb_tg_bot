@@ -35,5 +35,10 @@ public interface ResMessageRu {
     String DELETED_SUCCESS = "<b>Удалено успешно</b>";
     String ALL_BUILDINGS = "<b>Список всех зданий, имеющихся в базе данных\n\n</b>";
     String BACK = "<b>Выберите одну из услуг</b>";
+    String ENTER_NEW_ADMIN_PHONE_NUMBER = "<b>Введите номер телефона нового администратора (9989********) такой образом.</b>";
+    String ERROR_PHONE_NUMBER = "<b>Вы ввели неверный номер телефона:\nОбратите внимание на шаблон</b>";
+    String CREATED_NEW_ADMIN = "<b>Создан новый админ</b>";
+    String YOUR_ADMIN = "<b>Поздравляем, вы стали администратором</b>";
+    String START_WORK = "Начать работа";
 }
 

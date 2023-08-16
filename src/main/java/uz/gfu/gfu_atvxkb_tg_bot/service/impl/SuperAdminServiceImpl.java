@@ -16,6 +16,9 @@ import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SuperAdminService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Service
 public class SuperAdminServiceImpl implements SuperAdminService {
     private final GeneralService generalService;
@@ -38,6 +41,103 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             case ADD_BUILDING_STATE -> createNewBuilding(message, superAdmin, sendMessage, sender);
             case EDIT_BUILDING_STATE -> editBuilding(message, superAdmin, sendMessage, sender);
             case EDIT_BUILDING_STATE_1 -> editBuilding1(message, superAdmin, sendMessage, sender);
+            case ADD_ADMIN_STATE -> createNewAdmin(message, superAdmin, sendMessage, sender);
+            case CRUD_ADMIN -> crudAdminState(message, superAdmin, sendMessage, sender);
+        }
+    }
+
+    private void createNewAdmin(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            String text = message.getText();
+            String regexPattern = "^[0-9]+$";
+            Pattern pattern = Pattern.compile(regexPattern);
+            Matcher matcher = pattern.matcher(text);
+           if (matcher.matches() && text.length() == 12) {
+                userService.createNewAdmin(text, superAdmin, sendMessage,sender);
+            } else if (text.length() == 13) {
+                if (text.startsWith("+998")) {
+                    userService.createNewAdmin(text, superAdmin, sendMessage,sender);
+                } else {
+                    if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                        sendMessage.setText(ResMessageUz.ERROR_PHONE_NUMBER);
+                    else sendMessage.setText(ResMessageRu.ERROR_PHONE_NUMBER);
+                }
+            } else {
+                if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                    sendMessage.setText(ResMessageUz.ERROR_PHONE_NUMBER);
+                else sendMessage.setText(ResMessageRu.ERROR_PHONE_NUMBER);
+            }
+        } else {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void crudAdminState(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            String text = message.getText();
+            switch (text) {
+                case BotQuery.ADD_ADMIN -> addNewAdmin(message, superAdmin, sendMessage, sender);
+                case BotQuery.REMOVE_ADMIN -> removeAdmin(message, superAdmin, sendMessage, sender);
+                case BotQuery.ALL_ADMIN -> allAdmin(superAdmin, sendMessage, sender);
+                case BotQuery.UPDATE_ADMIN -> updateAndRemoveAdmin(message, superAdmin, sendMessage, sender);
+                case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
+                default -> {
+                    if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                        sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+                    else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                        sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+                    try {
+                        sender.execute(sendMessage);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateAndRemoveAdmin(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    }
+
+    private void allAdmin( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String getAllAdmins = userService.getDtoBuildings(superAdmin);
+        sendMessage.setChatId(superAdmin.getChatId());
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+            sendMessage.setText(ResMessageUz.ALL_BUILDING + getAllAdmins);
+        else sendMessage.setText(ResMessageRu.ALL_BUILDINGS + getAllAdmins);
+        sendMessage.setReplyMarkup(generalService.crudAdmin());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void removeAdmin(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    }
+
+
+    private void addNewAdmin(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.ENTER_NEW_ADMIN_PHONE_NUMBER);
+            else sendMessage.setText(ResMessageRu.ENTER_NEW_ADMIN_PHONE_NUMBER);
+            userService.changeAddNewAdminState(superAdmin);
+        } else {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -149,7 +249,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ADMIN_CRUD);
         sendMessage.setChatId(superAdmin.getChatId());
         sendMessage.setReplyMarkup(generalService.crudAdmin());
-        userService.changeStateBuilding(superAdmin);
+        userService.changeStateAdmin(superAdmin);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

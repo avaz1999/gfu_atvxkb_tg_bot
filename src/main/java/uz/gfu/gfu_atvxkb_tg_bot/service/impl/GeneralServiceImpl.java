@@ -15,6 +15,8 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
@@ -178,6 +180,23 @@ public class GeneralServiceImpl implements GeneralService {
         back.add(backButton);
         keyboardRows.add(back);
         return replyKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard startWork(BotUser admin) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        KeyboardRow back = new KeyboardRow();
+        KeyboardButton backButton = new KeyboardButton();
+        if (admin.getLanguage().equals(BotQuery.UZ_SELECT))backButton.setText(BotQuery.START_WORK_UZ);
+        else backButton.setText(BotQuery.START_WORK_RU);
+        back.add(backButton);
+        keyboardRows.add(back);
+        return replyKeyboardMarkup;
+
     }
 
     private KeyboardRow getKeyboardButtonsByLang(List<KeyboardRow> keyboardRows, KeyboardRow row, List<FeedBack> allFeedbackUz) {

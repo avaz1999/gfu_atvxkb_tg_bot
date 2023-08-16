@@ -32,4 +32,6 @@ public interface GeneralService {
     ReplyKeyboard getBuildingNumber();
 
     ReplyKeyboard getBack(BotUser superAdmin);
+
+    ReplyKeyboard startWork(BotUser superAdmin);
 }

@@ -9,4 +9,5 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<BotUser,Long> {
      BotUser findByChatIdAndDeletedFalse(Long chatId);
      List<BotUser> findAllByRoleAndDeletedFalse(Role role);
+     BotUser findByPhoneNumberAndDeletedFalse(String phoneNumber);
 }
