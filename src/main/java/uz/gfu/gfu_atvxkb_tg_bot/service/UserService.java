@@ -57,5 +57,10 @@ public interface UserService {
 
     void changeAddNewAdminState(BotUser superAdmin);
 
-    String getDtoBuildings(BotUser superAdmin);
+
+    String getDtoAdmin(BotUser superAdmin);
+
+    void changeStateRemoveAdmin(BotUser superAdmin);
+
+    void getAdminByPhoneNumber(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender);
 }

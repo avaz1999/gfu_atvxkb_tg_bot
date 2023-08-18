@@ -26,6 +26,7 @@ public class BotUser extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserState state;
     private String language;
+    private Boolean edited;
     @ManyToMany
     @JoinTable(name = "users_feedbacks",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -43,6 +43,20 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             case EDIT_BUILDING_STATE_1 -> editBuilding1(message, superAdmin, sendMessage, sender);
             case ADD_ADMIN_STATE -> createNewAdmin(message, superAdmin, sendMessage, sender);
             case CRUD_ADMIN -> crudAdminState(message, superAdmin, sendMessage, sender);
+            case REMOVE_ADMIN_STATE -> removeAdminState(message,superAdmin,sendMessage,sender);
+        }
+    }
+
+    private void removeAdminState(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        sendMessage.enableHtml(true);
+        if (message.hasText()) {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,11 +66,11 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             String regexPattern = "^[0-9]+$";
             Pattern pattern = Pattern.compile(regexPattern);
             Matcher matcher = pattern.matcher(text);
-           if (matcher.matches() && text.length() == 12) {
-                userService.createNewAdmin(text, superAdmin, sendMessage,sender);
+            if (matcher.matches() && text.length() == 12) {
+                userService.createNewAdmin(text, superAdmin, sendMessage, sender);
             } else if (text.length() == 13) {
                 if (text.startsWith("+998")) {
-                    userService.createNewAdmin(text, superAdmin, sendMessage,sender);
+                    userService.createNewAdmin(text, superAdmin, sendMessage, sender);
                 } else {
                     if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
                         sendMessage.setText(ResMessageUz.ERROR_PHONE_NUMBER);
@@ -83,7 +97,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             String text = message.getText();
             switch (text) {
                 case BotQuery.ADD_ADMIN -> addNewAdmin(message, superAdmin, sendMessage, sender);
-                case BotQuery.REMOVE_ADMIN -> removeAdmin(message, superAdmin, sendMessage, sender);
+                case BotQuery.REMOVE_ADMIN -> removeAdmin(superAdmin, sendMessage, sender);
                 case BotQuery.ALL_ADMIN -> allAdmin(superAdmin, sendMessage, sender);
                 case BotQuery.UPDATE_ADMIN -> updateAndRemoveAdmin(message, superAdmin, sendMessage, sender);
                 case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
@@ -105,8 +119,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     private void updateAndRemoveAdmin(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
     }
 
-    private void allAdmin( BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-        String getAllAdmins = userService.getDtoBuildings(superAdmin);
+    private void allAdmin(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String getAllAdmins = userService.getDtoAdmin(superAdmin);
         sendMessage.setChatId(superAdmin.getChatId());
         if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
             sendMessage.setText(ResMessageUz.ALL_BUILDING + getAllAdmins);
@@ -119,7 +133,16 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
     }
 
-    private void removeAdmin(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    private void removeAdmin(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String getAdmins = userService.getDtoAdmin(superAdmin);
+        userService.changeStateRemoveAdmin(superAdmin);
+        sendMessage.setText(ResMessageUz.REMOVE_BUILDING + getAdmins);
+        sendMessage.setReplyMarkup(generalService.getAdminNumber());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -385,13 +408,22 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         String data = callbackQuery.getData();
 
         SendMessage sendMessage = new SendMessage();
-        if (superAdmin.getState().equals(UserState.ADD_BUILDING_STATE) ||
-                superAdmin.getState().equals(UserState.EDIT_BUILDING_STATE) ||
-                superAdmin.getState().equals(UserState.REMOVE_BUILDING_STATE)) {
             switch (data) {
                 case BotQuery.BACK -> back(superAdmin, sendMessage, sender);
-                default -> buildingService.getBuildingByName(superAdmin, sendMessage, data, sender);
+                default -> chooseNumber(superAdmin, data, sendMessage, sender);
             }
+        }
+
+
+    private void chooseNumber(BotUser superAdmin, String data, SendMessage sendMessage, AbsSender sender) {
+        switch (superAdmin.getState()) {
+            case ADD_BUILDING_STATE,
+                    EDIT_BUILDING_STATE,
+                    REMOVE_BUILDING_STATE -> buildingService.getBuildingByName(superAdmin, sendMessage, data, sender);
+            case ADD_ADMIN_STATE,
+                    EDIT_ADMIN_STATE,
+                    REMOVE_ADMIN_STATE-> userService.getAdminByPhoneNumber(superAdmin,sendMessage,data,sender);
+
         }
     }
 

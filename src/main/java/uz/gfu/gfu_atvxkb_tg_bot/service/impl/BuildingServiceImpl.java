@@ -117,8 +117,8 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     public void getBuildingByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
-        Building building = buildingRepository.findByNameAndDeletedFalse(data);
         sendMessage.enableHtml(true);
+        Building building = buildingRepository.findByNameAndDeletedFalse(data);
         if (building == null) {
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_MESSAGE);

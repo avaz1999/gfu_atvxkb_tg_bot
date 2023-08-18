@@ -34,4 +34,6 @@ public interface GeneralService {
     ReplyKeyboard getBack(BotUser superAdmin);
 
     ReplyKeyboard startWork(BotUser superAdmin);
+
+    ReplyKeyboard getAdminNumber();
 }

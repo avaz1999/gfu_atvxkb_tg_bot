@@ -1,8 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -15,11 +14,10 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
-import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
-import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
+import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +29,15 @@ public class GeneralServiceImpl implements GeneralService {
     private final BuildingService buildingService;
     @Lazy
     private final SubFeedbackService subFeedbackService;
+    @Autowired
+    @Lazy
+     UserService userService;
 
     public GeneralServiceImpl(FeedbackServiceImpl feedbackService, BuildingService buildingService, SubFeedbackService subFeedbackService) {
         this.feedbackService = feedbackService;
         this.buildingService = buildingService;
         this.subFeedbackService = subFeedbackService;
+
     }
 
     @Override
@@ -191,12 +193,44 @@ public class GeneralServiceImpl implements GeneralService {
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         KeyboardRow back = new KeyboardRow();
         KeyboardButton backButton = new KeyboardButton();
-        if (admin.getLanguage().equals(BotQuery.UZ_SELECT))backButton.setText(BotQuery.START_WORK_UZ);
+        if (admin.getLanguage().equals(BotQuery.UZ_SELECT)) backButton.setText(BotQuery.START_WORK_UZ);
         else backButton.setText(BotQuery.START_WORK_RU);
         back.add(backButton);
         keyboardRows.add(back);
         return replyKeyboardMarkup;
 
+    }
+
+    @Override
+    public ReplyKeyboard getAdminNumber() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList2 = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList3 = new ArrayList<>();
+        InlineKeyboardButton back = new InlineKeyboardButton();
+        List<BotUser> admins = userService.getAllAdmins();
+        for (int i = 0; i < admins.size(); i++) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            BotUser adminButton = admins.get(i);
+            button.setText(String.valueOf(i + 1));
+            button.setCallbackData(adminButton.getPhoneNumber());
+            if (i == 5) {
+                inlineKeyboardButtonList2.add(button);
+            } else {
+                inlineKeyboardButtonList1.add(button);
+            }
+        }
+        back.setText(BotQuery.BACK);
+        back.setCallbackData(BotQuery.BACK);
+        inlineKeyboardButtonList3.add(back);
+        lists.add(inlineKeyboardButtonList1);
+        lists.add(inlineKeyboardButtonList2);
+        lists.add(inlineKeyboardButtonList3);
+        inlineKeyboardMarkup.setKeyboard(lists);
+
+
+        return inlineKeyboardMarkup;
     }
 
     private KeyboardRow getKeyboardButtonsByLang(List<KeyboardRow> keyboardRows, KeyboardRow row, List<FeedBack> allFeedbackUz) {

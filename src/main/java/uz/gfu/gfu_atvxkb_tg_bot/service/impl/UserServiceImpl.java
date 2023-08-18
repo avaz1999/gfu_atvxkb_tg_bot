@@ -1,6 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -244,7 +245,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getDtoBuildings(BotUser superAdmin) {
+    public String getDtoAdmin(BotUser superAdmin) {
         List<BotUser> getAllAdmin = userRepository.findAllByRoleAndDeletedFalse(Role.ADMIN);
         List<UserDto> userDtoList = new ArrayList<>();
         for (BotUser botUser : getAllAdmin) {
@@ -259,26 +260,51 @@ public class UserServiceImpl implements UserService {
         short i = 1;
         for (UserDto dto : userDtoList) {
             sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? "<b>" + i + " \uD83E\uDDD1\u200D\uD83D\uDCBB ADMIN: \n" +
-                            "ID: \n" +
-                            "ISM: \n" +
-                            "FAMILIYA: \n" +
-                            "TEL RAQAM: \n</b>" : " " +
-                            "<b>\uD83E\uDDD1\u200D\uD83D\uDCBB АДМИН: \n" +
-                            "ИД: \n" +
-                            "ИМЯ: \n" +
-                            "ФАМИЛИЯ: \n" +
-                            "ТЕЛ НОМЕР: \n" +
-                            "</b>").append(dto.getId())
-                    .append("\n")
-                    .append(dto.getFirstname())
-                    .append("\n")
-                    .append(dto.getLastname())
-                    .append("\n")
-                    .append(dto.getPhoneNumber())
-                    .append("\n");
+                    "ID: " + dto.getId() + "\n" +
+                    "ISM: " + dto.getFirstname() + "\n" +
+                    "FAMILIYA: " + dto.getLastname() + "\n" +
+                    "TEL RAQAM: " + dto.getPhoneNumber() + "\n\n" +
+                    "</b>" : " " +
+                    "<b>\uD83E\uDDD1\u200D\uD83D\uDCBB АДМИН: \n" +
+                    "ИД: " + dto.getId() + "\n" +
+                    "ИМЯ: " + dto.getFirstname() + "\n" +
+                    "ФАМИЛИЯ: " + dto.getLastname() + "\n" +
+                    "ТЕЛ НОМЕР: " + dto.getPhoneNumber() + "\n" +
+                    "</b>");
         }
         return sb.toString();
     }
+
+    @Override
+    public void changeStateRemoveAdmin(BotUser superAdmin) {
+        superAdmin.setState(UserState.REMOVE_ADMIN_STATE);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void getAdminByPhoneNumber(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
+        BotUser admin = userRepository.findByPhoneNumberAndDeletedFalse(data);
+        if (admin == null){
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        }
+        else if (superAdmin.getState().equals(UserState.REMOVE_ADMIN_STATE)){
+            admin.setDeleted(true);
+            admin.setDeletedBy(superAdmin.getId());
+            userRepository.save(admin);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DELETED_SUCCESS);
+            else sendMessage.setText(ResMessageRu.DELETED_SUCCESS);
+        } else if (superAdmin.getState().equals(UserState.EDIT_ADMIN_STATE)) {
+            admin.setEdited(true);
+//            admin.setState(UserState.);
+        }
+        try {
+             sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public void saveUserDepartmentName(String text, Long chatId) {
