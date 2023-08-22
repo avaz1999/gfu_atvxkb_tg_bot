@@ -12,4 +12,6 @@ public interface SubFeedbackService {
     List<SubFeedback> findAllFeedback(String feedback);
 
     void saveSubFeedback(String data, BotUser client, SendMessage sendMessage);
+
+    void addSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage);
 }

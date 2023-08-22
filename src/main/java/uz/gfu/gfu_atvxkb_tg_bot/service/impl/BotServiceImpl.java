@@ -18,15 +18,14 @@ public class BotServiceImpl implements BotService {
     private final SuperAdminService superAdminService;
     private final ClientService clientService;
     private final AdminService adminService;
-    private static final String START = "/start";
-    private final GeneralService generalService;
+    private final DeveloperService developerService;
 
-    public BotServiceImpl(UserServiceImpl userService, SuperAdminService superAdminService, ClientService clientService, AdminService adminService, GeneralService generalService) {
+    public BotServiceImpl(UserServiceImpl userService, SuperAdminService superAdminService, ClientService clientService, AdminService adminService, DeveloperService developerService) {
         this.userService = userService;
         this.superAdminService = superAdminService;
         this.clientService = clientService;
         this.adminService = adminService;
-        this.generalService = generalService;
+        this.developerService = developerService;
     }
 
     @Override
@@ -54,7 +53,8 @@ public class BotServiceImpl implements BotService {
         switch (currentUser.getRole()) {
             case CLIENT -> clientService.clientHasMessage(currentUser, message, sendMessage,sender);
             case ADMIN -> adminService.callAdminService(currentUser, message, sendMessage,sender);
-            case SUPER_ADMIN -> superAdminService.superAdminHasMessage(currentUser, message, sendMessage,sender );
+            case SUPER_ADMIN -> superAdminService.superAdminHasMessage(currentUser, message, sendMessage,sender);
+            case DEVELOPER -> developerService.developerService(currentUser,message,sendMessage,sender);
         }
     }
 

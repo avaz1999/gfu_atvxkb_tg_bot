@@ -95,8 +95,8 @@ public class BuildingServiceImpl implements BuildingService {
             else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
                 sendMessage.setText(ResMessageRu.EXIST_BUILDING_NAME);
         } else {
-            buildingRepository.save(new Building(text,false));
-            superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+            buildingRepository.save(new Building(text, false));
+            superAdmin.setState(UserState.CRUD_BUILDING);
             userRepository.save(superAdmin);
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.BUILDING_CRUD);
             else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
@@ -118,38 +118,34 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public void getBuildingByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
         sendMessage.enableHtml(true);
+        sendMessage.setChatId(superAdmin.getChatId());
         Building building = buildingRepository.findByNameAndDeletedFalse(data);
         if (building == null) {
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
                 sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+            } else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) {
                 sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
-        } else if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
-            sendMessage.setChatId(superAdmin.getChatId());
-            if (superAdmin.getState().equals(UserState.EDIT_BUILDING_STATE)) {
-                building.setEdited(true);
-                buildingRepository.save(building);
-                sendMessage.setText(building.getName() + ResMessageUz.ENTER_NEW_BLOCK);
-                superAdmin.setState(UserState.EDIT_BUILDING_STATE_1);
-            } else if (superAdmin.getState().equals(UserState.REMOVE_BUILDING_STATE)) {
-                building.setDeleted(true);
-                building.setDeletedBy(superAdmin.getId());
-                buildingRepository.save(building);
-                if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DELETED_SUCCESS);
-                else sendMessage.setText(ResMessageRu.DELETED_SUCCESS);
-                superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
-                sendMessage.setReplyMarkup(generalService.crudBuilding());
             }
+        } else if (superAdmin.getState().equals(UserState.REMOVE_BUILDING_STATE)) {
+            building.setDeleted(true);
+            buildingRepository.save(building);
+            superAdmin.setState(UserState.CRUD_BUILDING);
             userRepository.save(superAdmin);
-        } else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT)) {
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.DELETED_SUCCESS);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.DELETED_SUCCESS);
+            sendMessage.setReplyMarkup(generalService.crudBuilding());
+        } else if (superAdmin.getState().equals(UserState.EDIT_BUILDING_STATE)) {
             building.setEdited(true);
             buildingRepository.save(building);
-            sendMessage.setChatId(superAdmin.getChatId());
-            sendMessage.setText(building.getName() + ResMessageRu.ENTER_NEW_BLOCK);
             superAdmin.setState(UserState.EDIT_BUILDING_STATE_1);
             userRepository.save(superAdmin);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.ENTER_NEW_BLOCK);
+            else if (superAdmin.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ENTER_NEW_BLOCK);
         }
-
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -169,7 +165,7 @@ public class BuildingServiceImpl implements BuildingService {
             building.setModifiedBy(superAdmin.getId());
             building.setName(text);
             building.setEdited(false);
-            superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+            superAdmin.setState(UserState.CRUD_BUILDING);
             userRepository.save(superAdmin);
             buildingRepository.save(building);
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))

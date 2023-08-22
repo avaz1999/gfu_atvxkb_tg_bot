@@ -47,7 +47,7 @@ public interface UserService {
 
     void changeStateEditBuilding(BotUser superAdmin);
 
-    void back(BotUser superAdmin);
+    void back(BotUser superAdmin, SendMessage sendMessage);
 
     void changeStateRemoveBuilding(BotUser superAdmin);
 
@@ -63,4 +63,20 @@ public interface UserService {
     void changeStateRemoveAdmin(BotUser superAdmin);
 
     void getAdminByPhoneNumber(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender);
+
+    void changeStateEditAdmin(BotUser superAdmin);
+
+    void editAdmin(String text, BotUser superAdmin, SendMessage sendMessage);
+
+    void changeStateAddFeedback(BotUser superAdmin);
+
+    void changeStateRemoveFeedback(BotUser superAdmin);
+
+    void changeStateUpdateFeedback(BotUser superAdmin);
+
+    void changeStateFeedback(BotUser superAdmin);
+
+    void changeStateSubFeedback(BotUser superAdmin);
+
+    void changeStateGetFeedbackWithSubFeedback(BotUser superAdmin);
 }

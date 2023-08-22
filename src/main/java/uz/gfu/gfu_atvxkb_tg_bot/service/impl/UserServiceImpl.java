@@ -1,7 +1,6 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -156,7 +155,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeStateBuilding(BotUser superAdmin) {
-        superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+        superAdmin.setState(UserState.CRUD_BUILDING);
         userRepository.save(superAdmin);
     }
 
@@ -179,10 +178,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void back(BotUser superAdmin) {
+    public void back(BotUser superAdmin, SendMessage sendMessage) {
+        sendMessage.setChatId(superAdmin.getChatId());
         switch (superAdmin.getState()) {
             case EDIT_BUILDING_STATE,
-                    REMOVE_BUILDING_STATE -> superAdmin.setState(UserState.SUPER_ADMIN_BUILDING);
+                    REMOVE_BUILDING_STATE -> {
+                superAdmin.setState(UserState.CRUD_BUILDING);
+                sendMessage.setReplyMarkup(generalService.crudBuilding());
+            }
+            case EDIT_ADMIN_STATE,
+                    REMOVE_ADMIN_STATE -> {
+                superAdmin.setState(UserState.CRUD_ADMIN);
+                sendMessage.setReplyMarkup(generalService.crudAdmin());
+            }
+            case EDIT_FEEDBACK_STATE,
+                    REMOVE_FEEDBACK_STATE -> {
+                superAdmin.setState(UserState.CRUD_FEEDBACK);
+                sendMessage.setReplyMarkup(generalService.crudFeedback());
+            }
         }
         userRepository.save(superAdmin);
     }
@@ -196,6 +209,60 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeStateAdmin(BotUser superAdmin) {
         superAdmin.setState(UserState.CRUD_ADMIN);
+        userRepository.save(superAdmin);
+    }
+    @Override
+    public void editAdmin(String text, BotUser superAdmin, SendMessage sendMessage) {
+        sendMessage.setChatId(superAdmin.getChatId());
+        BotUser admin = userRepository.findByEditedTrueAndDeletedFalse();
+        if (admin == null){
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        }else {
+            admin.setPhoneNumber(text);
+            admin.setEdited(false);
+            userRepository.save(admin);
+            superAdmin.setState(UserState.CRUD_ADMIN);
+            userRepository.save(superAdmin);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.SUCCESS_EDITED);
+            else sendMessage.setText(ResMessageRu.SUCCESS_EDITED);
+            sendMessage.setReplyMarkup(generalService.crudAdmin());
+        }
+    }
+
+    @Override
+    public void changeStateAddFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.ADD_FEEDBACK_STATE);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateRemoveFeedback(BotUser superAdmin) {
+    superAdmin.setState(UserState.REMOVE_FEEDBACK_STATE);
+    userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateUpdateFeedback(BotUser superAdmin) {
+    superAdmin.setState(UserState.EDIT_FEEDBACK_STATE);
+    userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CRUD_FEEDBACK);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateGetFeedbackWithSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.ADD_SUB_FEEDBACK_STATE);
         userRepository.save(superAdmin);
     }
 
@@ -280,11 +347,20 @@ public class UserServiceImpl implements UserService {
         superAdmin.setState(UserState.REMOVE_ADMIN_STATE);
         userRepository.save(superAdmin);
     }
+    @Override
+    public void changeStateEditAdmin(BotUser superAdmin) {
+        superAdmin.setState(UserState.EDIT_ADMIN_STATE);
+        userRepository.save(superAdmin);
+    }
+
+
 
     @Override
     public void getAdminByPhoneNumber(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
         BotUser admin = userRepository.findByPhoneNumberAndDeletedFalse(data);
+        sendMessage.enableHtml(true);
         if (admin == null){
+            sendMessage.setChatId(superAdmin.getChatId());
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         }
@@ -292,11 +368,20 @@ public class UserServiceImpl implements UserService {
             admin.setDeleted(true);
             admin.setDeletedBy(superAdmin.getId());
             userRepository.save(admin);
+            superAdmin.setState(UserState.CRUD_ADMIN);
+            userRepository.save(superAdmin);
+            sendMessage.setChatId(superAdmin.getChatId());
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DELETED_SUCCESS);
             else sendMessage.setText(ResMessageRu.DELETED_SUCCESS);
+            sendMessage.setReplyMarkup(generalService.crudAdmin());
         } else if (superAdmin.getState().equals(UserState.EDIT_ADMIN_STATE)) {
             admin.setEdited(true);
-//            admin.setState(UserState.);
+            userRepository.save(admin);
+            sendMessage.setChatId(superAdmin.getChatId());
+            superAdmin.setState(UserState.EDIT_ADMIN_STATE1);
+            userRepository.save(superAdmin);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ENTER_NEW_ADMIN_PHONE_NUMBER);
+            else sendMessage.setText(ResMessageRu.ENTER_NEW_ADMIN_PHONE_NUMBER);
         }
         try {
              sender.execute(sendMessage);
@@ -304,6 +389,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(e);
         }
     }
+
 
 
     @Override

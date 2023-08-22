@@ -94,4 +94,17 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
             }
         }
     }
+
+    @Override
+    public void addSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage) {
+        sendMessage.setChatId(superAdmin.getChatId());
+        sendMessage.enableHtml(true);
+        SubFeedback subFeedback = subFeedbackRepository.findNameNull();
+        subFeedback.setName(text);
+        subFeedback.setCreatedBy(superAdmin.getId());
+        subFeedback.setLang(false);
+        subFeedbackRepository.save(subFeedback);
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+    }
 }

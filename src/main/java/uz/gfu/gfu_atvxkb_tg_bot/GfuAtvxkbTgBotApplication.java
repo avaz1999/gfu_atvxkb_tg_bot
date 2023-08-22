@@ -11,6 +11,5 @@ public class GfuAtvxkbTgBotApplication {
         SpringApplication.run(GfuAtvxkbTgBotApplication.class, args);
 
     }
-    public static Bot bot = new Bot("6393147133:AAFLn1UAERHVQyNmsl7dzSGC1A3raoYghNQ");
 
 }

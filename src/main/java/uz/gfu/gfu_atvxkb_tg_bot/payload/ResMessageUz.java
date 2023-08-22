@@ -48,4 +48,15 @@ public interface ResMessageUz {
     String CREATED_NEW_ADMIN = "<b>Yangi Admin yaratildi</b>";
     String YOUR_ADMIN = "<b>Tabriklaymiz siz Admin bo'ldingiz:</b>";
     String START_WORK = "Ishni boshlash";
+    String EDIT_ADMIN = "<b>O'zgartimoqchi bo'lgan \nAdminingizni tanlang\n</b>";
+    String ADD_NEW_FEEDBACK = "<b>Yangi Service ni kiriting</b>";
+    String EXIST_FEEDBACK_NAME = "<b>Bunday Service mavjud</b>";
+    String PLEASE_ENTER_RUSSIAN = "<b>Muvofaqiyatli saqlandi \nIltimos ruschasini ham qo'shing \nRus tilida foydalanuvchilar uchun</b>";
+    String SUCCESS_ADD_FEEDBACK = "<b>Service muvofaqiyatli saqlandi</b>";
+    String REMOVE_FEEDBACK = "<b>O'chirmoqchi bo'lgan servicengizni tanlang\n</b>";
+    String UPDATE_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan serviceingizni tanlang</b>";
+    String ENTER_NEW_FEEDBACK = "<b>Yangi Service nomini kiriting</b>";
+    String ALL_FEEDBACK = "<b>Hamma servicelar ro'yxati</b>";
+    String SUB_FEEDBACK_WITH_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan service turini tanlang</b>";
+    String ENTER_NEW_SUB_FEEDBACK = "<b>Yangi Service turini kiriting</b>";
 }

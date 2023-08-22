@@ -25,15 +25,13 @@ public class ClientServiceImpl implements ClientService {
     private final FeedbackService feedbackService;
     private final SubFeedbackService subFeedbackService;
     private final AdminService adminService;
-    private final BuildingService buildingService;
 
-    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, SubFeedbackService subFeedbackService, AdminService adminService, BuildingService buildingService) {
+    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, SubFeedbackService subFeedbackService, AdminService adminService) {
         this.userService = userService;
         this.generalService = generalService;
         this.feedbackService = feedbackService;
         this.subFeedbackService = subFeedbackService;
         this.adminService = adminService;
-        this.buildingService = buildingService;
     }
 
     @Override

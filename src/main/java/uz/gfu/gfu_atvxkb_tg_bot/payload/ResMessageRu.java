@@ -40,5 +40,15 @@ public interface ResMessageRu {
     String CREATED_NEW_ADMIN = "<b>Создан новый админ</b>";
     String YOUR_ADMIN = "<b>Поздравляем, вы стали администратором</b>";
     String START_WORK = "Начать работа";
+    String ADD_NEW_FEEDBACK = "<b>Введите новую услугу</b>";
+    String EXIST_FEEDBACK_NAME = "<b>такая услуга есть</b>";
+    String PLEASE_ENTER_RUSSIAN = "<b>Успешно сохранено\nПожалуйста, добавьте русский язык тоже\nДля пользователей на русском</b>";
+    String SUCCESS_ADD_FEEDBACK = "<b>Услуга успешно сохранена</b>";
+    String REMOVE_FEEDBACK = "<b>Выберите услугу, которую хотите отключить</b>";
+    String UPDATE_FEEDBACK = "<b>Выберите услугу, которую хотите изменить</b>";
+    String ENTER_NEW_FEEDBACK = "<b>Введите новое имя службы</b>";
+    String ALL_FEEDBACK = "<b>Список всех услуг</b>";
+    String SUB_FEEDBACK_WITH_FEEDBACK = "<b>Выберите тип услуги, которую вы хотите изменить</b>";
+    String ENTER_NEW_SUB_FEEDBACK = "<b>Введите новый тип услуги</b>";
 }
 

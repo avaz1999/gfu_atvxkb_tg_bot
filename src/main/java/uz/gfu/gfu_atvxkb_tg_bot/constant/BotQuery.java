@@ -28,8 +28,8 @@ public interface BotQuery {
     String ALL_BUILDING = "\uD83E\uDDFE Все здание";
     String MENU = "\uD83D\uDCCC MENU";
     String REMOVE_FEEDBACK = "❌ Услуга";
-    String ALL_FEEDBACK = "✏️ Услуга";
-    String UPDATE_FEEDBACK = "\uD83E\uDDFE Все Услуга";
+    String ALL_FEEDBACK = "\uD83E\uDDFE Все Услуга";
+    String UPDATE_FEEDBACK = "✏️ Услуга";
     String REMOVE_SUB_FEEDBACK = "❌ Услуга типа";
     String ALL_SUB_FEEDBACK = "\uD83E\uDDFE Услуга типа";
     String UPDATE_SUB_FEEDBACK = "✏️ Услуга типа";

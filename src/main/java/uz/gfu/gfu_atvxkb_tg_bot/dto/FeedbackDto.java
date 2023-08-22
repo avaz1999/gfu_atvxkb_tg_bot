@@ -12,5 +12,6 @@ import java.util.List;
 public class FeedbackDto {
     private Long id;
     private String name;
+    private boolean lang;
     private List<String> message;
 }

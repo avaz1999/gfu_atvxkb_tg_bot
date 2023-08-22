@@ -2,17 +2,14 @@ package uz.gfu.gfu_atvxkb_tg_bot.entitiy;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 
 import java.util.List;
+import java.util.Objects;
 
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -20,7 +17,12 @@ import java.util.List;
 public class FeedBack extends BaseEntity {
     private String name;
     private boolean lang = false; // default uz
-    @OneToMany(mappedBy = "feedBack",cascade = CascadeType.ALL)
+    private boolean edited = false;
+    @OneToMany(mappedBy = "feedBack", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<SubFeedback> subFeedbacks;
+
+
+
 
 }

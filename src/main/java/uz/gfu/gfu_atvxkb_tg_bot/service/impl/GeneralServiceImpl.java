@@ -233,6 +233,38 @@ public class GeneralServiceImpl implements GeneralService {
         return inlineKeyboardMarkup;
     }
 
+    @Override
+    public ReplyKeyboard getFeedbacksNumber() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList2 = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtonList3 = new ArrayList<>();
+        InlineKeyboardButton back = new InlineKeyboardButton();
+        List<FeedBack> feedBacks = feedbackService.getAllFeedback();
+        for (int i = 0; i < feedBacks.size(); i++) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            FeedBack feedbackButton = feedBacks.get(i);
+            button.setText(String.valueOf(i + 1));
+            button.setCallbackData(feedbackButton.getName());
+            if (i == 5) {
+                inlineKeyboardButtonList2.add(button);
+            } else {
+                inlineKeyboardButtonList1.add(button);
+            }
+        }
+        back.setText(BotQuery.BACK);
+        back.setCallbackData(BotQuery.BACK);
+        inlineKeyboardButtonList3.add(back);
+        lists.add(inlineKeyboardButtonList1);
+        lists.add(inlineKeyboardButtonList2);
+        lists.add(inlineKeyboardButtonList3);
+        inlineKeyboardMarkup.setKeyboard(lists);
+
+
+        return inlineKeyboardMarkup;
+    }
+
     private KeyboardRow getKeyboardButtonsByLang(List<KeyboardRow> keyboardRows, KeyboardRow row, List<FeedBack> allFeedbackUz) {
         for (int i = 0; i < allFeedbackUz.size(); i++) {
             FeedBack feedBack = allFeedbackUz.get(i);
