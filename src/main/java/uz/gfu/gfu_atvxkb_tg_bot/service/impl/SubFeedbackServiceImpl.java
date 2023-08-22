@@ -8,13 +8,13 @@ import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.History;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Application;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.HistoryRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.ApplicationRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
@@ -29,7 +29,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
     private final SubFeedbackRepository subFeedbackRepository;
-    private final HistoryRepository historyRepository;
+    private final ApplicationRepository historyRepository;
     @Autowired
     @Lazy
     UserService userService;
@@ -37,7 +37,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     @Lazy
     GeneralService generalService;
 
-    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, HistoryRepository historyRepository) {
+    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, ApplicationRepository historyRepository) {
         this.feedBackRepository = feedBackRepository;
         this.userRepository = userRepository;
         this.subFeedbackRepository = subFeedbackRepository;
@@ -78,7 +78,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
             else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         }
         else {
-            History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+            Application history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
             if (history != null) {
                 history.setSubFeedbackId(subFeedback.getId());
                 historyRepository.save(history);
@@ -104,7 +104,10 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         subFeedback.setCreatedBy(superAdmin.getId());
         subFeedback.setLang(false);
         subFeedbackRepository.save(subFeedback);
-        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
+        sendMessage.setReplyMarkup(generalService.crudSubFeedback());
+        userRepository.save(superAdmin);
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.SUCCESS_ADD_SUB_FEEDBACK);
+            else sendMessage.setText(ResMessageRu.SUCCESS_ADD_SUB_FEEDBACK);
     }
 }

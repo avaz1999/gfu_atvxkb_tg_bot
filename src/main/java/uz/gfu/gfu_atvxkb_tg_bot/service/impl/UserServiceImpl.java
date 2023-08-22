@@ -15,6 +15,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
+import uz.gfu.gfu_atvxkb_tg_bot.service.AdminService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
@@ -28,17 +29,19 @@ public class UserServiceImpl implements UserService {
     private final SubFeedbackRepository subFeedbackRepository;
     private final DepartmentRepository departmentRepository;
     private final BuildingRepository buildingRepository;
-    private final HistoryRepository historyRepository;
+    private final ApplicationRepository applicationRepository;
+    private final AdminService adminService;
     @Lazy
     private final GeneralService generalService;
 
-    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, HistoryRepository historyRepository, GeneralService generalService) {
+    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, ApplicationRepository historyRepository, AdminService adminService, GeneralService generalService) {
         this.userRepository = userRepository;
         this.feedBackRepository = feedBackRepository;
         this.subFeedbackRepository = subFeedbackRepository;
         this.departmentRepository = departmentRepository;
         this.buildingRepository = buildingRepository;
-        this.historyRepository = historyRepository;
+        this.applicationRepository = historyRepository;
+        this.adminService = adminService;
         this.generalService = generalService;
     }
 
@@ -74,25 +77,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveBlock(String text, Long chatId, SendMessage sendMessage) {
-        BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
+    public void saveBlock(String text, BotUser client, SendMessage sendMessage) {
         Building byName = buildingRepository.findByNameAndDeletedFalse(text);
-        sendMessage.setChatId(user.getChatId());
+        sendMessage.setChatId(client.getChatId());
         if (byName == null) {
-            if (user.getLanguage().equals(BotQuery.UZ_SELECT))
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_BUILD_NAME);
-            else {
-                sendMessage.setText(ResMessageRu.ERROR_BUILD_NAME);
-            }
-            sendMessage.setChatId(chatId);
+            else sendMessage.setText(ResMessageRu.ERROR_BUILD_NAME);
             sendMessage.setReplyMarkup(generalService.getBlock());
         } else {
-            user.setState(UserState.GET_DEPARTMENT);
-            userRepository.save(user);
-            if (user.getLanguage().equals(BotQuery.UZ_SELECT))
+            client.setState(UserState.GET_DEPARTMENT);
+            userRepository.save(client);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
-            else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ENTER_DEPARTMENT);
-            historyRepository.save(new History(user.getId(), byName.getId()));
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ENTER_DEPARTMENT);
+            applicationRepository.save(new Application(client.getId(), byName.getId()));
         }
     }
 
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String clientShowFeedback(BotUser client) {
-        History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+        Application history = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
         FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
         SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
         Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
@@ -211,14 +211,15 @@ public class UserServiceImpl implements UserService {
         superAdmin.setState(UserState.CRUD_ADMIN);
         userRepository.save(superAdmin);
     }
+
     @Override
     public void editAdmin(String text, BotUser superAdmin, SendMessage sendMessage) {
         sendMessage.setChatId(superAdmin.getChatId());
         BotUser admin = userRepository.findByEditedTrueAndDeletedFalse();
-        if (admin == null){
+        if (admin == null) {
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
-        }else {
+        } else {
             admin.setPhoneNumber(text);
             admin.setEdited(false);
             userRepository.save(admin);
@@ -238,14 +239,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeStateRemoveFeedback(BotUser superAdmin) {
-    superAdmin.setState(UserState.REMOVE_FEEDBACK_STATE);
-    userRepository.save(superAdmin);
+        superAdmin.setState(UserState.REMOVE_FEEDBACK_STATE);
+        userRepository.save(superAdmin);
     }
 
     @Override
     public void changeStateUpdateFeedback(BotUser superAdmin) {
-    superAdmin.setState(UserState.EDIT_FEEDBACK_STATE);
-    userRepository.save(superAdmin);
+        superAdmin.setState(UserState.EDIT_FEEDBACK_STATE);
+        userRepository.save(superAdmin);
     }
 
     @Override
@@ -347,6 +348,7 @@ public class UserServiceImpl implements UserService {
         superAdmin.setState(UserState.REMOVE_ADMIN_STATE);
         userRepository.save(superAdmin);
     }
+
     @Override
     public void changeStateEditAdmin(BotUser superAdmin) {
         superAdmin.setState(UserState.EDIT_ADMIN_STATE);
@@ -354,17 +356,15 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public void getAdminByPhoneNumber(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
         BotUser admin = userRepository.findByPhoneNumberAndDeletedFalse(data);
         sendMessage.enableHtml(true);
-        if (admin == null){
+        if (admin == null) {
             sendMessage.setChatId(superAdmin.getChatId());
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
-        }
-        else if (superAdmin.getState().equals(UserState.REMOVE_ADMIN_STATE)){
+        } else if (superAdmin.getState().equals(UserState.REMOVE_ADMIN_STATE)) {
             admin.setDeleted(true);
             admin.setDeletedBy(superAdmin.getId());
             userRepository.save(admin);
@@ -380,52 +380,89 @@ public class UserServiceImpl implements UserService {
             sendMessage.setChatId(superAdmin.getChatId());
             superAdmin.setState(UserState.EDIT_ADMIN_STATE1);
             userRepository.save(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ENTER_NEW_ADMIN_PHONE_NUMBER);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.ENTER_NEW_ADMIN_PHONE_NUMBER);
             else sendMessage.setText(ResMessageRu.ENTER_NEW_ADMIN_PHONE_NUMBER);
         }
         try {
-             sender.execute(sendMessage);
+            sender.execute(sendMessage);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-
     @Override
-    public void saveUserDepartmentName(String text, Long chatId) {
-        BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
+    public void saveUserDepartmentName(String text, BotUser client) {
         Department department = new Department();
         department.setName(text);
         Department saveDepartment = departmentRepository.save(department);
-        user.setDepartment(saveDepartment);
-        user.setState(UserState.GET_ROOM_NUM);
-        History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
-        history.setDepartmentId(saveDepartment.getId());
-        historyRepository.save(history);
-        userRepository.save(user);
+        client.setDepartment(saveDepartment);
+        client.setState(UserState.GET_ROOM_NUM);
+        Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+        application.setBuildId(client.getBuilding().getId());
+        application.setDepartmentId(saveDepartment.getId());
+        applicationRepository.save(application);
+        userRepository.save(client);
     }
 
     @Override
-    public void saveUserRoomNum(String text, Long chatId) {
-        BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
+    public void saveUserRoomNum(String text, BotUser client) {
         Department department = departmentRepository.
-                findByIdAndDeletedFalse(user.getDepartment().getId());
+                findByIdAndDeletedFalse(client.getDepartment().getId());
         department.setRoomNumber(text);
-        user.setState(UserState.SHARE_PHONE_NUMBER);
+        client.setState(UserState.SHARE_PHONE_NUMBER);
         departmentRepository.save(department);
-        userRepository.save(user);
+        userRepository.save(client);
     }
 
     @Override
-    public void saveUserPhoneNumber(String contact, Long chatId) {
-        BotUser user = userRepository.findByChatIdAndDeletedFalse(chatId);
-        Department department = departmentRepository.findByIdAndDeletedFalse(user.getDepartment().getId());
-        user.setPhoneNumber(contact);
-        user.setState(UserState.REGISTER_DONE);
-        department.setInnerPhoneNumber(contact);
-        departmentRepository.save(department);
-        userRepository.save(user);
+    public void saveUserPhoneNumber(SendMessage sendMessage, String contact, BotUser client, AbsSender sender) {
+        BotUser byPhoneNumber = userRepository.findByPhoneNumberAndDeletedFalse(contact);
+        if (byPhoneNumber == null) {
+            Department department = departmentRepository.findByIdAndDeletedFalse(client.getDepartment().getId());
+            client.setPhoneNumber(contact);
+            client.setState(UserState.REGISTER_DONE);
+            department.setInnerPhoneNumber(contact);
+            departmentRepository.save(department);
+            userRepository.save(client);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
+            else sendMessage.setText(ResMessageRu.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
+            sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+        } else {
+            if (byPhoneNumber.getRole().equals(Role.ADMIN)) {
+                List<Application> allApplications = applicationRepository.findAllByFinishedFalseAndDeletedFalse();
+                for (Application allApplication : allApplications) {
+                    FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(allApplication.getFeedbackId());
+                    SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(allApplication.getSubFeedbackId());
+                    Building building = buildingRepository.findByIdAndDeletedFalse(allApplication.getBuildId());
+                    Department department = departmentRepository.findByIdAndDeletedFalse(allApplication.getDepartmentId());
+                }
+//                adminService.adminHasMessage(byPhoneNumber, message, sendMessage, sender);
+//                Application history = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+//                FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
+//                SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
+//                Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
+//                Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
+//                if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
+//                    return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+//                            "<b>Bino: </b>" + building.getName() + "\n" +
+//                            "<b>Bo'lim: </b>" + department.getName() + "\n" +
+//                            "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
+//                            "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
+//                            "<b>Muammo: </b>" + subFeedback.getName();
+//                } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
+//                    return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+//                            "<b>Здание: </b>" + building.getName() + "\n" +
+//                            "<b>Отделение: </b>" + department.getName() + "\n" +
+//                            "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
+//                            "<b>Тип Заявка: </b>" + feedback.getName() + "\n" +
+//                            "<b>Проблема: </b>" + subFeedback.getName();
+//                }
+//                return "ERROR";
+            }
+        }
     }
 
     @Override

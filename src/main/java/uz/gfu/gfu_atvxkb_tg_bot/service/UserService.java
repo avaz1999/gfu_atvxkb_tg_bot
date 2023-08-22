@@ -14,18 +14,18 @@ public interface UserService {
 
     void saveUserFirstname(String text, Long id);
 
-    void saveUserDepartmentName(String text, Long userId);
+    void saveUserDepartmentName(String text, BotUser userId);
 
-    void saveUserRoomNum(String text, Long userId);
+    void saveUserRoomNum(String text, BotUser userId);
 
-    void saveUserPhoneNumber(String contact, Long userId);
+    void saveUserPhoneNumber(SendMessage sendMessage, String contact, BotUser userId,AbsSender sender);
 
     String showUserData(Long userId,Long chatId);
 
 
     void saveState(BotUser client);
 
-    void saveBlock(String text, Long chatId, SendMessage sendMessage);
+    void saveBlock(String text, BotUser chatId, SendMessage sendMessage);
 
     void changStateFeedback(BotUser client);
 

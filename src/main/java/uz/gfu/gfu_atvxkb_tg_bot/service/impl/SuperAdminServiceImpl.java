@@ -84,6 +84,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
                 case BotQuery.REMOVE_SUB_FEEDBACK -> removeSubFeedback(superAdmin,sendMessage,sender);
                 case BotQuery.ALL_SUB_FEEDBACK -> getAllSubFeedback(superAdmin,sendMessage,sender);
                 case BotQuery.UPDATE_SUB_FEEDBACK -> updateSubFeedback(superAdmin,sendMessage,sender);
+                case BotQuery.MENU -> menu(superAdmin,sendMessage,sender);
             }
         }else {
             errorMessage(superAdmin, sendMessage);
@@ -136,8 +137,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             String text = message.getText();
             feedbackService.createNewFeedbackRus(text, superAdmin, sendMessage);
         } else {
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+           errorMessage(superAdmin,sendMessage);
         }
         try {
             sender.execute(sendMessage);
@@ -151,8 +151,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             String text = message.getText();
             feedbackService.createNewFeedback(text, superAdmin, sendMessage);
         } else {
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+            errorMessage(superAdmin,sendMessage);
         }
         try {
             sender.execute(sendMessage);

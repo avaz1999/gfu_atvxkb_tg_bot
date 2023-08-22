@@ -50,5 +50,6 @@ public interface ResMessageRu {
     String ALL_FEEDBACK = "<b>Список всех услуг</b>";
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>Выберите тип услуги, которую вы хотите изменить</b>";
     String ENTER_NEW_SUB_FEEDBACK = "<b>Введите новый тип услуги</b>";
+    String SUCCESS_ADD_SUB_FEEDBACK = "<b>Тип службы успешно добавлен</b>";
 }
 

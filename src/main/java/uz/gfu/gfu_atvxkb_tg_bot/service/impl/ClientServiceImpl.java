@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import uz.gfu.gfu_atvxkb_tg_bot.bot.Bot;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
@@ -38,23 +37,23 @@ public class ClientServiceImpl implements ClientService {
     public void clientHasMessage(BotUser client, Message message, SendMessage sendMessage, AbsSender sender) {
         sendMessage.enableHtml(true);
         switch (client.getState()) {
-            case START -> stateStart(message, sendMessage, client,sender);
-            case CHOOSE_LANG -> stateChooseLang(sendMessage,client,sender);
-            case LAST_NAME -> stateLastName(message, sendMessage, client,sender);
-            case NAME -> stateName(message, sendMessage, client,sender);
-            case BLOCK -> stateBlock(message, sendMessage, client,sender);
-            case GET_DEPARTMENT -> stateDepartment(message, sendMessage, client,sender);
-            case GET_ROOM_NUM -> stateRoomNumber(message, sendMessage, client,sender);
-            case SHARE_PHONE_NUMBER -> statePhoneNumber(message, sendMessage, client,sender);
-            case GET_FEEDBACK -> stateFeedback(message, sendMessage, client,sender);
-            case GET_SUB_FEEDBACK -> stateTextSubFeedback(client,message,sendMessage,sender);
-            case REGISTER_DONE -> stateRegisterDone(sendMessage,client,sender);
+            case START -> stateStart(message, sendMessage, client, sender);
+            case CHOOSE_LANG -> stateChooseLang(sendMessage, client, sender);
+            case LAST_NAME -> stateLastName(message, sendMessage, client, sender);
+            case NAME -> stateName(message, sendMessage, client, sender);
+            case BLOCK -> stateBlock(message, sendMessage, client, sender);
+            case GET_DEPARTMENT -> stateDepartment(message, sendMessage, client, sender);
+            case GET_ROOM_NUM -> stateRoomNumber(message, sendMessage, client, sender);
+            case SHARE_PHONE_NUMBER -> statePhoneNumber(message, sendMessage, client, sender);
+            case GET_FEEDBACK -> stateFeedback(message, sendMessage, client, sender);
+            case GET_SUB_FEEDBACK -> stateTextSubFeedback(client, message, sendMessage, sender);
+            case REGISTER_DONE -> stateRegisterDone(sendMessage, client, sender);
         }
     }
 
-    private void stateTextSubFeedback(BotUser client,Message message, SendMessage sendMessage, AbsSender sender) {
+    private void stateTextSubFeedback(BotUser client, Message message, SendMessage sendMessage, AbsSender sender) {
         if (message.hasText()) {
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ERROR_SERVICE);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_SERVICE);
             else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_SERVICE);
         }
         try {
@@ -65,7 +64,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     private void stateRegisterDone(SendMessage sendMessage, BotUser client, AbsSender sender) {
-        if (Objects.equals(client.getLanguage(),BotQuery.UZ_SELECT))
+        if (Objects.equals(client.getLanguage(), BotQuery.UZ_SELECT))
             sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
         else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         try {
@@ -75,7 +74,7 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-    private void stateChooseLang(SendMessage sendMessage, BotUser client,AbsSender sender) {
+    private void stateChooseLang(SendMessage sendMessage, BotUser client, AbsSender sender) {
         sendMessage.setText(ResMessageUz.ERROR_CHOOSE_LANG);
         sendMessage.setChatId(client.getChatId());
         try {
@@ -94,8 +93,8 @@ public class ClientServiceImpl implements ClientService {
         sendMessage.setChatId(chatId.toString());
 
         switch (data) {
-            case BotQuery.UZ_SELECT -> uzSelect(client, data, sendMessage,sender);
-            case BotQuery.RU_SELECT -> ruSelect(client, data, sendMessage,sender);
+            case BotQuery.UZ_SELECT -> uzSelect(client, data, sendMessage, sender);
+            case BotQuery.RU_SELECT -> ruSelect(client, data, sendMessage, sender);
         }
         if (client.getState().equals(UserState.REGISTER_DONE) ||
                 client.getState().equals(UserState.SAVE_SUB_FEEDBACK)) {
@@ -105,7 +104,7 @@ public class ClientServiceImpl implements ClientService {
             }
         }
         if (client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
-            stateSubFeedback(data, sendMessage, client,sender);
+            stateSubFeedback(data, sendMessage, client, sender);
         }
     }
 
@@ -130,7 +129,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateStart(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
+    public void stateStart(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
         if (message.getText() != null && message.getText().equalsIgnoreCase(START)) {
             userService.saveState(client);
             sendMessage.setText(ResMessageUz.START);
@@ -146,10 +145,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateLastName(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
+    public void stateLastName(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
         if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             sendMessage.setText(ResMessageUz.ENTER_NAME);
-        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+        } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
             sendMessage.setText(ResMessageRu.ENTER_NAME);
         }
         userService.saveUserLastname(message.getText(), client.getChatId());
@@ -161,10 +160,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateName(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
+    public void stateName(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
         if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             sendMessage.setText(ResMessageUz.ENTER_BLOCK);
-        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
+        } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
             sendMessage.setText(ResMessageRu.ENTER_BLOCK);
         }
         userService.saveUserFirstname(message.getText(), client.getChatId());
@@ -177,8 +176,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateBlock(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        userService.saveBlock(message.getText(), client.getChatId(),sendMessage);
+    public void stateBlock(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        userService.saveBlock(message.getText(), client, sendMessage);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -187,10 +186,17 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateDepartment(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        userService.saveUserDepartmentName(message.getText(), client.getChatId());
-        if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
-        else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.ENTER_ROOM_NUMBER);
+    public void stateDepartment(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        if (message.hasText()) {
+            String text = message.getText();
+            userService.saveUserDepartmentName(text, client);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ENTER_ROOM_NUMBER);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ENTER_ROOM_NUMBER);
+
+        } else {
+            errorMessage(client, sendMessage);
+        }
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -199,11 +205,16 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateRoomNumber(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        userService.saveUserRoomNum(message.getText(), client.getChatId());
-        if(client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
-        else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.ENTER_PHONE_NUMBER);
-        sendMessage.setReplyMarkup(generalService.getPhoneNumber(client));
+    public void stateRoomNumber(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        if (message.hasText()) {
+            userService.saveUserRoomNum(message.getText(), client);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ENTER_PHONE_NUMBER);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT))
+                sendMessage.setText(ResMessageRu.ENTER_PHONE_NUMBER);
+            sendMessage.setReplyMarkup(generalService.getPhoneNumber(client));
+        } else {
+            errorMessage(client, sendMessage);
+        }
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -212,39 +223,23 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void statePhoneNumber(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
+    public void statePhoneNumber(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
         Contact contact = message.getContact();
         String phoneNumber = message.getText();
         sendMessage.enableHtml(true);
         sendMessage.setChatId(client.getChatId());
-        if (message.hasContact()){
-            userService.saveUserPhoneNumber(contact.getPhoneNumber(), client.getChatId());
-            sharePhoneNumberForLang(sendMessage, client);
-        }else if (!checkPhoneNumber(message.getText()) ||
-                !phoneNumber.startsWith("+998") || phoneNumber.length()!=13) {
+        if (message.hasContact()) {
+            userService.saveUserPhoneNumber(sendMessage,contact.getPhoneNumber(), client,sender );
+        } else if (!checkPhoneNumber(message.getText()) ||
+                !phoneNumber.startsWith("+998") || phoneNumber.length() != 13) {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         } else {
-            userService.saveUserPhoneNumber(phoneNumber, client.getChatId());
-            sharePhoneNumberForLang(sendMessage, client);
-        }
-        try {
-            sender.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            userService.saveUserPhoneNumber(sendMessage, phoneNumber, client,sender );
         }
     }
 
-    private void sharePhoneNumberForLang(SendMessage sendMessage, BotUser client) {
-        if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
-            sendMessage.setText(ResMessageUz.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
-            sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
-        }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
-            sendMessage.setText(ResMessageRu.SHOW_DATA + userService.showUserData(client.getId(), client.getChatId()));
-            sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
-        }
-    }
 
     private boolean checkPhoneNumber(String text) {
         try {
@@ -265,13 +260,13 @@ public class ClientServiceImpl implements ClientService {
                 adminService.adminHasMessage(admins, message, sendMessage, sender);
             }
             userService.changeStateGetFeedback(client);
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.SUCCESS);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.SUCCESS);
             else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.SUCCESS);
             sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             sendMessage.setChatId(client.getChatId());
         } else {
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT))sendMessage.setText(ResMessageUz.DONE);
-            else if (client.getLanguage().equals(BotQuery.RU_SELECT))sendMessage.setText(ResMessageRu.DONE);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DONE);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.DONE);
             sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             userService.changStateFeedback(client);
         }
@@ -288,28 +283,30 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateFeedback(Message message, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        if (message.getText().equals(BotQuery.GET_SERVICE)) {
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT)){
-                sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
+    public void stateFeedback(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        if (message.hasText()) {
+            String text = message.getText();
+            if (text.equals(BotQuery.GET_SERVICE)) {
+                if (client.getLanguage().equals(BotQuery.UZ_SELECT))
+                    sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
+                else sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
                 sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
-            }else if (client.getLanguage().equals(BotQuery.RU_SELECT)){
-                sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
-                sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+            } else {
+                feedbackService.saveFeedback(text, client, sendMessage);
+            }
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
             }
         } else {
-            feedbackService.saveFeedback(message.getText(), client,sendMessage);
-        }
-        try {
-            sender.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            errorMessage(client, sendMessage);
         }
     }
 
     @Override
-    public void stateSubFeedback(String data, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        subFeedbackService.saveSubFeedback(data, client,sendMessage);
+    public void stateSubFeedback(String data, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        subFeedbackService.saveSubFeedback(data, client, sendMessage);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -317,4 +314,8 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
+    private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+        else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+    }
 }

@@ -37,8 +37,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void shareAdminMessage(String message,Long chatId,SendMessage sendMessage,AbsSender sender) {
         sendMessage.setText(message);
-        sendMessage.setReplyMarkup(generalService.serviceDone());
         sendMessage.setChatId(chatId);
+        sendMessage.setReplyMarkup(generalService.serviceDone());
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

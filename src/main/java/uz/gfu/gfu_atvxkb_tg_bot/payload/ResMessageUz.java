@@ -59,4 +59,5 @@ public interface ResMessageUz {
     String ALL_FEEDBACK = "<b>Hamma servicelar ro'yxati</b>";
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan service turini tanlang</b>";
     String ENTER_NEW_SUB_FEEDBACK = "<b>Yangi Service turini kiriting</b>";
+    String SUCCESS_ADD_SUB_FEEDBACK = "<b>Service turi muvofaqiyatli qo'shildi</b>";
 }

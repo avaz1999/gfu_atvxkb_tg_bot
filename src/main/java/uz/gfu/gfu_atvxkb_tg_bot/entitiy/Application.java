@@ -10,8 +10,8 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity(name = "histories")
-public class History extends BaseEntity {
+@Entity(name = "application")
+public class Application extends BaseEntity {
     private Long userId;
     private Long feedbackId;
     private Long subFeedbackId;
@@ -19,7 +19,7 @@ public class History extends BaseEntity {
     private Long departmentId;
     private Boolean finished = false;
 
-    public History(Long userId, Long buildId) {
+    public Application(Long userId, Long buildId) {
         this.userId = userId;
         this.buildId = buildId;
     }

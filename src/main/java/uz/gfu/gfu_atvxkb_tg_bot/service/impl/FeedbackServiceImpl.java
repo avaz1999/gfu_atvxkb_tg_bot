@@ -11,13 +11,13 @@ import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.FeedbackDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.History;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Application;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
-import uz.gfu.gfu_atvxkb_tg_bot.repository.HistoryRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.ApplicationRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.FeedbackService;
@@ -30,16 +30,16 @@ import java.util.List;
 public class FeedbackServiceImpl implements FeedbackService {
     private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
-    private final HistoryRepository historyRepository;
+    private final ApplicationRepository applicationRepository;
     @Autowired
     @Lazy
     GeneralService generalService;
     private final SubFeedbackRepository subFeedbackRepository;
 
-    public FeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, HistoryRepository historyRepository, SubFeedbackRepository subFeedbackRepository) {
+    public FeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, ApplicationRepository historyRepository, SubFeedbackRepository subFeedbackRepository) {
         this.feedBackRepository = feedBackRepository;
         this.userRepository = userRepository;
-        this.historyRepository = historyRepository;
+        this.applicationRepository = historyRepository;
 
         this.subFeedbackRepository = subFeedbackRepository;
     }
@@ -59,9 +59,9 @@ public class FeedbackServiceImpl implements FeedbackService {
             user.setFeedBacks(feedBackList);
             user.setState(UserState.GET_SUB_FEEDBACK);
             userRepository.save(user);
-            History history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
-            history.setFeedbackId(feedback.getId());
-            historyRepository.save(history);
+            Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
+            application.setFeedbackId(feedback.getId());
+            applicationRepository.save(application);
             sendMessage.setChatId(user.getChatId().toString());
             if (user.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
             else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
