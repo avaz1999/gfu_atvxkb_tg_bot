@@ -14,4 +14,5 @@ public interface SubFeedbackService {
     void saveSubFeedback(String data, BotUser client, SendMessage sendMessage);
 
     void addSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage);
+
 }

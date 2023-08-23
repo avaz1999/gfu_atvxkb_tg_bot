@@ -13,14 +13,11 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @Entity(name = "application")
 public class Application extends BaseEntity {
     private Long userId;
-    private Long feedbackId;
-    private Long subFeedbackId;
-    private Long buildId;
+    private String feedbackName;
+    private String subFeedbackName;
+    private String buildingName;
     private Long departmentId;
     private Boolean finished = false;
 
-    public Application(Long userId, Long buildId) {
-        this.userId = userId;
-        this.buildId = buildId;
-    }
+
 }

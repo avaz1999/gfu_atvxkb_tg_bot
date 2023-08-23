@@ -1,6 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -30,18 +31,19 @@ public class UserServiceImpl implements UserService {
     private final DepartmentRepository departmentRepository;
     private final BuildingRepository buildingRepository;
     private final ApplicationRepository applicationRepository;
-    private final AdminService adminService;
+    @Autowired
+    @Lazy
+    AdminService adminService;
     @Lazy
     private final GeneralService generalService;
 
-    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, ApplicationRepository historyRepository, AdminService adminService, GeneralService generalService) {
+    public UserServiceImpl(UserRepository userRepository, FeedBackRepository feedBackRepository, SubFeedbackRepository subFeedbackRepository, DepartmentRepository departmentRepository, BuildingRepository buildingRepository, ApplicationRepository historyRepository, GeneralService generalService) {
         this.userRepository = userRepository;
         this.feedBackRepository = feedBackRepository;
         this.subFeedbackRepository = subFeedbackRepository;
         this.departmentRepository = departmentRepository;
         this.buildingRepository = buildingRepository;
         this.applicationRepository = historyRepository;
-        this.adminService = adminService;
         this.generalService = generalService;
     }
 
@@ -87,12 +89,12 @@ public class UserServiceImpl implements UserService {
             sendMessage.setReplyMarkup(generalService.getBlock());
         } else {
             client.setState(UserState.GET_DEPARTMENT);
+            client.setBuilding(byName);
             userRepository.save(client);
             if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ENTER_DEPARTMENT);
             else if (client.getLanguage().equals(BotQuery.RU_SELECT))
                 sendMessage.setText(ResMessageRu.ENTER_DEPARTMENT);
-            applicationRepository.save(new Application(client.getId(), byName.getId()));
         }
     }
 
@@ -105,25 +107,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String clientShowFeedback(BotUser client) {
-        Application history = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
-        FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
-        SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
-        Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
-        Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
+        Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+        Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
         if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-                    "<b>Bino: </b>" + building.getName() + "\n" +
+                    "<b>Bino: </b>" + application.getBuildingName() + "\n" +
                     "<b>Bo'lim: </b>" + department.getName() + "\n" +
                     "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
-                    "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
-                    "<b>Muammo: </b>" + subFeedback.getName();
+                    "<b>Ariza turi: </b>" + application.getFeedbackName() + "\n" +
+                    "<b>Muammo: </b>" + application.getSubFeedbackName();
         } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
             return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-                    "<b>Здание: </b>" + building.getName() + "\n" +
+                    "<b>Здание: </b>" + application.getBuildingName() + "\n" +
                     "<b>Отделение: </b>" + department.getName() + "\n" +
                     "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
-                    "<b>Тип Заявка: </b>" + feedback.getName() + "\n" +
-                    "<b>Проблема: </b>" + subFeedback.getName();
+                    "<b>Тип Заявка: </b>" + application.getFeedbackName() + "\n" +
+                    "<b>Проблема: </b>" + application.getSubFeedbackName();
         }
         return "ERROR";
     }
@@ -399,10 +398,6 @@ public class UserServiceImpl implements UserService {
         Department saveDepartment = departmentRepository.save(department);
         client.setDepartment(saveDepartment);
         client.setState(UserState.GET_ROOM_NUM);
-        Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
-        application.setBuildId(client.getBuilding().getId());
-        application.setDepartmentId(saveDepartment.getId());
-        applicationRepository.save(application);
         userRepository.save(client);
     }
 
@@ -417,52 +412,91 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUserPhoneNumber(SendMessage sendMessage, String contact, BotUser client, AbsSender sender) {
-        BotUser byPhoneNumber = userRepository.findByPhoneNumberAndDeletedFalse(contact);
-        if (byPhoneNumber == null) {
-            Department department = departmentRepository.findByIdAndDeletedFalse(client.getDepartment().getId());
-            client.setPhoneNumber(contact);
-            client.setState(UserState.REGISTER_DONE);
-            department.setInnerPhoneNumber(contact);
-            departmentRepository.save(department);
-            userRepository.save(client);
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
-            else sendMessage.setText(ResMessageRu.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
-            sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
-        } else {
-            if (byPhoneNumber.getRole().equals(Role.ADMIN)) {
-                List<Application> allApplications = applicationRepository.findAllByFinishedFalseAndDeletedFalse();
-                for (Application allApplication : allApplications) {
-                    FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(allApplication.getFeedbackId());
-                    SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(allApplication.getSubFeedbackId());
-                    Building building = buildingRepository.findByIdAndDeletedFalse(allApplication.getBuildId());
-                    Department department = departmentRepository.findByIdAndDeletedFalse(allApplication.getDepartmentId());
-                }
-//                adminService.adminHasMessage(byPhoneNumber, message, sendMessage, sender);
-//                Application history = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
-//                FeedBack feedback = feedBackRepository.findByIdAndDeletedFalse(history.getFeedbackId());
-//                SubFeedback subFeedback = subFeedbackRepository.findByIdAndDeletedFalse(history.getSubFeedbackId());
-//                Building building = buildingRepository.findByIdAndDeletedFalse(history.getBuildId());
-//                Department department = departmentRepository.findByIdAndDeletedFalse(history.getDepartmentId());
-//                if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
-//                    return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-//                            "<b>Bino: </b>" + building.getName() + "\n" +
-//                            "<b>Bo'lim: </b>" + department.getName() + "\n" +
-//                            "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
-//                            "<b>Ariza turi: </b>" + feedback.getName() + "\n" +
-//                            "<b>Muammo: </b>" + subFeedback.getName();
-//                } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
-//                    return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-//                            "<b>Здание: </b>" + building.getName() + "\n" +
-//                            "<b>Отделение: </b>" + department.getName() + "\n" +
-//                            "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
-//                            "<b>Тип Заявка: </b>" + feedback.getName() + "\n" +
-//                            "<b>Проблема: </b>" + subFeedback.getName();
-//                }
-//                return "ERROR";
+    public Boolean checkPhoneNumber(String phoneNumber) {
+        return userRepository.existsByPhoneNumberAndDeletedFalse(phoneNumber);
+    }
+
+    @Override
+    public void saveAdminPhoneNumber(SendMessage sendMessage, String phoneNumber, BotUser admin, AbsSender sender, BotUser client) {
+
+        if (admin.getRole().equals(Role.ADMIN)) {
+            admin.setBuilding(client.getBuilding());
+            admin.setLanguage(client.getLanguage());
+            admin.setDepartment(client.getDepartment());
+            admin.setFirstname(client.getFirstname());
+            admin.setLanguage(client.getLastname());
+            admin.setFeedBacks(client.getFeedBacks());
+            BotUser newAdmin = userRepository.save(admin);
+            Department department = departmentRepository.findByIdAndDeletedFalse(newAdmin.getDepartment().getId());
+            userRepository.delete(client);
+            List<Application> allApplications = applicationRepository.findAllByFinishedFalseAndDeletedFalse();
+            for (Application application : allApplications) {
+                if (admin.getLanguage().equals(BotQuery.UZ_SELECT)) {
+                    adminService.adminHasMessage(admin,
+                            formUz(admin,
+                                    application.getFeedbackName(),
+                                    application.getSubFeedbackName(),
+                                    application.getBuildingName(),
+                                    department),
+                            sendMessage, sender);
+
+                } else adminService.adminHasMessage(admin,
+                        formRus(admin, application.getFeedbackName(),
+                                application.getSubFeedbackName(),
+                                application.getBuildingName(),
+                                department),
+                        sendMessage, sender);
             }
+        } else {
+            saveUserPhoneNumber(sendMessage,phoneNumber,admin,sender);
         }
+    }
+
+    @Override
+    public BotUser findAdminByPhoneNumber(String phoneNumber) {
+    return userRepository.findByPhoneNumberAndDeletedFalse(phoneNumber);
+    }
+
+    @Override
+    public void saveUserPhoneNumber(SendMessage sendMessage, String contact, BotUser client, AbsSender sender) {
+        Department department = departmentRepository.findByIdAndDeletedFalse(client.getDepartment().getId());
+        savePhoneNumber(sendMessage, contact, client, department, sender);
+    }
+
+    private void savePhoneNumber(SendMessage sendMessage, String contact, BotUser client, Department department, AbsSender sender) {
+        client.setPhoneNumber(contact);
+        client.setState(UserState.REGISTER_DONE);
+        department.setInnerPhoneNumber(contact);
+        departmentRepository.save(department);
+        userRepository.save(client);
+        if (client.getLanguage().equals(BotQuery.UZ_SELECT))
+            sendMessage.setText(ResMessageUz.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
+        else sendMessage.setText(ResMessageRu.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
+        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String formRus(BotUser client, String feedback, String subFeedback, String building, Department department) {
+        return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Здание: </b>" + building + "\n" +
+                "<b>Отделение: </b>" + department.getName() + "\n" +
+                "<b>Комната: </b>" + department.getInnerPhoneNumber() + "\n" +
+                "<b>Тип Заявка: </b>" + feedback + "\n" +
+                "<b>Проблема: </b>" + subFeedback;
+    }
+
+    private String formUz(BotUser client, String feedback, String subFeedback, String building, Department department) {
+        return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Bino: </b>" + building + "\n" +
+                "<b>Bo'lim: </b>" + department.getName() + "\n" +
+                "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
+                "<b>Ariza turi: </b>" + feedback + "\n" +
+                "<b>Muammo: </b>" + subFeedback;
+
     }
 
     @Override
@@ -491,4 +525,8 @@ public class UserServiceImpl implements UserService {
         userRepository.save(client);
     }
 
+    private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
+        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+        else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+    }
 }

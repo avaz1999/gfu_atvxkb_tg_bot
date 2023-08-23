@@ -229,14 +229,17 @@ public class ClientServiceImpl implements ClientService {
         sendMessage.enableHtml(true);
         sendMessage.setChatId(client.getChatId());
         if (message.hasContact()) {
-            userService.saveUserPhoneNumber(sendMessage,contact.getPhoneNumber(), client,sender );
+            if (userService.checkPhoneNumber(contact.getPhoneNumber())){
+                BotUser admin = userService.findAdminByPhoneNumber(contact.getPhoneNumber());
+                userService.saveAdminPhoneNumber(sendMessage,contact.getPhoneNumber(),admin,sender,client);
+            }else  userService.saveUserPhoneNumber(sendMessage, contact.getPhoneNumber(), client, sender);
         } else if (!checkPhoneNumber(message.getText()) ||
                 !phoneNumber.startsWith("+998") || phoneNumber.length() != 13) {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         } else {
-            userService.saveUserPhoneNumber(sendMessage, phoneNumber, client,sender );
+             userService.saveUserPhoneNumber(sendMessage, phoneNumber, client, sender);
         }
     }
 

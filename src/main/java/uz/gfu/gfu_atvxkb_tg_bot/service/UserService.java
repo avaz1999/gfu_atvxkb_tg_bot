@@ -18,6 +18,8 @@ public interface UserService {
 
     void saveUserRoomNum(String text, BotUser userId);
 
+    Boolean checkPhoneNumber(String phoneNumber);
+
     void saveUserPhoneNumber(SendMessage sendMessage, String contact, BotUser userId,AbsSender sender);
 
     String showUserData(Long userId,Long chatId);
@@ -79,4 +81,8 @@ public interface UserService {
     void changeStateSubFeedback(BotUser superAdmin);
 
     void changeStateGetFeedbackWithSubFeedback(BotUser superAdmin);
+
+    void saveAdminPhoneNumber(SendMessage sender, String phoneNumber, BotUser client, AbsSender sender1, BotUser botUser);
+
+    BotUser findAdminByPhoneNumber(String phoneNumber);
 }

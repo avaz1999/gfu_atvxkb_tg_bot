@@ -29,7 +29,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
     private final SubFeedbackRepository subFeedbackRepository;
-    private final ApplicationRepository historyRepository;
+    private final ApplicationRepository applicationRepository;
     @Autowired
     @Lazy
     UserService userService;
@@ -37,11 +37,11 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     @Lazy
     GeneralService generalService;
 
-    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, ApplicationRepository historyRepository) {
+    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, ApplicationRepository applicationRepository) {
         this.feedBackRepository = feedBackRepository;
         this.userRepository = userRepository;
         this.subFeedbackRepository = subFeedbackRepository;
-        this.historyRepository = historyRepository;
+        this.applicationRepository = applicationRepository;
     }
 
     @Override
@@ -71,23 +71,22 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
 
     @Override
     public void saveSubFeedback(String data, BotUser client, SendMessage sendMessage) {
-        BotUser user = userRepository.findByChatIdAndDeletedFalse(client.getChatId());
         SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
         if (subFeedback == null) {
-            if (user.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         }
         else {
-            Application history = historyRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
-            if (history != null) {
-                history.setSubFeedbackId(subFeedback.getId());
-                historyRepository.save(history);
-                user.setState(UserState.SAVE_SUB_FEEDBACK);
-                userRepository.save(user);
-                if (user.getLanguage().equals(BotQuery.UZ_SELECT)) {
+            Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+            if (application != null) {
+                application.setSubFeedbackName(subFeedback.getName());
+                applicationRepository.save(application);
+                client.setState(UserState.SAVE_SUB_FEEDBACK);
+                userRepository.save(client);
+                if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
                     sendMessage.setText(ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client));
                     sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
-                } else if (user.getLanguage().equals(BotQuery.RU_SELECT)) {
+                } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
                     sendMessage.setText(ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client));
                     sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
                 }

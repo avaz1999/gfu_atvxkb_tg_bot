@@ -13,4 +13,5 @@ public interface UserRepository extends JpaRepository<BotUser,Long> {
      @Query("select u from users u where u.phoneNumber = ?1 and u.deleted = false")
      BotUser findByPhoneNumberAndDeletedFalse(String phoneNumber);
      BotUser findByEditedTrueAndDeletedFalse();
+     Boolean existsByPhoneNumberAndDeletedFalse(String phoneNumber);
 }

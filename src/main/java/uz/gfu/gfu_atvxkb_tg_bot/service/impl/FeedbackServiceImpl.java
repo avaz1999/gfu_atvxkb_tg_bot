@@ -59,8 +59,11 @@ public class FeedbackServiceImpl implements FeedbackService {
             user.setFeedBacks(feedBackList);
             user.setState(UserState.GET_SUB_FEEDBACK);
             userRepository.save(user);
-            Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(user.getId());
-            application.setFeedbackId(feedback.getId());
+            Application application = new Application();
+            application.setUserId(user.getId());
+            application.setBuildingName(user.getBuilding().getName());
+            application.setDepartmentId(user.getDepartment().getId());
+            application.setFeedbackName(feedback.getName());
             applicationRepository.save(application);
             sendMessage.setChatId(user.getChatId().toString());
             if (user.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
