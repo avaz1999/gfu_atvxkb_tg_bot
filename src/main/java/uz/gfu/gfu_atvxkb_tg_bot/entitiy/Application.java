@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.State;
+
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,11 +15,10 @@ import uz.gfu.gfu_atvxkb_tg_bot.base.BaseEntity;
 @Entity(name = "application")
 public class Application extends BaseEntity {
     private Long userId;
+    private Long adminId;
     private String feedbackName;
     private String subFeedbackName;
     private String buildingName;
     private Long departmentId;
-    private Boolean finished = false;
-
-
+    private State done;
 }

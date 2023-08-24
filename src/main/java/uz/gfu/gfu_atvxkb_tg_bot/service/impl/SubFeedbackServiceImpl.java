@@ -10,6 +10,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Application;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.State;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
@@ -77,9 +78,10 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
             else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         }
         else {
-            Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+            Application application = applicationRepository.findByUserIdAndDoneAndDeletedFalse(client.getId(),State.CREATED);
             if (application != null) {
                 application.setSubFeedbackName(subFeedback.getName());
+                application.setDone(State.CREATED);
                 applicationRepository.save(application);
                 client.setState(UserState.SAVE_SUB_FEEDBACK);
                 userRepository.save(client);

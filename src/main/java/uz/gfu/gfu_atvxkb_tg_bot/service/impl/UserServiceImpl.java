@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.UserDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.*;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.State;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
@@ -107,7 +108,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String clientShowFeedback(BotUser client) {
-        Application application = applicationRepository.findByUserIdAndFinishedFalseAndDeletedFalse(client.getId());
+        Application application = applicationRepository.findByUserIdAndDoneAndDeletedFalse(client.getId(), State.CREATED);
         Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
         if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
@@ -420,6 +421,7 @@ public class UserServiceImpl implements UserService {
     public void saveAdminPhoneNumber(SendMessage sendMessage, String phoneNumber, BotUser admin, AbsSender sender, BotUser client) {
 
         if (admin.getRole().equals(Role.ADMIN)) {
+            admin.setChatId(client.getChatId());
             admin.setBuilding(client.getBuilding());
             admin.setLanguage(client.getLanguage());
             admin.setDepartment(client.getDepartment());
@@ -429,23 +431,29 @@ public class UserServiceImpl implements UserService {
             BotUser newAdmin = userRepository.save(admin);
             Department department = departmentRepository.findByIdAndDeletedFalse(newAdmin.getDepartment().getId());
             userRepository.delete(client);
-            List<Application> allApplications = applicationRepository.findAllByFinishedFalseAndDeletedFalse();
+            List<Application> allApplications = applicationRepository.findAllByDoneAndDeletedFalse(State.CREATED);
             for (Application application : allApplications) {
-                if (admin.getLanguage().equals(BotQuery.UZ_SELECT)) {
-                    adminService.adminHasMessage(admin,
-                            formUz(admin,
-                                    application.getFeedbackName(),
-                                    application.getSubFeedbackName(),
-                                    application.getBuildingName(),
-                                    department),
-                            sendMessage, sender);
+                sendMessage.setChatId(newAdmin.getChatId());
+                if (newAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
+                   sendMessage.setText(formUz(newAdmin,
+                           application.getFeedbackName(),
+                           application.getSubFeedbackName(),
+                           application.getBuildingName(),
+                           department
+                           ));
 
-                } else adminService.adminHasMessage(admin,
-                        formRus(admin, application.getFeedbackName(),
-                                application.getSubFeedbackName(),
-                                application.getBuildingName(),
-                                department),
-                        sendMessage, sender);
+                } else sendMessage.setText(formRus(newAdmin,
+                        application.getFeedbackName(),
+                        application.getSubFeedbackName(),
+                        application.getBuildingName(),
+                        department
+                ));
+                sendMessage.setReplyMarkup(generalService.serviceDone());
+                try {
+                    sender.execute(sendMessage);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
             }
         } else {
             saveUserPhoneNumber(sendMessage,phoneNumber,admin,sender);

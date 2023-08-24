@@ -107,7 +107,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         sendMessage.enableHtml(true);
         if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
             sendMessage.setText(ResMessageUz.SUB_FEEDBACK_WITH_FEEDBACK + getDtoFeedBack);
-        else sendMessage.setText(ResMessageRu.SUB_FEEDBACK_WITH_FEEDBACK);
+        else sendMessage.setText(ResMessageRu.SUB_FEEDBACK_WITH_FEEDBACK+getDtoFeedBack);
         sendMessage.setReplyMarkup(generalService.getFeedbacksNumber());
         userService.changeStateGetFeedbackWithSubFeedback(superAdmin);
         try {

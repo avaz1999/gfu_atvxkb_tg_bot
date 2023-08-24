@@ -296,6 +296,7 @@ public class GeneralServiceImpl implements GeneralService {
                 lists.add(inlineKeyboardButtonList1);
                 inlineKeyboardButtonList1 = new ArrayList<>();
             }
+            lists.add(inlineKeyboardButtonList1);
         }
         return inlineKeyboardMarkup;
     }
