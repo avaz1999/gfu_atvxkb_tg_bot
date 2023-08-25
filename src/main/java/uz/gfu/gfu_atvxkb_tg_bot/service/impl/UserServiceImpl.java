@@ -426,28 +426,29 @@ public class UserServiceImpl implements UserService {
             admin.setLanguage(client.getLanguage());
             admin.setDepartment(client.getDepartment());
             admin.setFirstname(client.getFirstname());
-            admin.setLanguage(client.getLastname());
+            admin.setLastname(client.getLastname());
+            admin.setLanguage(client.getLanguage());
             admin.setFeedBacks(client.getFeedBacks());
+            admin.setState(UserState.ADMIN_FOR_FEEDBACK);
             BotUser newAdmin = userRepository.save(admin);
             Department department = departmentRepository.findByIdAndDeletedFalse(newAdmin.getDepartment().getId());
             userRepository.delete(client);
             List<Application> allApplications = applicationRepository.findAllByDoneAndDeletedFalse(State.CREATED);
             for (Application application : allApplications) {
+                BotUser allClient = userRepository.findByIdAndDeletedFalse(application.getUserId());
                 sendMessage.setChatId(newAdmin.getChatId());
-                if (newAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) {
-                   sendMessage.setText(formUz(newAdmin,
-                           application.getFeedbackName(),
-                           application.getSubFeedbackName(),
-                           application.getBuildingName(),
-                           department
-                           ));
-
-                } else sendMessage.setText(formRus(newAdmin,
+                String adminShow = newAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                        ? formUz(allClient,
                         application.getFeedbackName(),
                         application.getSubFeedbackName(),
                         application.getBuildingName(),
-                        department
-                ));
+                        department)
+                        : formRus(allClient,
+                        application.getFeedbackName(),
+                        application.getSubFeedbackName(),
+                        application.getBuildingName(),
+                        department);
+                sendMessage.setText(adminShow);
                 sendMessage.setReplyMarkup(generalService.serviceDone());
                 try {
                     sender.execute(sendMessage);
@@ -456,13 +457,13 @@ public class UserServiceImpl implements UserService {
                 }
             }
         } else {
-            saveUserPhoneNumber(sendMessage,phoneNumber,admin,sender);
+            saveUserPhoneNumber(sendMessage, phoneNumber, admin, sender);
         }
     }
 
     @Override
     public BotUser findAdminByPhoneNumber(String phoneNumber) {
-    return userRepository.findByPhoneNumberAndDeletedFalse(phoneNumber);
+        return userRepository.findByPhoneNumberAndDeletedFalse(phoneNumber);
     }
 
     @Override
@@ -492,7 +493,8 @@ public class UserServiceImpl implements UserService {
         return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
                 "<b>Здание: </b>" + building + "\n" +
                 "<b>Отделение: </b>" + department.getName() + "\n" +
-                "<b>Комната: </b>" + department.getInnerPhoneNumber() + "\n" +
+                "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
+                "<b>Номер телефона: </b>"+client.getPhoneNumber()+
                 "<b>Тип Заявка: </b>" + feedback + "\n" +
                 "<b>Проблема: </b>" + subFeedback;
     }
@@ -502,6 +504,7 @@ public class UserServiceImpl implements UserService {
                 "<b>Bino: </b>" + building + "\n" +
                 "<b>Bo'lim: </b>" + department.getName() + "\n" +
                 "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
+                "<b>Telefon raqam: </b>"+ client.getPhoneNumber()+
                 "<b>Ariza turi: </b>" + feedback + "\n" +
                 "<b>Muammo: </b>" + subFeedback;
 

@@ -65,6 +65,7 @@ public class FeedbackServiceImpl implements FeedbackService {
             application.setBuildingName(user.getBuilding().getName());
             application.setDepartmentId(user.getDepartment().getId());
             application.setFeedbackName(feedback.getName());
+            application.setDone(State.CREATED);
             applicationRepository.save(application);
             sendMessage.setChatId(user.getChatId().toString());
             if (user.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);

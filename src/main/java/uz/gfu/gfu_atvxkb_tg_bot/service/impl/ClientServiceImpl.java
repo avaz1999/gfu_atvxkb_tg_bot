@@ -9,11 +9,13 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -229,17 +231,17 @@ public class ClientServiceImpl implements ClientService {
         sendMessage.enableHtml(true);
         sendMessage.setChatId(client.getChatId());
         if (message.hasContact()) {
-            if (userService.checkPhoneNumber(contact.getPhoneNumber())){
+            if (userService.checkPhoneNumber(contact.getPhoneNumber())) {
                 BotUser admin = userService.findAdminByPhoneNumber(contact.getPhoneNumber());
-                userService.saveAdminPhoneNumber(sendMessage,contact.getPhoneNumber(),admin,sender,client);
-            }else  userService.saveUserPhoneNumber(sendMessage, contact.getPhoneNumber(), client, sender);
+                userService.saveAdminPhoneNumber(sendMessage, contact.getPhoneNumber(), admin, sender, client);
+            } else userService.saveUserPhoneNumber(sendMessage, contact.getPhoneNumber(), client, sender);
         } else if (!checkPhoneNumber(message.getText()) ||
                 !phoneNumber.startsWith("+998") || phoneNumber.length() != 13) {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT))
                 sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
             else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
         } else {
-             userService.saveUserPhoneNumber(sendMessage, phoneNumber, client, sender);
+            userService.saveUserPhoneNumber(sendMessage, phoneNumber, client, sender);
         }
     }
 
@@ -256,27 +258,35 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void stateDone(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client, AbsSender sender) {
-
         if (client.getState() == UserState.SAVE_SUB_FEEDBACK) {
             String message = userService.clientShowFeedback(client);
+            if (client.getRole().equals(Role.CLIENT)){
+                String success = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                        ? ResMessageUz.SUCCESS
+                        : ResMessageRu.SUCCESS;
+                sendMessage.setText(success);
+                sendMessage.setChatId(client.getChatId());
+                sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+                userService.changeStateGetFeedback(client);
+                try {
+                    sender.execute(sendMessage);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             for (BotUser admins : userService.getAllAdmins()) {
                 adminService.adminHasMessage(admins, message, sendMessage, sender);
             }
-            userService.changeStateGetFeedback(client);
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.SUCCESS);
-            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.SUCCESS);
-            sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
-            sendMessage.setChatId(client.getChatId());
         } else {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DONE);
             else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.DONE);
             sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             userService.changStateFeedback(client);
-        }
-        try {
-            sender.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

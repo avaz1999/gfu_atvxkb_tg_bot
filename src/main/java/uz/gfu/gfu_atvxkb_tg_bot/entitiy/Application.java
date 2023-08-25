@@ -1,6 +1,8 @@
 package uz.gfu.gfu_atvxkb_tg_bot.entitiy;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,5 +22,6 @@ public class Application extends BaseEntity {
     private String subFeedbackName;
     private String buildingName;
     private Long departmentId;
+    @Enumerated(EnumType.STRING)
     private State done;
 }

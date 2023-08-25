@@ -51,5 +51,8 @@ public interface ResMessageRu {
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>Выберите тип услуги, которую вы хотите изменить</b>";
     String ENTER_NEW_SUB_FEEDBACK = "<b>Введите новый тип услуги</b>";
     String SUCCESS_ADD_SUB_FEEDBACK = "<b>Тип службы успешно добавлен</b>";
+    String ERROR = "<b>ПРОИЗОШЛА ОШИБКА!</b>";
+    String WAITING = "<b>Вы отправили такую заявку, пожалуйста\nЖдите наших сотрудников\nВы можете отправить другой тип заявки</b>";
+    String RESEND = "ОТПРАВИТЬ";
 }
 

@@ -14,6 +14,8 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
@@ -31,7 +33,7 @@ public class GeneralServiceImpl implements GeneralService {
     private final SubFeedbackService subFeedbackService;
     @Autowired
     @Lazy
-     UserService userService;
+    UserService userService;
 
     public GeneralServiceImpl(FeedbackServiceImpl feedbackService, BuildingService buildingService, SubFeedbackService subFeedbackService) {
         this.feedbackService = feedbackService;
@@ -263,6 +265,25 @@ public class GeneralServiceImpl implements GeneralService {
 
 
         return inlineKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard sendFeedback(BotUser client) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+
+        KeyboardRow row = new KeyboardRow();
+        String add = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.RESEND
+                : ResMessageRu.RESEND;
+        KeyboardButton button1 = new KeyboardButton();
+        button1.setText(add);
+        row.add(button1);
+        return replyKeyboardMarkup;
     }
 
     private KeyboardRow getKeyboardButtonsByLang(List<KeyboardRow> keyboardRows, KeyboardRow row, List<FeedBack> allFeedbackUz) {

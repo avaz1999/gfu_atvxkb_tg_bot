@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.bot.Bot;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 import uz.gfu.gfu_atvxkb_tg_bot.service.AdminService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
@@ -23,9 +24,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void adminHasMessage(BotUser admin, String message, SendMessage sendMessage,AbsSender sender) {
+    public void adminHasMessage(BotUser admin, String message, SendMessage sendMessage, AbsSender sender) {
         switch (admin.getState()) {
-            case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message,admin.getChatId(),sendMessage,sender);
+            case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message, admin, sendMessage, sender);
         }
     }
 
@@ -35,9 +36,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void shareAdminMessage(String message,Long chatId,SendMessage sendMessage,AbsSender sender) {
+    public void shareAdminMessage(String message, BotUser admin, SendMessage sendMessage, AbsSender sender) {
         sendMessage.setText(message);
-        sendMessage.setChatId(chatId);
+        sendMessage.setChatId(admin.getChatId());
         sendMessage.setReplyMarkup(generalService.serviceDone());
         try {
             sender.execute(sendMessage);
@@ -48,6 +49,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender) {
-        adminHasMessage(currentUser,message.getText(),sendMessage,sender);
+        adminHasMessage(currentUser, message.getText(), sendMessage, sender);
     }
 }

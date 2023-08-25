@@ -38,4 +38,6 @@ public interface GeneralService {
     ReplyKeyboard getAdminNumber();
 
     ReplyKeyboard getFeedbacksNumber();
+
+    ReplyKeyboard sendFeedback(BotUser client);
 }

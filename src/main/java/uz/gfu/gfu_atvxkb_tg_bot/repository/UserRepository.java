@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<BotUser,Long> {
      BotUser findByChatIdAndDeletedFalse(Long chatId);
+     BotUser findByIdAndDeletedFalse(Long clientId);
      List<BotUser> findAllByRoleAndDeletedFalse(Role role);
      @Query("select u from users u where u.phoneNumber = ?1 and u.deleted = false")
      BotUser findByPhoneNumberAndDeletedFalse(String phoneNumber);
