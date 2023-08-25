@@ -8,14 +8,16 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Application;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.State;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
+import uz.gfu.gfu_atvxkb_tg_bot.repository.ApplicationRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -26,13 +28,15 @@ public class ClientServiceImpl implements ClientService {
     private final FeedbackService feedbackService;
     private final SubFeedbackService subFeedbackService;
     private final AdminService adminService;
+    private final ApplicationRepository applicationRepository;
 
-    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, SubFeedbackService subFeedbackService, AdminService adminService) {
+    public ClientServiceImpl(UserService userService, GeneralService generalService, FeedbackService feedbackService, SubFeedbackService subFeedbackService, AdminService adminService, ApplicationRepository applicationRepository) {
         this.userService = userService;
         this.generalService = generalService;
         this.feedbackService = feedbackService;
         this.subFeedbackService = subFeedbackService;
         this.adminService = adminService;
+        this.applicationRepository = applicationRepository;
     }
 
     @Override
@@ -259,8 +263,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void stateDone(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client, AbsSender sender) {
         if (client.getState() == UserState.SAVE_SUB_FEEDBACK) {
-            String message = userService.clientShowFeedback(client);
-            if (client.getRole().equals(Role.CLIENT)){
+            Application application =
+                    applicationRepository
+                            .findByUserIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), State.CREATED);
+            if (client.getRole().equals(Role.CLIENT)) {
                 String success = client.getLanguage().equals(BotQuery.UZ_SELECT)
                         ? ResMessageUz.SUCCESS
                         : ResMessageRu.SUCCESS;
@@ -275,7 +281,7 @@ public class ClientServiceImpl implements ClientService {
                 }
             }
             for (BotUser admins : userService.getAllAdmins()) {
-                adminService.adminHasMessage(admins, message, sendMessage, sender);
+                userService.sendMessageToAdmin(admins,application, sendMessage, sender);
             }
         } else {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DONE);

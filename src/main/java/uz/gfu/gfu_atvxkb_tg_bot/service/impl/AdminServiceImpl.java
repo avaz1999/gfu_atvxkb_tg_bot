@@ -6,9 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import uz.gfu.gfu_atvxkb_tg_bot.bot.Bot;
+import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
-import uz.gfu.gfu_atvxkb_tg_bot.enums.Role;
 import uz.gfu.gfu_atvxkb_tg_bot.service.AdminService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
@@ -27,28 +26,47 @@ public class AdminServiceImpl implements AdminService {
     public void adminHasMessage(BotUser admin, String message, SendMessage sendMessage, AbsSender sender) {
         switch (admin.getState()) {
             case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message, admin, sendMessage, sender);
+
         }
     }
 
-    @Override
-    public void adminHasCallBackQuery(BotUser admin, CallbackQuery callbackQuery) {
 
-    }
 
     @Override
     public void shareAdminMessage(String message, BotUser admin, SendMessage sendMessage, AbsSender sender) {
-        sendMessage.setText(message);
-        sendMessage.setChatId(admin.getChatId());
-        sendMessage.setReplyMarkup(generalService.serviceDone());
-        try {
-            sender.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     @Override
     public void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender) {
         adminHasMessage(currentUser, message.getText(), sendMessage, sender);
+    }
+
+    @Override
+    public void callAdminHasCallBackQuery(BotUser admin, CallbackQuery callbackQuery, AbsSender sender) {
+        String data = callbackQuery.getData();
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableHtml(true);
+        switch (admin.getState()) {
+            case ADMIN_FOR_FEEDBACK -> adminInWork(admin,sendMessage,data,sender);
+        }
+
+    }
+
+    private void adminInWork(BotUser admin, SendMessage sendMessage, String data, AbsSender sender) {
+        switch (data) {
+            case BotQuery.ADMIN_DONE -> adminDone(admin,sendMessage,sender);
+            case BotQuery.ADMIN_IN_PROCESS -> adminInProses(admin,sendMessage,sender);
+            case BotQuery.ADMIN_FAILED -> adminFailed(admin,sendMessage,sender);
+        }
+    }
+
+    private void adminFailed(BotUser admin, SendMessage sendMessage, AbsSender sender) {
+    }
+
+    private void adminInProses(BotUser admin, SendMessage sendMessage, AbsSender sender) {
+    }
+
+    private void adminDone(BotUser admin, SendMessage sendMessage, AbsSender sender) {
     }
 }

@@ -17,7 +17,7 @@ public interface GeneralService {
 
     ReplyKeyboard getSubFeedbacks(String text);
 
-    ReplyKeyboard serviceDone();
+    ReplyKeyboard serviceDone(Long id);
 
     ReplyKeyboard getSettingForSuperAdmin(BotUser superAdmin);
 

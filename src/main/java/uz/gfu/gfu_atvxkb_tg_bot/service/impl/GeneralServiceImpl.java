@@ -304,23 +304,26 @@ public class GeneralServiceImpl implements GeneralService {
     public ReplyKeyboard getSubFeedbacks(String text) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
-        List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
-        inlineKeyboardMarkup.setKeyboard(lists);
         List<SubFeedback> allSubFeedbacks = subFeedbackService.findAllFeedback(text);
-        for (int i = 0; i < allSubFeedbacks.size(); i++) {
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            SubFeedback subFeedback = allSubFeedbacks.get(i);
-            button.setText(subFeedback.getName());
-            button.setCallbackData(subFeedback.getName());
-            inlineKeyboardButtonList1.add(button);
-            if (i % 2 != 0) {
-                lists.add(inlineKeyboardButtonList1);
-                inlineKeyboardButtonList1 = new ArrayList<>();
+
+        for (int i = 0; i < allSubFeedbacks.size(); i += 2) {
+            List<InlineKeyboardButton> inlineKeyboardButtonList = new ArrayList<>();
+
+            for (int j = i; j < Math.min(i + 2, allSubFeedbacks.size()); j++) {
+                InlineKeyboardButton button = new InlineKeyboardButton();
+                SubFeedback subFeedback = allSubFeedbacks.get(j);
+                button.setText(subFeedback.getName());
+                button.setCallbackData(subFeedback.getName());
+                inlineKeyboardButtonList.add(button);
             }
-            lists.add(inlineKeyboardButtonList1);
+
+            lists.add(inlineKeyboardButtonList);
         }
+
+        inlineKeyboardMarkup.setKeyboard(lists);
         return inlineKeyboardMarkup;
     }
+
 
     @Override
     public ReplyKeyboard getBuildingNumber() {
@@ -356,7 +359,7 @@ public class GeneralServiceImpl implements GeneralService {
 
 
     @Override
-    public ReplyKeyboard serviceDone() {
+    public ReplyKeyboard serviceDone(Long id) {
         Result result = getResult();
 
         // "Bajarildi" tugmasini yaratish

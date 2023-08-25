@@ -66,7 +66,7 @@ public class BotServiceImpl implements BotService {
 
         switch (currentUser.getRole()) {
             case CLIENT -> clientService.clientHasCallBackQuery(currentUser, callbackQuery,sender);
-//            case ADMIN -> adminService.callAdminService(currentUser, message, sendMessage,sender);
+            case ADMIN -> adminService.callAdminHasCallBackQuery(currentUser, callbackQuery,sender);
             case SUPER_ADMIN -> superAdminService.superAdminHasCallBackQuery(currentUser, callbackQuery,sender );
         }
     }

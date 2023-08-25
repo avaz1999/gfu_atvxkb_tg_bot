@@ -83,12 +83,14 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
                 client.setState(UserState.GET_FEEDBACK);
                 userRepository.save(client);
                 Application application = applicationRepository.
-                        findBySubFeedbackNameAndDoneAndUserIdAndDeletedFalse(data, State.CREATED, client.getId());
+                        findBySubFeedbackNameAndDoneAndUserIdAndDeletedFalseOrderByCreatedAtDesc(data, State.CREATED, client.getId());
                 applicationRepository.delete(application);
                 sendMessage.setText(waiting);
                 sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             } else {
-                Application application = applicationRepository.findByUserIdAndDoneAndDeletedFalse(client.getId(), State.CREATED);
+                Application application =
+                        applicationRepository.
+                                findByUserIdAndDoneAndDeletedFalseAndSubFeedbackNameIsNull(client.getId(), State.CREATED);
                 if (application == null) {
                     errorMessage(client, sendMessage);
                 } else {

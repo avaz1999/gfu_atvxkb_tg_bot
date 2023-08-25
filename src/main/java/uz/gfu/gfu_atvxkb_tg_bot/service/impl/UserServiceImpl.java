@@ -449,7 +449,7 @@ public class UserServiceImpl implements UserService {
                         application.getBuildingName(),
                         department);
                 sendMessage.setText(adminShow);
-                sendMessage.setReplyMarkup(generalService.serviceDone());
+                sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
                 try {
                     sender.execute(sendMessage);
                 } catch (TelegramApiException e) {
@@ -460,11 +460,24 @@ public class UserServiceImpl implements UserService {
             saveUserPhoneNumber(sendMessage, phoneNumber, admin, sender);
         }
     }
-
+    @Override
+    public void sendMessageToAdmin(BotUser admins, Application application, SendMessage sendMessage, AbsSender sender) {
+        String shareMessage = clientShowFeedback(admins);
+        sendMessage.setChatId(admins.getChatId());
+        sendMessage.setText(shareMessage);
+        sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public BotUser findAdminByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumberAndDeletedFalse(phoneNumber);
     }
+
+
 
     @Override
     public void saveUserPhoneNumber(SendMessage sendMessage, String contact, BotUser client, AbsSender sender) {
@@ -494,7 +507,7 @@ public class UserServiceImpl implements UserService {
                 "<b>Здание: </b>" + building + "\n" +
                 "<b>Отделение: </b>" + department.getName() + "\n" +
                 "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
-                "<b>Номер телефона: </b>"+client.getPhoneNumber()+
+                "<b>Номер телефона: </b>"+client.getPhoneNumber()+"\n"+
                 "<b>Тип Заявка: </b>" + feedback + "\n" +
                 "<b>Проблема: </b>" + subFeedback;
     }
@@ -504,7 +517,7 @@ public class UserServiceImpl implements UserService {
                 "<b>Bino: </b>" + building + "\n" +
                 "<b>Bo'lim: </b>" + department.getName() + "\n" +
                 "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
-                "<b>Telefon raqam: </b>"+ client.getPhoneNumber()+
+                "<b>Telefon raqam: </b>"+ client.getPhoneNumber()+"\n"+
                 "<b>Ariza turi: </b>" + feedback + "\n" +
                 "<b>Muammo: </b>" + subFeedback;
 
