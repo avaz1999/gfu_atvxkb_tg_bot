@@ -112,33 +112,36 @@ public class GeneralServiceImpl implements GeneralService {
         return keyboardRow;
     }
 
+
     @Override
     public ReplyKeyboard getRegisterDone(BotUser client) {
         Result result = getResult();
+        String confirmText = "";
+        String cancelText = "";
+
         if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
-            result.inlineKeyboardButtonSave().setText("✅ Tasdiqlash");
-            result.inlineKeyboardButtonSave().setCallbackData(BotQuery.DONE);
-            result.inlineKeyboardButtonList().add(result.inlineKeyboardButtonSave());
-
-            InlineKeyboardButton inlineKeyboardButtonCancel = new InlineKeyboardButton();
-            inlineKeyboardButtonCancel.setText("❌ Tahrirlash");
-            inlineKeyboardButtonCancel.setCallbackData(BotQuery.EDIT);
-            result.inlineKeyboardButtonList().add(inlineKeyboardButtonCancel);
-            result.lists().add(result.inlineKeyboardButtonList());
+            confirmText = "✅ Tasdiqlash";
+            cancelText = "❌ Tahrirlash";
         } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
-            result.inlineKeyboardButtonSave().setText("✅ Подтверждение");
-            result.inlineKeyboardButtonSave().setCallbackData(BotQuery.DONE);
-            result.inlineKeyboardButtonList().add(result.inlineKeyboardButtonSave());
-
-            InlineKeyboardButton inlineKeyboardButtonCancel = new InlineKeyboardButton();
-            inlineKeyboardButtonCancel.setText("❌ Редактирование");
-            inlineKeyboardButtonCancel.setCallbackData(BotQuery.EDIT);
-            result.inlineKeyboardButtonList().add(inlineKeyboardButtonCancel);
-            result.lists().add(result.inlineKeyboardButtonList());
+            confirmText = "✅ Подтверждение";
+            cancelText = "❌ Редактирование";
         }
+
+        InlineKeyboardButton confirmButton = new InlineKeyboardButton();
+        confirmButton.setText(confirmText);
+        confirmButton.setCallbackData(BotQuery.DONE);
+
+        InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+        cancelButton.setText(cancelText);
+        cancelButton.setCallbackData(BotQuery.EDIT);
+
+        result.inlineKeyboardButtonList().add(confirmButton);
+        result.inlineKeyboardButtonList().add(cancelButton);
+        result.lists().add(result.inlineKeyboardButtonList());
 
         return result.inlineKeyboardMarkup;
     }
+
 
     @Override
     public ReplyKeyboard getFeedbacks(BotUser client) {
@@ -359,19 +362,19 @@ public class GeneralServiceImpl implements GeneralService {
 
 
     @Override
-    public ReplyKeyboard serviceDone(Long id) {
+    public ReplyKeyboard serviceDone(Long applicationId) {
         Result result = getResult();
 
         // "Bajarildi" tugmasini yaratish
         InlineKeyboardButton inlineKeyboardButtonSave = new InlineKeyboardButton();
         inlineKeyboardButtonSave.setText("✅ Bajarildi");
-        inlineKeyboardButtonSave.setCallbackData(BotQuery.ADMIN_DONE);
+        inlineKeyboardButtonSave.setCallbackData(BotQuery.ADMIN_DONE + "#" + applicationId);
         result.inlineKeyboardButtonList().add(inlineKeyboardButtonSave);
 
         // "Bajarilmadi" tugmasini yaratish
         InlineKeyboardButton inlineKeyboardButtonCancel = new InlineKeyboardButton();
         inlineKeyboardButtonCancel.setText("❌ Bajarilmadi");
-        inlineKeyboardButtonCancel.setCallbackData(BotQuery.ADMIN_FAILED);
+        inlineKeyboardButtonCancel.setCallbackData(BotQuery.ADMIN_FAILED + "#" + applicationId);
         result.inlineKeyboardButtonList().add(inlineKeyboardButtonCancel);
 
         // Buttonlar ro'yxatini "lists" ga qo'shish
@@ -380,7 +383,7 @@ public class GeneralServiceImpl implements GeneralService {
         // "Bajarilmoqda" tugmasini yangi qator (pastga) qo'shish
         InlineKeyboardButton inlineKeyboardButtonInProcess = new InlineKeyboardButton();
         inlineKeyboardButtonInProcess.setText("⚠️ Bajarilmoqda");
-        inlineKeyboardButtonInProcess.setCallbackData(BotQuery.ADMIN_IN_PROCESS);
+        inlineKeyboardButtonInProcess.setCallbackData(BotQuery.ADMIN_IN_PROCESS + "#" + applicationId);
 
         // "Bajarilmoqda" tugmasini alohida qator (pastga) qo'shish
         List<InlineKeyboardButton> inProcessRow = new ArrayList<>();
@@ -389,7 +392,7 @@ public class GeneralServiceImpl implements GeneralService {
 
         // "Bajarildi" tugmasini "Save" deb yangilab olish
         result.inlineKeyboardButtonSave().setText("✅ Bajarildi");
-        result.inlineKeyboardButtonSave().setCallbackData(BotQuery.ADMIN_DONE);
+        result.inlineKeyboardButtonSave().setCallbackData(BotQuery.ADMIN_DONE + applicationId);
 
         return result.inlineKeyboardMarkup();
     }

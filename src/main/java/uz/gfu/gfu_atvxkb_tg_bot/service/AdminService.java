@@ -8,7 +8,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 
 public interface AdminService {
     void adminHasMessage(BotUser admin, String message, SendMessage sendMessage,AbsSender sender);
-    void shareAdminMessage(String message,BotUser admin,SendMessage sendMessage,AbsSender sender);
+    void adminForFeedbackState(String message,BotUser admin,SendMessage sendMessage,AbsSender sender);
 
     void callAdminService(BotUser currentUser, Message message, SendMessage sendMessage, AbsSender sender);
 

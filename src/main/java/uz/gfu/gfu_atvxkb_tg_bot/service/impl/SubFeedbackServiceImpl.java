@@ -76,21 +76,23 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         if (subFeedback == null) {
             errorMessage(client, sendMessage);
         } else {
-            if (applicationRepository.existsBySubFeedbackNameAndDoneAndUserIdAndDeletedFalse(data, State.CREATED, client.getId())) {
+            if (applicationRepository.
+                    existsBySubFeedbackNameAndDoneAndUserIdAndDeletedFalse(data, State.CREATED, client.getId())) {
                 String waiting = client.getLanguage().equals(BotQuery.UZ_SELECT)
                         ? ResMessageUz.WAITING
                         : ResMessageRu.WAITING;
                 client.setState(UserState.GET_FEEDBACK);
                 userRepository.save(client);
+
                 Application application = applicationRepository.
-                        findBySubFeedbackNameAndDoneAndUserIdAndDeletedFalseOrderByCreatedAtDesc(data, State.CREATED, client.getId());
+                        findTopByUserIdAndDoneAndDeletedFalseAndSubFeedbackNameIsNullOrderByCreatedAtDesc(client.getId(), State.CREATED);
                 applicationRepository.delete(application);
                 sendMessage.setText(waiting);
                 sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             } else {
                 Application application =
                         applicationRepository.
-                                findByUserIdAndDoneAndDeletedFalseAndSubFeedbackNameIsNull(client.getId(), State.CREATED);
+                                findByUserIdAndDoneAndDeletedFalseAndSubFeedbackName(client.getId(), State.CREATED,null);
                 if (application == null) {
                     errorMessage(client, sendMessage);
                 } else {
@@ -102,12 +104,12 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
 
     private void saveApplication(BotUser client, SendMessage sendMessage, Application application, SubFeedback subFeedback) {
         application.setSubFeedbackName(subFeedback.getName());
-        applicationRepository.save(application);
+        Application saveApplication = applicationRepository.save(application);
         client.setState(UserState.SAVE_SUB_FEEDBACK);
         userRepository.save(client);
         String doneService = client.getLanguage().equals(BotQuery.UZ_SELECT)
-                ? ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client)
-                : ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client);
+                ? ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client,saveApplication)
+                : ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client, saveApplication);
         sendMessage.setText(doneService);
         sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
     }

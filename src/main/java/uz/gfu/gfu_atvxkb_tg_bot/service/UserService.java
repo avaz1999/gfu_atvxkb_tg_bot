@@ -32,7 +32,7 @@ public interface UserService {
 
     void changStateFeedback(BotUser client);
 
-    String clientShowFeedback(BotUser client);
+    String clientShowFeedback(BotUser client, Application saveApplication);
 
     List<BotUser> getAllAdmins();
 
@@ -87,5 +87,7 @@ public interface UserService {
 
     BotUser findAdminByPhoneNumber(String phoneNumber);
 
-    void sendMessageToAdmin(BotUser admins, Application application, SendMessage sendMessage, AbsSender sender);
+    void sendMessageToAdmin(BotUser admins, BotUser client, Application application, SendMessage sendMessage, AbsSender sender);
+
+    void adminInProses(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
 }

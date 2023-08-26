@@ -107,8 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String clientShowFeedback(BotUser client) {
-        Application application = applicationRepository.findByUserIdAndDoneAndDeletedFalse(client.getId(), State.CREATED);
+    public String clientShowFeedback(BotUser client, Application application) {
         Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
         if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
             return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
@@ -460,23 +459,93 @@ public class UserServiceImpl implements UserService {
             saveUserPhoneNumber(sendMessage, phoneNumber, admin, sender);
         }
     }
+
     @Override
-    public void sendMessageToAdmin(BotUser admins, Application application, SendMessage sendMessage, AbsSender sender) {
-        String shareMessage = clientShowFeedback(admins);
-        sendMessage.setChatId(admins.getChatId());
-        sendMessage.setText(shareMessage);
-        sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
+    public void sendMessageToAdmin(BotUser admins, BotUser client, Application application, SendMessage sendMessage, AbsSender sender) {
+        if (admins.getChatId() == null) {
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.NOT_ADMIN
+                    : ResMessageRu.NOT_ADMIN;
+            sendMessage.setText(msg);
+            sendMessage.setChatId(client.getChatId());
+            sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+        } else {
+            Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
+            String shareMessage = admins.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? formUz(admins, application.getFeedbackName(),
+                    application.getSubFeedbackName(),
+                    application.getBuildingName(), department)
+                    : formRus(admins, application.getFeedbackName(),
+                    application.getSubFeedbackName(),
+                    application.getBuildingName(), department);
+            sendMessage.setChatId(admins.getChatId());
+            sendMessage.setText(shareMessage);
+            sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
+        }
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void adminInProses(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
+        Application application = applicationRepository.findByIdAndDeletedFalse(applicationId);
+        if (application.getDone().equals(State.CREATED)) {
+            if (application.getAdminId() != null) {
+                BotUser connectAdmin = userRepository.findByIdAndDeletedFalse(application.getAdminId());
+                if (connectAdmin == null) errorMessage(admin, sendMessage);
+                else {
+                    String msg = admin.getLanguage().equals(BotQuery.UZ_SELECT)
+                            ? "<b>Bu so'rov" + connectAdmin.getFirstname() + " " + connectAdmin.getLanguage() + " ga  biriktitilgan</b>"
+                            : "<b>Этот запрос прикреплен " + connectAdmin.getFirstname() + " " + connectAdmin.getLanguage() + "</b>";
+                    sendMessage.setText(msg);
+                    sendMessage.setChatId(admin.getChatId());
+                }
+                try {
+                    sender.execute(sendMessage);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            } else connectAdminToClient(admin, sendMessage, sender, application);
+        } else if (application.getDone().equals(State.FAILED))
+            connectAdminToClient(admin, sendMessage, sender, application);
+        else {
+            String msg = admin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.TO_CARRY_OUT
+                    : ResMessageRu.TO_CARRY_OUT;
+            sendMessage.setText(msg);
+            sendMessage.setChatId(admin.getChatId());
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void connectAdminToClient(BotUser admin, SendMessage sendMessage, AbsSender sender, Application application) {
+        BotUser client = userRepository.findByIdAndDeletedFalse(application.getUserId());
+        application.setDone(State.IN_PROSES);
+        application.setAdminId(admin.getId());
+        applicationRepository.save(application);
+        String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.CONNECT_ADMIN
+                : ResMessageRu.CONNECT_ADMIN;
+        sendMessage.setChatId(client.getChatId());
+        sendMessage.setText(msg);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public BotUser findAdminByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumberAndDeletedFalse(phoneNumber);
     }
-
 
 
     @Override
@@ -507,7 +576,7 @@ public class UserServiceImpl implements UserService {
                 "<b>Здание: </b>" + building + "\n" +
                 "<b>Отделение: </b>" + department.getName() + "\n" +
                 "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
-                "<b>Номер телефона: </b>"+client.getPhoneNumber()+"\n"+
+                "<b>Номер телефона: </b>" + client.getPhoneNumber() + "\n" +
                 "<b>Тип Заявка: </b>" + feedback + "\n" +
                 "<b>Проблема: </b>" + subFeedback;
     }
@@ -517,7 +586,7 @@ public class UserServiceImpl implements UserService {
                 "<b>Bino: </b>" + building + "\n" +
                 "<b>Bo'lim: </b>" + department.getName() + "\n" +
                 "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
-                "<b>Telefon raqam: </b>"+ client.getPhoneNumber()+"\n"+
+                "<b>Telefon raqam: </b>" + client.getPhoneNumber() + "\n" +
                 "<b>Ariza turi: </b>" + feedback + "\n" +
                 "<b>Muammo: </b>" + subFeedback;
 

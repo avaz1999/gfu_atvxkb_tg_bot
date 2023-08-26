@@ -15,7 +15,7 @@ public interface ResMessageUz {
     String DONE = "<b>Ro'yhatdan o'tish \nMuvofaqiyatli yakunalndi ✅ \nXizmat turini  tanlang</b>";
     String EDIT = "<b>Qaytadan kiriting</b>";
     String SUCCESS = "<b>Muvofaqiyatli amalga oshdi ✅\nXodimlarimiz siz bilan siz bilan bog'lanadi \uD83D\uDC68\u200D\uD83D\uDCBB\n" +
-            "Agar yana so'rov yubormoqchi bo'lsangiz \nServiclardan birini tanlang \uD83D\uDCC3</b>";
+            "Agar yana so'rov yubormoqchi bo'lsangiz \nServiclardan birini tanlang \uD83D\uDCC3\n</b>";
     String SERVICE = "<b>Servislardan birini tanlang\n\nAgar bu yerda muamongiz ko'rsatilmagan bo'lsa\n\nBoshqa: tugmasini bosing</b>";
     String HELLO = "<b>Assalomu aleykum </b>\n";
     String CHOOSE_LANG = "<b>\nBotga xush kelibsiz\nIltimos tilni tanlang</b>";
@@ -63,4 +63,8 @@ public interface ResMessageUz {
     String ERROR = "<b>XATOLIK YUZ BERDI!</b>";
     String WAITING = "<b>Siz bunday ariza yo'lladingiz iltimos \nXodimlarimizni kuting\nBoshqa turdagi ariza yo'llashingiz mumkin</b>";
     String RESEND = "QAYTA YUBORISH";
+    String NOT_ADMIN = "<b>Kechirasiz xozirda Adminlarimiz mavjud emas</b>";
+    String CONNECT_THIS_MESSAGE = "<b>Bu so'rov biriktitilgan</b>";
+    String TO_CARRY_OUT = "<b>Bu xizmat Amalga oshirilgan</b>";
+    String CONNECT_ADMIN = "<b>Sizning So'rovingizni Xodimimiz qabul qildi\nTez orada siz bilan aloqaga chiqadi</b>";
 }

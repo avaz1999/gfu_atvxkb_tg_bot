@@ -1,5 +1,6 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -18,6 +19,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.ApplicationRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.service.*;
 
+import java.awt.print.Pageable;
 import java.util.Objects;
 
 @Service
@@ -259,13 +261,9 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-
     @Override
     public void stateDone(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client, AbsSender sender) {
         if (client.getState() == UserState.SAVE_SUB_FEEDBACK) {
-            Application application =
-                    applicationRepository
-                            .findByUserIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), State.CREATED);
             if (client.getRole().equals(Role.CLIENT)) {
                 String success = client.getLanguage().equals(BotQuery.UZ_SELECT)
                         ? ResMessageUz.SUCCESS
@@ -281,7 +279,11 @@ public class ClientServiceImpl implements ClientService {
                 }
             }
             for (BotUser admins : userService.getAllAdmins()) {
-                userService.sendMessageToAdmin(admins,application, sendMessage, sender);
+                PageRequest pageRequest = PageRequest.of(0, 1);
+                Application application =
+                        applicationRepository
+                                .findTopByUserIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), State.CREATED);
+                userService.sendMessageToAdmin(admins, client, application, sendMessage, sender);
             }
         } else {
             if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DONE);

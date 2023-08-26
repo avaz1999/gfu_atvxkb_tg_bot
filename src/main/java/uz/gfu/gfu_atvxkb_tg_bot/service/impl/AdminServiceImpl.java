@@ -8,6 +8,8 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
+import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.AdminService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
@@ -25,16 +27,24 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void adminHasMessage(BotUser admin, String message, SendMessage sendMessage, AbsSender sender) {
         switch (admin.getState()) {
-            case ADMIN_FOR_FEEDBACK -> shareAdminMessage(message, admin, sendMessage, sender);
+            case ADMIN_FOR_FEEDBACK -> adminForFeedbackState(message, admin, sendMessage, sender);
 
         }
     }
 
 
-
     @Override
-    public void shareAdminMessage(String message, BotUser admin, SendMessage sendMessage, AbsSender sender) {
-
+    public void adminForFeedbackState(String message, BotUser admin, SendMessage sendMessage, AbsSender sender) {
+        String error = admin.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ERROR_MESSAGE
+                : ResMessageRu.ERROR_MESSAGE;
+        sendMessage.setChatId(admin.getChatId());
+        sendMessage.setText(error);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -48,25 +58,28 @@ public class AdminServiceImpl implements AdminService {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableHtml(true);
         switch (admin.getState()) {
-            case ADMIN_FOR_FEEDBACK -> adminInWork(admin,sendMessage,data,sender);
+            case ADMIN_FOR_FEEDBACK -> adminInWork(admin, sendMessage, data, sender);
         }
 
     }
 
     private void adminInWork(BotUser admin, SendMessage sendMessage, String data, AbsSender sender) {
-        switch (data) {
-            case BotQuery.ADMIN_DONE -> adminDone(admin,sendMessage,sender);
-            case BotQuery.ADMIN_IN_PROCESS -> adminInProses(admin,sendMessage,sender);
-            case BotQuery.ADMIN_FAILED -> adminFailed(admin,sendMessage,sender);
+        String[] split = data.split("#");
+        Long applicationId = Long.valueOf(split[1]);
+        switch (split[0]) {
+            case BotQuery.ADMIN_DONE -> adminDone(admin, applicationId, sendMessage, sender);
+            case BotQuery.ADMIN_IN_PROCESS -> adminInProses(admin, applicationId, sendMessage, sender);
+            case BotQuery.ADMIN_FAILED -> adminFailed(admin, applicationId, sendMessage, sender);
         }
     }
 
-    private void adminFailed(BotUser admin, SendMessage sendMessage, AbsSender sender) {
+    private void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
     }
 
-    private void adminInProses(BotUser admin, SendMessage sendMessage, AbsSender sender) {
+    private void adminInProses(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
+        userService.adminInProses(admin, applicationId, sendMessage, sender);
     }
 
-    private void adminDone(BotUser admin, SendMessage sendMessage, AbsSender sender) {
+    private void adminDone(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
     }
 }
