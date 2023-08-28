@@ -472,10 +472,10 @@ public class UserServiceImpl implements UserService {
         } else {
             Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
             String shareMessage = admins.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ? formUz(admins, application.getFeedbackName(),
+                    ? formUz(client, application.getFeedbackName(),
                     application.getSubFeedbackName(),
                     application.getBuildingName(), department)
-                    : formRus(admins, application.getFeedbackName(),
+                    : formRus(client, application.getFeedbackName(),
                     application.getSubFeedbackName(),
                     application.getBuildingName(), department);
             sendMessage.setChatId(admins.getChatId());
@@ -531,14 +531,75 @@ public class UserServiceImpl implements UserService {
         application.setAdminId(admin.getId());
         applicationRepository.save(application);
         String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
-                ? ResMessageUz.CONNECT_ADMIN
-                : ResMessageRu.CONNECT_ADMIN;
+                ? ResMessageUz.CONNECT_ADMIN + admin.getFirstname() + " " + admin.getLastname() + ResMessageUz.CONNECT_ADMIN2
+                : ResMessageRu.CONNECT_ADMIN + admin.getFirstname() + " " + admin.getLastname() + ResMessageRu.CONNECT_ADMIN2;
         sendMessage.setChatId(client.getChatId());
         sendMessage.setText(msg);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void adminDone(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
+        Application application = applicationRepository.findByIdAndDeletedFalse(applicationId);
+        if (application.getDone().equals(State.IN_PROSES) || application.getDone().equals(State.FAILED)) {
+            BotUser client = userRepository.findByIdAndDeletedFalse(application.getUserId());
+            sendMessage.setChatId(client.getChatId());
+            sendMessage.enableHtml(true);
+            sendMessage.setReplyMarkup(generalService.rateAdmin(client, admin));
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? admin.getFirstname() + " " + admin.getLastname() + ResMessageUz.SERVICE_DONE
+                    : admin.getFirstname() + " " + admin.getLastname() + ResMessageRu.SERVICE_DONE;
+            sendMessage.setText(msg);
+
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+
+            sendMessage.setChatId(admin.getChatId());
+            String msgToAdmin = admin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.SUCCESS_DONE
+                    : ResMessageRu.SUCCESS_DONE;
+            sendMessage.setText(msgToAdmin);
+            sendMessage.setReplyMarkup(generalService.forAdmin());
+
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+            // TODO: 28/08/23 Super adminni developer create qilganda ochiladi
+//            for (BotUser superAdmin : userRepository.findAllByRoleAndDeletedFalse(Role.SUPER_ADMIN)) {
+//                sendMessage.setChatId(superAdmin.getChatId());
+//                String msgToSuperAdmin = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+//                        ? admin.getFirstname() + " " + admin.getLastname()  + ResMessageUz.SUCCESS_ADMIN_DONE
+//                        : admin.getFirstname() + " " + admin.getLastname()  + ResMessageRu.SUCCESS_ADMIN_DONE;
+//                sendMessage.setChatId(msgToSuperAdmin);
+//                sendMessage.setReplyMarkup(generalService.forAdmin());
+
+//                try {
+//                    sender.execute(sendMessage);
+//                } catch (TelegramApiException e) {
+//                    throw new RuntimeException(e);
+//                }
+//
+//            }
+        } else {
+            sendMessage.setChatId(admin.getChatId());
+            String msg = admin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ERROR_ADMIN_IN_PROSES
+                    : ResMessageRu.ERROR_ADMIN_IN_PROSES;
+            sendMessage.setText(msg);
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

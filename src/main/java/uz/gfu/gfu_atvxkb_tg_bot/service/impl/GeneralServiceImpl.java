@@ -14,6 +14,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
 import uz.gfu.gfu_atvxkb_tg_bot.service.BuildingService;
@@ -287,6 +288,30 @@ public class GeneralServiceImpl implements GeneralService {
         button1.setText(add);
         row.add(button1);
         return replyKeyboardMarkup;
+    }
+
+    @Override
+    public ReplyKeyboard rateAdmin(BotUser client, BotUser admin) {
+        if (client.getState().equals(UserState.GET_FEEDBACK)){
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            for (int i = 1; i <= 5; i++) {
+                InlineKeyboardButton rate = new InlineKeyboardButton();
+                rate.setText("⭐️");
+                rate.setCallbackData(i + "#" + admin.getId());
+                row.add(rate);
+            }
+            lists.add(row);
+            inlineKeyboardMarkup.setKeyboard(lists);
+            return inlineKeyboardMarkup;
+        }
+        return null;
+    }
+
+    @Override
+    public ReplyKeyboard forAdmin() {
+        return null;
     }
 
     private KeyboardRow getKeyboardButtonsByLang(List<KeyboardRow> keyboardRows, KeyboardRow row, List<FeedBack> allFeedbackUz) {

@@ -81,5 +81,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private void adminDone(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
+        userService.adminDone(admin,applicationId,sendMessage,sender);
     }
 }

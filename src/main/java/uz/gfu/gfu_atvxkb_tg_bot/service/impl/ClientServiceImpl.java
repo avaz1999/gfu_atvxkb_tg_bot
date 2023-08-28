@@ -231,26 +231,71 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void statePhoneNumber(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
-        Contact contact = message.getContact();
-        String phoneNumber = message.getText();
+    public void statePhoneNumber(Message message, SendMessage sendMessage,BotUser client, AbsSender sender) {
+
         sendMessage.enableHtml(true);
         sendMessage.setChatId(client.getChatId());
+
         if (message.hasContact()) {
-            if (userService.checkPhoneNumber(contact.getPhoneNumber())) {
-                BotUser admin = userService.findAdminByPhoneNumber(contact.getPhoneNumber());
-                userService.saveAdminPhoneNumber(sendMessage, contact.getPhoneNumber(), admin, sender, client);
-            } else userService.saveUserPhoneNumber(sendMessage, contact.getPhoneNumber(), client, sender);
-        } else if (!checkPhoneNumber(message.getText()) ||
-                !phoneNumber.startsWith("+998") || phoneNumber.length() != 13) {
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+            processContactPhoneNumber(message, sendMessage, client, sender);
+        } else {
+            processTextPhoneNumber(message.getText(), sendMessage, client, sender);
+        }
+    }
+
+    private void processContactPhoneNumber(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        Contact contact = message.getContact();
+        String phoneNumber = contact.getPhoneNumber();
+
+        if (phoneNumber.startsWith("+")) {
+            phoneNumber = phoneNumber.substring(1);
+        }
+
+        processPhoneNumberLogic(phoneNumber, sendMessage, client, sender);
+    }
+
+    private void processTextPhoneNumber(String phoneNumber, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        if (phoneNumber.startsWith("+")) {
+            phoneNumber = phoneNumber.substring(1);
+        }
+
+        if (isValidPhoneNumber(phoneNumber)) {
+            if (checkPhoneNumber(phoneNumber)){
+                processPhoneNumberLogic(phoneNumber, sendMessage, client, sender);
+            }else handleInvalidPhoneNumberInText(sendMessage,client);
+        } else {
+            handleInvalidPhoneNumber(sendMessage, client);
+        }
+    }
+
+    private void handleInvalidPhoneNumberInText(SendMessage sendMessage, BotUser client) {
+        String errorMessage = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ERROR_PHONE_NUMBER
+                : ResMessageRu.ERROR_PHONE_NUMBER;
+
+        sendMessage.setText(errorMessage);
+    }
+
+    private void processPhoneNumberLogic(String phoneNumber, SendMessage sendMessage, BotUser client, AbsSender sender) {
+        if (userService.checkPhoneNumber(phoneNumber)) {
+            BotUser admin = userService.findAdminByPhoneNumber(phoneNumber);
+            userService.saveAdminPhoneNumber(sendMessage, phoneNumber, admin, sender, client);
         } else {
             userService.saveUserPhoneNumber(sendMessage, phoneNumber, client, sender);
         }
     }
 
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.startsWith("998") && phoneNumber.length() == 12;
+    }
+
+    private void handleInvalidPhoneNumber(SendMessage sendMessage, BotUser client) {
+        String errorMessage = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ERROR_MESSAGE
+                : ResMessageRu.ERROR_MESSAGE;
+
+        sendMessage.setText(errorMessage);
+    }
 
     private boolean checkPhoneNumber(String text) {
         try {
@@ -279,7 +324,6 @@ public class ClientServiceImpl implements ClientService {
                 }
             }
             for (BotUser admins : userService.getAllAdmins()) {
-                PageRequest pageRequest = PageRequest.of(0, 1);
                 Application application =
                         applicationRepository
                                 .findTopByUserIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), State.CREATED);

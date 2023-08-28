@@ -66,5 +66,10 @@ public interface ResMessageUz {
     String NOT_ADMIN = "<b>Kechirasiz xozirda Adminlarimiz mavjud emas</b>";
     String CONNECT_THIS_MESSAGE = "<b>Bu so'rov biriktitilgan</b>";
     String TO_CARRY_OUT = "<b>Bu xizmat Amalga oshirilgan</b>";
-    String CONNECT_ADMIN = "<b>Sizning So'rovingizni Xodimimiz qabul qildi\nTez orada siz bilan aloqaga chiqadi</b>";
+    String CONNECT_ADMIN = "<b>Sizning So'rovingizni \nXodimimiz: </b>";
+    String CONNECT_ADMIN2 = "<b> qabul qildi\nTez orada siz bilan boglanadi</b>";
+    String SERVICE_DONE = "<b> : Sizning arizangizni ko'rib chiqdi ✅\nSifatni yaxshilash uchun baholashni unutmang \uD83D\uDCDD \nYana so'rovingiz bo'lsa yuboring</b>";
+    String SUCCESS_DONE = "<b>Hammasini muvofaqiyatli amalga oshirgan bo'lsangiz\nKeyingi vazifalarni bajaring</b>";
+    String SUCCESS_ADMIN_DONE = "<b>: Xodim vazifani muvofaqiyatli yakunladi</b>";
+    String ERROR_ADMIN_IN_PROSES = "<b>Kechirasiz siz Bajarildi tugmasini bosa olmaysiz\nSiz avval Bajarilmowda tugmasini bosing</b>";
 }

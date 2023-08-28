@@ -42,4 +42,7 @@ public interface GeneralService {
     ReplyKeyboard sendFeedback(BotUser client);
 
 
+    ReplyKeyboard rateAdmin(BotUser admin, BotUser botUser);
+
+    ReplyKeyboard forAdmin();
 }
