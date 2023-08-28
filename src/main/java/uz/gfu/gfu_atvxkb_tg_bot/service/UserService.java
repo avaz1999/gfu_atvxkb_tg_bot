@@ -94,4 +94,6 @@ public interface UserService {
     void adminDone(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
 
     void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
+
+    void rateAdmin(BotUser client, Byte rate, Long adminId, SendMessage sendMessage, AbsSender sender);
 }

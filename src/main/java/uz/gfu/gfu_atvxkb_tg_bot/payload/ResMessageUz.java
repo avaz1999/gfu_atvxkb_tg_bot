@@ -72,4 +72,10 @@ public interface ResMessageUz {
     String SUCCESS_DONE = "<b>Hammasini muvofaqiyatli amalga oshirgan bo'lsangiz\nKeyingi vazifalarni bajaring</b>";
     String SUCCESS_ADMIN_DONE = "<b>: Xodim vazifani muvofaqiyatli yakunladi</b>";
     String ERROR_ADMIN_IN_PROSES = "<b>Kechirasiz siz Bajarildi tugmasini bosa olmaysiz\nSiz avval Bajarilmowda tugmasini bosing</b>";
+    String SORRY_FAILED = "<b>Uzur siz yo'llagan ariza muvofaqiyatsiz yakunlandi\nBoshqa xodimlarimiz tomonidan ko'rib chiqiladi</b>";
+    String FAILED_SERVICE = "<b>Ushbu so'rov </b>";
+    String FAILED_SERVICE2 = "<b> tomonidan amalga oshirilmadi\n</b>";
+    String ERROR_STATE_SERVICE = "<b>Bajarilmadi ni bosishdan oldin urinib ko'ring</b>";
+    String RATE_SUCCESS = "<b>Baholaganingiz uchun rahmat\nSavollaringiz bo'lsa yo'llang</b>";
+
 }

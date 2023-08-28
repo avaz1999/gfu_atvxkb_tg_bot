@@ -22,6 +22,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -437,14 +438,10 @@ public class UserServiceImpl implements UserService {
                 sendMessage.setChatId(newAdmin.getChatId());
                 String adminShow = newAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                         ? formUz(allClient,
-                        application.getFeedbackName(),
-                        application.getSubFeedbackName(),
-                        application.getBuildingName(),
+                        application,
                         department)
                         : formRus(allClient,
-                        application.getFeedbackName(),
-                        application.getSubFeedbackName(),
-                        application.getBuildingName(),
+                        application,
                         department);
                 sendMessage.setText(adminShow);
                 sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
@@ -471,12 +468,8 @@ public class UserServiceImpl implements UserService {
         } else {
             Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
             String shareMessage = admins.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ? formUz(client, application.getFeedbackName(),
-                    application.getSubFeedbackName(),
-                    application.getBuildingName(), department)
-                    : formRus(client, application.getFeedbackName(),
-                    application.getSubFeedbackName(),
-                    application.getBuildingName(), department);
+                    ? formUz(client, application, department)
+                    : formRus(client, application, department);
             sendMessage.setChatId(admins.getChatId());
             sendMessage.setText(shareMessage);
             sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
@@ -605,6 +598,101 @@ public class UserServiceImpl implements UserService {
     @Override
     public void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
         Application application = applicationRepository.findByIdAndDeletedFalse(applicationId);
+        if (application.getDone().equals(State.DONE) || application.getDone().equals(State.IN_PROSES)) {
+            BotUser client = userRepository.findByIdAndDeletedFalse(application.getUserId());
+            application.setDone(State.FAILED);
+            applicationRepository.save(application);
+            sendMessage.setChatId(client.getChatId());
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.SORRY_FAILED
+                    : ResMessageRu.SORRY_FAILED;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+            List<BotUser> superAdmins = userRepository.findAllByRoleAndDeletedFalse(Role.SUPER_ADMIN);
+            for (BotUser superAdmin : superAdmins) {
+                sendMessageToSuperAdmin(superAdmin, admin, client, application, sendMessage, sender);
+            }
+            for (BotUser admins : getAllAdmins()) {
+                sendMessageToAdmin(admins, client, application, sendMessage, sender);
+            }
+        } else {
+            String msg = admin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ERROR_STATE_SERVICE
+                    : ResMessageRu.ERROR_STATE_SERVICE;
+            sendMessage.setChatId(admin.getChatId());
+            sendMessage.setText(msg);
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public void rateAdmin(BotUser client, Byte rate, Long adminId, SendMessage sendMessage, AbsSender sender) {
+        BotUser admin = userRepository.findByIdAndDeletedFalse(adminId);
+        Application rateApplication = applicationRepository
+                .findByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), adminId, State.DONE);
+        applicationRepository.save(rateApplication);
+        List<Application> applicationOfAdmin = applicationRepository.findAllByAdminIdAndDeletedFalse(adminId);
+        int count = 0;
+        int sum = 0;
+        for (Application application : applicationOfAdmin) {
+            count += application.getAdminId();
+            sum += application.getRate();
+        }
+        Float averageRate = (float) sum / count;
+        admin.setRateAdmin(averageRate);
+        userRepository.save(admin);
+        sendMessage.setChatId(client.getChatId());
+        String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.RATE_SUCCESS
+                : ResMessageRu.RATE_SUCCESS;
+        sendMessage.setText(msg);
+        sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+        for (BotUser superAdmin : userRepository.findAllByRoleAndDeletedFalse(Role.SUPER_ADMIN)) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msgToSuperAdmin = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ?"<b>Ariza beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() +
+                    "\n<b>Xodim: </b>"+admin.getFirstname() + " " + admin.getLastname() + "<b> ni\n </b>" + rate + "</b>: Baho bilan baholadi </b>"
+                    :"<b>Заявитель: </b>"+ client.getFirstname() + " " + client.getLastname() +
+                    "<b>Сотрудник: </b>"+admin.getFirstname() + " " + admin.getLastname() + "<b> тот\n</b>" + rate+ "<b>: Оценивается оценкой</b>";
+            sendMessage.setText(msgToSuperAdmin);
+            sendMessage.setReplyMarkup(generalService.forAdmin());
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void sendMessageToSuperAdmin(BotUser superAdmin, BotUser admin, BotUser client, Application application, SendMessage sendMessage, AbsSender sender) {
+        Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
+        String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.FAILED_SERVICE + "<b>" + admin.getFirstname() + " " + admin.getLastname() + ResMessageUz.FAILED_SERVICE2 +
+                formUz(client, application, department)
+                : ResMessageRu.FAILED_SERVICE + "<b>" + admin.getFirstname() + " " + admin.getLastname() + ResMessageRu.FAILED_SERVICE2 +
+                formRus(client, application, department);
+        sendMessage.setChatId(superAdmin.getChatId());
+        sendMessage.setText(msg);
+        sendMessage.setReplyMarkup(generalService.serviceDone(application.getId()));
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -637,25 +725,42 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private String formRus(BotUser client, String feedback, String subFeedback, String building, Department department) {
-        return "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-                "<b>Здание: </b>" + building + "\n" +
+    private String formRus(BotUser client, Application application, Department department) {
+        return application.getDone().equals(State.CREATED)
+                ? "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Здание: </b>" + application.getBuildingName() + "\n" +
                 "<b>Отделение: </b>" + department.getName() + "\n" +
                 "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
                 "<b>Номер телефона: </b>" + client.getPhoneNumber() + "\n" +
-                "<b>Тип Заявка: </b>" + feedback + "\n" +
-                "<b>Проблема: </b>" + subFeedback;
+                "<b>Тип Заявка: </b>" + application.getFeedbackName() + "\n" +
+                "<b>Проблема: </b>" + application.getSubFeedbackName()
+                : "<b>Эта задача не удалась\nМы просим вас пересмотреть</b>" + "\n" +
+                "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Здание: </b>" + application.getBuildingName() + "\n" +
+                "<b>Отделение: </b>" + department.getName() + "\n" +
+                "<b>Комната: </b>" + department.getRoomNumber() + "\n" +
+                "<b>Номер телефона: </b>" + client.getPhoneNumber() + "\n" +
+                "<b>Тип Заявка: </b>" + application.getFeedbackName() + "\n" +
+                "<b>Проблема: </b>" + application.getSubFeedbackName();
     }
 
-    private String formUz(BotUser client, String feedback, String subFeedback, String building, Department department) {
-        return "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
-                "<b>Bino: </b>" + building + "\n" +
+    private String formUz(BotUser client, Application application, Department department) {
+        return application.getDone().equals(State.CREATED)
+                ? "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Bino: </b>" + application.getBuildingName() + "\n" +
                 "<b>Bo'lim: </b>" + department.getName() + "\n" +
                 "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
                 "<b>Telefon raqam: </b>" + client.getPhoneNumber() + "\n" +
-                "<b>Ariza turi: </b>" + feedback + "\n" +
-                "<b>Muammo: </b>" + subFeedback;
-
+                "<b>Ariza turi: </b>" + application.getFeedbackName() + "\n" +
+                "<b>Muammo: </b>" + application.getSubFeedbackName()
+                : "<b>Bu vazifa bajarilmadi \nQaytadan ko'rib chiqishizni so'rab qolamiz\n</b>" + "\n" +
+                "<b>Ariza Beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() + "\n" +
+                "<b>Bino: </b>" + application.getBuildingName() + "\n" +
+                "<b>Bo'lim: </b>" + department.getName() + "\n" +
+                "<b>Xona: </b>" + department.getRoomNumber() + "\n" +
+                "<b>Telefon raqam: </b>" + client.getPhoneNumber() + "\n" +
+                "<b>Ariza turi: </b>" + application.getFeedbackName() + "\n" +
+                "<b>Muammo: </b>" + application.getSubFeedbackName();
     }
 
     @Override

@@ -24,4 +24,5 @@ public class Application extends BaseEntity {
     private Long departmentId;
     @Enumerated(EnumType.STRING)
     private State done;
+    private Byte rate;
 }

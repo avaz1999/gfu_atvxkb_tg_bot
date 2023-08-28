@@ -63,5 +63,10 @@ public interface ResMessageRu {
     String SUCCESS_DONE = "<b>Если вы все сделали успешно\nВыполните следующие задачи</b>";
     String SUCCESS_ADMIN_DONE = "<b>: Сотрудник успешно выполнил задание</b>";
     String ERROR_ADMIN_IN_PROSES = "<b>Извините, вы не можете нажать Готово\nСначала необходимо нажать кнопку «Готово».</b>";
+    String SORRY_FAILED = "<bИзвините, ваша заявка не удалась\nОно будет рассмотрено другими нашими сотрудниками.></b>";
+    String FAILED_SERVICE = "<b>Этот запрос</b>";
+    String FAILED_SERVICE2 = "<b> провалился\n</b>";
+    String ERROR_STATE_SERVICE = "<b>Пожалуйста, попробуйте, прежде чем нажать «Не удалось».</b>";
+    String RATE_SUCCESS = "<b>Thank you for your rating\nIf you have any questions, send them</b>";
 }
 

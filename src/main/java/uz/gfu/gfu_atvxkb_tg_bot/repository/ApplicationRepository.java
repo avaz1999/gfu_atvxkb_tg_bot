@@ -26,7 +26,9 @@ public interface ApplicationRepository extends JpaRepository<Application,Long> {
             Long userId,
             State done);
 
+    List<Application> findAllByAdminIdAndDeletedFalse(Long adminId);
 
+    Application findByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(Long clientId,Long adminId,State state);
 
     Application findTopByUserIdAndDoneAndSubFeedbackNameAndDeletedFalseOrderByCreatedAtDesc(
             Long userId,

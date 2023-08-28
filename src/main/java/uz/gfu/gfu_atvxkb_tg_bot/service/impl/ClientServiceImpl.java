@@ -103,6 +103,14 @@ public class ClientServiceImpl implements ClientService {
         switch (data) {
             case BotQuery.UZ_SELECT -> uzSelect(client, data, sendMessage, sender);
             case BotQuery.RU_SELECT -> ruSelect(client, data, sendMessage, sender);
+            default -> {
+                if (client.getState().equals(UserState.GET_FEEDBACK)){
+                    String[] split = data.split("#");
+                    Byte rate = Byte.valueOf(split[0]);
+                    Long adminId = Long.valueOf(split[1]);
+                    userService.rateAdmin(client,rate,adminId,sendMessage,sender);
+                }
+            }
         }
         if (client.getState().equals(UserState.REGISTER_DONE) ||
                 client.getState().equals(UserState.SAVE_SUB_FEEDBACK)) {

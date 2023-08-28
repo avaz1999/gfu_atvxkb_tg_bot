@@ -27,6 +27,7 @@ public class BotUser extends BaseEntity {
     private UserState state;
     private String language;
     private Boolean edited = false;
+    private Float rateAdmin = null;
     @ManyToMany
     @JoinTable(name = "users_feedbacks",
             joinColumns = @JoinColumn(name = "user_id"),
