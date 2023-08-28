@@ -243,8 +243,11 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     private void addNewFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
         if (message.hasText()) {
             sendMessage.setChatId(superAdmin.getChatId());
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ADD_NEW_FEEDBACK);
-            else sendMessage.setText(ResMessageRu.ADD_NEW_FEEDBACK);
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ADD_NEW_FEEDBACK
+                    : ResMessageRu.ADD_NEW_FEEDBACK;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
             userService.changeStateAddFeedback(superAdmin);
         } else {
             if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
@@ -655,8 +658,20 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         SendMessage sendMessage = new SendMessage();
         switch (data) {
             case BotQuery.BACK -> back(superAdmin, sendMessage, sender);
+            case BotQuery.UZ_SELECT -> addFeedbackChooseLangUz(superAdmin,sendMessage,sender);
+            case BotQuery.RU_SELECT -> addFeedbackChooseLangRu(superAdmin,sendMessage,sender);
             default -> chooseNumber(superAdmin, data, sendMessage, sender);
         }
+    }
+
+    private void addFeedbackChooseLangRu(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    }
+
+    private void addFeedbackChooseLangUz(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ENTER_NEW_FEEDBACK
+                : ResMessageRu.ENTER_NEW_FEEDBACK;
+        // TODO: 28/08/23 Eslatma
     }
 
 

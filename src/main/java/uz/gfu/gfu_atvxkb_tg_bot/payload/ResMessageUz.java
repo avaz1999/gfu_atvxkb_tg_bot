@@ -49,7 +49,7 @@ public interface ResMessageUz {
     String YOUR_ADMIN = "<b>Tabriklaymiz siz Admin bo'ldingiz:</b>";
     String START_WORK = "Ishni boshlash";
     String EDIT_ADMIN = "<b>O'zgartimoqchi bo'lgan \nAdminingizni tanlang\n</b>";
-    String ADD_NEW_FEEDBACK = "<b>Yangi Service ni kiriting</b>";
+    String ADD_NEW_FEEDBACK = "<b>Yaratmoqchi bo'lgan servicingizni tilini tanlang</b>";
     String EXIST_FEEDBACK_NAME = "<b>Bunday Service mavjud</b>";
     String PLEASE_ENTER_RUSSIAN = "<b>Muvofaqiyatli saqlandi \nIltimos ruschasini ham qo'shing \nRus tilida foydalanuvchilar uchun</b>";
     String SUCCESS_ADD_FEEDBACK = "<b>Service muvofaqiyatli saqlandi</b>";

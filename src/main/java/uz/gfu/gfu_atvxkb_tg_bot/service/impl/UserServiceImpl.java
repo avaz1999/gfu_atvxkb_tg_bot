@@ -233,7 +233,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeStateAddFeedback(BotUser superAdmin) {
-        superAdmin.setState(UserState.ADD_FEEDBACK_STATE);
+        superAdmin.setState(UserState.CHOOSE_LANG);
         userRepository.save(superAdmin);
     }
 

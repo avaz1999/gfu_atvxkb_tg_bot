@@ -40,7 +40,7 @@ public interface ResMessageRu {
     String CREATED_NEW_ADMIN = "<b>Создан новый админ</b>";
     String YOUR_ADMIN = "<b>Поздравляем, вы стали администратором</b>";
     String START_WORK = "Начать работа";
-    String ADD_NEW_FEEDBACK = "<b>Введите новую услугу</b>";
+    String ADD_NEW_FEEDBACK = "<b>Выберите язык сервиса, который вы хотите создать.</b>";
     String EXIST_FEEDBACK_NAME = "<b>такая услуга есть</b>";
     String PLEASE_ENTER_RUSSIAN = "<b>Успешно сохранено\nПожалуйста, добавьте русский язык тоже\nДля пользователей на русском</b>";
     String SUCCESS_ADD_FEEDBACK = "<b>Услуга успешно сохранена</b>";
