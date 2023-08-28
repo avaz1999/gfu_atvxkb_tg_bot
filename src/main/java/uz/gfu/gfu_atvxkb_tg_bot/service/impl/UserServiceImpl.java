@@ -418,7 +418,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveAdminPhoneNumber(SendMessage sendMessage, String phoneNumber, BotUser admin, AbsSender sender, BotUser client) {
-
         if (admin.getRole().equals(Role.ADMIN)) {
             admin.setChatId(client.getChatId());
             admin.setBuilding(client.getBuilding());
@@ -601,6 +600,12 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
+        Application application = applicationRepository.findByIdAndDeletedFalse(applicationId);
+
     }
 
     @Override

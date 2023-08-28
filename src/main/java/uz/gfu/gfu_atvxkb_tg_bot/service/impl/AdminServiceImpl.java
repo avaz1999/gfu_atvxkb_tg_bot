@@ -74,6 +74,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {
+        userService.adminFailed(admin,applicationId,sendMessage,sender);
     }
 
     private void adminInProses(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender) {

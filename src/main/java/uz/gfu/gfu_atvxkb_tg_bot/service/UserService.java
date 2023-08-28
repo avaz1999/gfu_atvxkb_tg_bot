@@ -92,4 +92,6 @@ public interface UserService {
     void adminInProses(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
 
     void adminDone(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
+
+    void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
 }
