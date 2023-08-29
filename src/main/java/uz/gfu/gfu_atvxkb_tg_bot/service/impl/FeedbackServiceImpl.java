@@ -186,18 +186,20 @@ public class FeedbackServiceImpl implements FeedbackService {
             feedBackRepository.save(feedback);
             superAdmin.setState(UserState.CRUD_FEEDBACK);
             userRepository.save(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.DELETED_SUCCESS);
-            else sendMessage.setText(ResMessageRu.DELETED_SUCCESS);
+           String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                   ? ResMessageUz.DELETED_SUCCESS
+                   : ResMessageRu.DELETED_SUCCESS;
+                sendMessage.setText(msg);
             sendMessage.setReplyMarkup(generalService.crudFeedback());
         }else if (superAdmin.getState().equals(UserState.EDIT_FEEDBACK_STATE)){
             feedback.setEdited(true);
             feedBackRepository.save(feedback);
             superAdmin.setState(UserState.EDIT_FEEDBACK_STATE_1);
             userRepository.save(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.ENTER_NEW_FEEDBACK);
-            else sendMessage.setText(ResMessageRu.ENTER_NEW_FEEDBACK);
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ENTER_NEW_FEEDBACK
+                    : ResMessageRu.ENTER_NEW_FEEDBACK;
+            sendMessage.setText(msg);
         } else if (superAdmin.getState().equals(UserState.ADD_SUB_FEEDBACK_STATE)) {
             SubFeedback subFeedback = new SubFeedback();
             subFeedback.setFeedBack(feedback);
@@ -239,12 +241,13 @@ public class FeedbackServiceImpl implements FeedbackService {
         List<FeedBack> allFeedbackByLang = feedBackRepository.findAllByLangAndDeletedFalseOrderByCreatedAtDesc(lang);
         StringBuilder sb = new StringBuilder();
         byte i = 0;
+        if (allFeedbackByLang.isEmpty()) return "";
         for (FeedBack feedBack : allFeedbackByLang) {
-            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? "<b>" + i + 1 + "\n\n \uD83D\uDD28 SERVICE: \n" +
+            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ?"<b>" + i + 1 + " \uD83D\uDD28 SERVICE: \n" +
                     "ID: " + feedBack.getId() + "\n" +
-                    "NOMI:  " + feedBack.getName() + "\n" +
-                    "</b>" : " " +
-                    "<b>\uD83D\uDD28 SERVICE: \n" +
+                    "NOMI:  " + feedBack.getName() + "\n</b>"
+                    :"<b> \uD83D\uDD28 SERVICE: \n" +
                     "ИД: " + feedBack.getId() + "\n" +
                     "ИМЯ: " + feedBack.getName() + "\n");
             i++;

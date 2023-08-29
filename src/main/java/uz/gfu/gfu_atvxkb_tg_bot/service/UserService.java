@@ -99,5 +99,7 @@ public interface UserService {
 
     void saveSuperAdmin(BotUser superAdmin, Message message);
 
-    void changeStateChooseLangForSuperAdmin(BotUser superAdmin);
+    void changeStateChooseLangForAddFeedback(BotUser superAdmin);
+
+    void changeStateChooseLangForRemoveFeedback(BotUser superAdmin);
 }

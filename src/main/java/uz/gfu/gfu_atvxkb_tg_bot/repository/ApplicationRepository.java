@@ -34,10 +34,6 @@ public interface ApplicationRepository extends JpaRepository<Application,Long> {
             order by a.createdAt DESC""")
     Application findByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(Long clientId,Long adminId,State state);
 
-    Application findTopByUserIdAndDoneAndSubFeedbackNameAndDeletedFalseOrderByCreatedAtDesc(
-            Long userId,
-            State state,
-            String subFeedbackName);
     Application findTopByUserIdAndDoneAndDeletedFalseAndSubFeedbackNameIsNullOrderByCreatedAtDesc(
             Long userId,
             State state

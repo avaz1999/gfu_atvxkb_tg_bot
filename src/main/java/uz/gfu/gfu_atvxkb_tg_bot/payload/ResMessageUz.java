@@ -54,7 +54,7 @@ public interface ResMessageUz {
     String PLEASE_ENTER_RUSSIAN = "<b>Muvofaqiyatli saqlandi \nIltimos ruschasini ham qo'shing \nRus tilida foydalanuvchilar uchun</b>";
     String SUCCESS_ADD_FEEDBACK = "<b>Service muvofaqiyatli saqlandi</b>";
     String REMOVE_FEEDBACK = "<b>O'chirmoqchi bo'lgan servicengizni tanlang\n</b>";
-    String UPDATE_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan serviceingizni tanlang</b>";
+    String UPDATE_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan serviceingizni tanlang\n</b>";
     String ENTER_NEW_FEEDBACK = "<b>Yangi Service nomini kiriting\n</b>";
     String ALL_FEEDBACK = "<b>Hamma servicelar ro'yxati</b>";
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan service turini tanlang</b>";
@@ -79,4 +79,6 @@ public interface ResMessageUz {
     String RATE_SUCCESS = "<b>Baholaganingiz uchun rahmat\nSavollaringiz bo'lsa yo'llang</b>";
 
     String ERROR_START = "<b>Xizmatdan foydalanish uchun /start ni bosing</b>";
+    String REMOVE_FEEDBACK_LANG = "<b>O'chirmoqchi  bo'lgan serviceingizni tilini tanlang</b>";
+    String FEEDBACK_IS_EMPTY = "<b>Xozirda servicelar majud emas</b>";
 }

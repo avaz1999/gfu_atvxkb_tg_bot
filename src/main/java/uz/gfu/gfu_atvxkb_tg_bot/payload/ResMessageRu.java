@@ -44,8 +44,8 @@ public interface ResMessageRu {
     String EXIST_FEEDBACK_NAME = "<b>такая услуга есть</b>";
     String PLEASE_ENTER_RUSSIAN = "<b>Успешно сохранено\nПожалуйста, добавьте русский язык тоже\nДля пользователей на русском</b>";
     String SUCCESS_ADD_FEEDBACK = "<b>Услуга успешно сохранена</b>";
-    String REMOVE_FEEDBACK = "<b>Выберите услугу, которую хотите отключить</b>";
-    String UPDATE_FEEDBACK = "<b>Выберите услугу, которую хотите изменить</b>";
+    String REMOVE_FEEDBACK = "<b>Выберите услугу, которую хотите отключить\n</b>";
+    String UPDATE_FEEDBACK = "<b>Выберите услугу, которую хотите изменить\n</b>";
     String ENTER_NEW_FEEDBACK = "<b>Введите новое имя службы\n</b>";
     String ALL_FEEDBACK = "<b>Список всех услуг</b>";
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>Выберите тип услуги, которую вы хотите изменить</b>";
@@ -68,5 +68,7 @@ public interface ResMessageRu {
     String FAILED_SERVICE2 = "<b> провалился\n</b>";
     String ERROR_STATE_SERVICE = "<b>Пожалуйста, попробуйте, прежде чем нажать «Не удалось».</b>";
     String RATE_SUCCESS = "<b>Thank you for your rating\nIf you have any questions, send them</b>";
+    String REMOVE_FEEDBACK_LANG = "<b>Выберите язык услуги, которую хотите изменить.</b>";
+    String FEEDBACK_IS_EMPTY = "<b>Услуги в настоящее время недоступны</b>";
 }
 

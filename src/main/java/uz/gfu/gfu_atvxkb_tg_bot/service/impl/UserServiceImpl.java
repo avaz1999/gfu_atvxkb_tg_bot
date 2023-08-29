@@ -690,8 +690,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeStateChooseLangForSuperAdmin(BotUser superAdmin) {
-        superAdmin.setState(UserState.CHOOSE_LANG);
+    public void changeStateChooseLangForAddFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_ADD);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForRemoveFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_REMOVE);
         userRepository.save(superAdmin);
     }
 
