@@ -240,14 +240,14 @@ public class GeneralServiceImpl implements GeneralService {
     }
 
     @Override
-    public ReplyKeyboard getFeedbacksNumber() {
+    public ReplyKeyboard getFeedbacksNumber(boolean lang) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
         List<InlineKeyboardButton> inlineKeyboardButtonList1 = new ArrayList<>();
         List<InlineKeyboardButton> inlineKeyboardButtonList2 = new ArrayList<>();
         List<InlineKeyboardButton> inlineKeyboardButtonList3 = new ArrayList<>();
         InlineKeyboardButton back = new InlineKeyboardButton();
-        List<FeedBack> feedBacks = feedbackService.getAllFeedback();
+        List<FeedBack> feedBacks = feedbackService.getAllFeedbackByLangForNumber(lang);
         for (int i = 0; i < feedBacks.size(); i++) {
             InlineKeyboardButton button = new InlineKeyboardButton();
             FeedBack feedbackButton = feedBacks.get(i);

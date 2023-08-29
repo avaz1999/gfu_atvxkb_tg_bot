@@ -26,4 +26,6 @@ public interface FeedbackService {
     void getFeedbackByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender);
 
     void editFeedback(String text, SendMessage sendMessage, BotUser superAdmin);
+
+    String getAllFeedbackByLang(boolean lang, BotUser superAdmin);
 }

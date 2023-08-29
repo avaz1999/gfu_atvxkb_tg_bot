@@ -71,7 +71,7 @@ public interface UserService {
 
     void editAdmin(String text, BotUser superAdmin, SendMessage sendMessage);
 
-    void changeStateAddFeedback(BotUser superAdmin);
+    void changeStateAddFeedback(BotUser superAdmin, boolean lang);
 
     void changeStateRemoveFeedback(BotUser superAdmin);
 
@@ -96,4 +96,8 @@ public interface UserService {
     void adminFailed(BotUser admin, Long applicationId, SendMessage sendMessage, AbsSender sender);
 
     void rateAdmin(BotUser client, Byte rate, Long adminId, SendMessage sendMessage, AbsSender sender);
+
+    void saveSuperAdmin(BotUser superAdmin, Message message);
+
+    void changeStateChooseLangForSuperAdmin(BotUser superAdmin);
 }

@@ -103,11 +103,12 @@ public class FeedbackServiceImpl implements FeedbackService {
             FeedBack feedBack = new FeedBack();
             feedBack.setName(text);
             feedBackRepository.save(feedBack);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.PLEASE_ENTER_RUSSIAN);
-            else sendMessage.setText(ResMessageRu.PLEASE_ENTER_RUSSIAN);
-            superAdmin.setState(UserState.ADD_FEEDBACK_STATE_RUS);
+            superAdmin.setState(UserState.CRUD_FEEDBACK);
             userRepository.save(superAdmin);
+            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
+                sendMessage.setText(ResMessageUz.SUCCESS_ADD_FEEDBACK);
+            else sendMessage.setText(ResMessageRu.SUCCESS_ADD_FEEDBACK);
+            sendMessage.setReplyMarkup(generalService.crudFeedback());
         }
     }
 
@@ -231,5 +232,27 @@ public class FeedbackServiceImpl implements FeedbackService {
             else sendMessage.setText(ResMessageRu.SUCCESS_EDITED);
             sendMessage.setReplyMarkup(generalService.crudFeedback());
         }
+    }
+
+    @Override
+    public String getAllFeedbackByLang(boolean lang, BotUser superAdmin) {
+        List<FeedBack> allFeedbackByLang = feedBackRepository.findAllByLangAndDeletedFalseOrderByCreatedAtDesc(lang);
+        StringBuilder sb = new StringBuilder();
+        byte i = 0;
+        for (FeedBack feedBack : allFeedbackByLang) {
+            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? "<b>" + i + 1 + "\n\n \uD83D\uDD28 SERVICE: \n" +
+                    "ID: " + feedBack.getId() + "\n" +
+                    "NOMI:  " + feedBack.getName() + "\n" +
+                    "</b>" : " " +
+                    "<b>\uD83D\uDD28 SERVICE: \n" +
+                    "ИД: " + feedBack.getId() + "\n" +
+                    "ИМЯ: " + feedBack.getName() + "\n");
+            i++;
+        }
+        return sb.toString();
+    }
+
+    public List<FeedBack> getAllFeedbackByLangForNumber(boolean lang) {
+        return feedBackRepository.findAllByLangAndDeletedFalseOrderByCreatedAtDesc(lang);
     }
 }

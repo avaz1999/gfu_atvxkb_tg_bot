@@ -46,7 +46,7 @@ public interface ResMessageRu {
     String SUCCESS_ADD_FEEDBACK = "<b>Услуга успешно сохранена</b>";
     String REMOVE_FEEDBACK = "<b>Выберите услугу, которую хотите отключить</b>";
     String UPDATE_FEEDBACK = "<b>Выберите услугу, которую хотите изменить</b>";
-    String ENTER_NEW_FEEDBACK = "<b>Введите новое имя службы</b>";
+    String ENTER_NEW_FEEDBACK = "<b>Введите новое имя службы\n</b>";
     String ALL_FEEDBACK = "<b>Список всех услуг</b>";
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>Выберите тип услуги, которую вы хотите изменить</b>";
     String ENTER_NEW_SUB_FEEDBACK = "<b>Введите новый тип услуги</b>";

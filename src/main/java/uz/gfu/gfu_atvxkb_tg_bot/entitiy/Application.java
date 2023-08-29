@@ -25,4 +25,5 @@ public class Application extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private State done;
     private Byte rate;
+    private boolean complete = false;
 }

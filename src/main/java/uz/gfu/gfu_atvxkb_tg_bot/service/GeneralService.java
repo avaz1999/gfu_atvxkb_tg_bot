@@ -37,7 +37,7 @@ public interface GeneralService {
 
     ReplyKeyboard getAdminNumber();
 
-    ReplyKeyboard getFeedbacksNumber();
+    ReplyKeyboard getFeedbacksNumber(boolean lang);
 
     ReplyKeyboard sendFeedback(BotUser client);
 

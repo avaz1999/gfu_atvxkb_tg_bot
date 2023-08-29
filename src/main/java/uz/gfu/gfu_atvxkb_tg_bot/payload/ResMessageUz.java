@@ -1,7 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.payload;
 
 public interface ResMessageUz {
-    String START = "Assalomu aleykum Geologiya fanlari universitetining ATM bo'limiga murojaat yuborish bo'limiga hush kelibsiz";
+    String START = "<b>Assalomu aleykum Geologiya fanlari universitetining\nAxborota Texnikalariga Xizmat Ko'rsatish\nBo'tiga xush kelibsiz</b>";
 
     String ERROR_MESSAGE = "<b>Xato xabar kiritdingiz</b>";
     String FEEDBACK = "<b>O'zingizning taklifingizni yozing</b>";
@@ -55,7 +55,7 @@ public interface ResMessageUz {
     String SUCCESS_ADD_FEEDBACK = "<b>Service muvofaqiyatli saqlandi</b>";
     String REMOVE_FEEDBACK = "<b>O'chirmoqchi bo'lgan servicengizni tanlang\n</b>";
     String UPDATE_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan serviceingizni tanlang</b>";
-    String ENTER_NEW_FEEDBACK = "<b>Yangi Service nomini kiriting</b>";
+    String ENTER_NEW_FEEDBACK = "<b>Yangi Service nomini kiriting\n</b>";
     String ALL_FEEDBACK = "<b>Hamma servicelar ro'yxati</b>";
     String SUB_FEEDBACK_WITH_FEEDBACK = "<b>O'zgartirmoqchi bo'lgan service turini tanlang</b>";
     String ENTER_NEW_SUB_FEEDBACK = "<b>Yangi Service turini kiriting</b>";
@@ -78,4 +78,5 @@ public interface ResMessageUz {
     String ERROR_STATE_SERVICE = "<b>Bajarilmadi ni bosishdan oldin urinib ko'ring</b>";
     String RATE_SUCCESS = "<b>Baholaganingiz uchun rahmat\nSavollaringiz bo'lsa yo'llang</b>";
 
+    String ERROR_START = "<b>Xizmatdan foydalanish uchun /start ni bosing</b>";
 }

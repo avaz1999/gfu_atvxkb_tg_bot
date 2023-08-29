@@ -148,10 +148,11 @@ public class ClientServiceImpl implements ClientService {
     public void stateStart(Message message, SendMessage sendMessage, BotUser client, AbsSender sender) {
         if (message.getText() != null && message.getText().equalsIgnoreCase(START)) {
             userService.saveState(client);
+            sendMessage.enableHtml(true);
             sendMessage.setText(ResMessageUz.START);
             sendMessage.setReplyMarkup(generalService.getChooseLang());
         } else {
-            sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
+            sendMessage.setText(ResMessageUz.ERROR_START);
         }
         try {
             sender.execute(sendMessage);

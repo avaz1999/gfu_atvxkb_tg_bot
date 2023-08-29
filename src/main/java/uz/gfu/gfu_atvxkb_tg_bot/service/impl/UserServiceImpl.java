@@ -22,7 +22,6 @@ import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -232,8 +231,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeStateAddFeedback(BotUser superAdmin) {
-        superAdmin.setState(UserState.CHOOSE_LANG);
+    public void changeStateAddFeedback(BotUser superAdmin, boolean lang) {
+        if (lang) superAdmin.setState(UserState.ADD_FEEDBACK_STATE_RUS);
+        else superAdmin.setState(UserState.ADD_FEEDBACK_STATE);
         userRepository.save(superAdmin);
     }
 
@@ -539,6 +539,8 @@ public class UserServiceImpl implements UserService {
         Application application = applicationRepository.findByIdAndDeletedFalse(applicationId);
         if (application.getDone().equals(State.IN_PROSES) || application.getDone().equals(State.FAILED)) {
             BotUser client = userRepository.findByIdAndDeletedFalse(application.getUserId());
+            application.setDone(State.DONE);
+            applicationRepository.save(application);
             sendMessage.setChatId(client.getChatId());
             sendMessage.enableHtml(true);
             sendMessage.setReplyMarkup(generalService.rateAdmin(client, admin));
@@ -639,6 +641,7 @@ public class UserServiceImpl implements UserService {
         BotUser admin = userRepository.findByIdAndDeletedFalse(adminId);
         Application rateApplication = applicationRepository
                 .findByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), adminId, State.DONE);
+        rateApplication.setRate(rate);
         applicationRepository.save(rateApplication);
         List<Application> applicationOfAdmin = applicationRepository.findAllByAdminIdAndDeletedFalse(adminId);
         int count = 0;
@@ -676,6 +679,20 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public void saveSuperAdmin(BotUser superAdmin, Message message) {
+        BotUser saveSuperAdmin = userRepository.findByIdAndDeletedFalse(superAdmin.getId());
+        Long chatId = message.getChatId();
+        saveSuperAdmin.setChatId(chatId);
+        userRepository.save(saveSuperAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForSuperAdmin(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG);
+        userRepository.save(superAdmin);
     }
 
     private void sendMessageToSuperAdmin(BotUser superAdmin, BotUser admin, BotUser client, Application application, SendMessage sendMessage, AbsSender sender) {
