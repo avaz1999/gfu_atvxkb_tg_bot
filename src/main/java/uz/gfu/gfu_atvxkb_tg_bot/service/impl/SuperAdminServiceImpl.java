@@ -1,6 +1,7 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -169,7 +170,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             switch (text) {
                 case BotQuery.ADD_FEEDBACK -> addNewFeedback(message, superAdmin, sendMessage, sender);
                 case BotQuery.REMOVE_FEEDBACK -> removeFeedback(message, superAdmin, sendMessage, sender);
-                case BotQuery.ALL_FEEDBACK -> allFeedback(superAdmin, sendMessage, sender);
+                case BotQuery.ALL_FEEDBACK -> allFeedback(message,superAdmin, sendMessage, sender);
                 case BotQuery.UPDATE_FEEDBACK -> updateFeedback(superAdmin, sendMessage, sender);
                 case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
                 default -> {
@@ -211,15 +212,16 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
     }
 
-    private void allFeedback(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-        String getDtoFeedBack = feedbackService.getDtoFeedback(superAdmin, sendMessage);
-        sendMessage.setChatId(superAdmin.getChatId());
-        sendMessage.enableHtml(true);
-        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-            sendMessage.setText(ResMessageUz.ALL_FEEDBACK + getDtoFeedBack);
-        else sendMessage.setText(ResMessageRu.ALL_FEEDBACK);
-        sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(false));
-        sendMessage.setReplyMarkup(generalService.crudFeedback());
+    private void allFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.GET_FEEDBACK_LANG
+                    : ResMessageRu.GET_FEEDBACK_LANG;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
+            userService.changeStateChooseLangForGetAllFeedback(superAdmin);
+        } else errorMessage(superAdmin, sendMessage);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -679,17 +681,19 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         String getAllFeedbacksByLang = feedbackService.getAllFeedbackByLang(lang, superAdmin);
         sendMessage.setChatId(superAdmin.getChatId());
         sendMessage.enableHtml(true);
-        String msg;
+        String msg = "";
         if (getAllFeedbacksByLang.isEmpty()) {
             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                     ? ResMessageUz.FEEDBACK_IS_EMPTY
                     : ResMessageRu.FEEDBACK_IS_EMPTY;
         } else {
             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ? ResMessageUz.UPDATE_FEEDBACK + getAllFeedbacksByLang
-                    : ResMessageRu.UPDATE_FEEDBACK + getAllFeedbacksByLang;
+                    ? ResMessageUz.GET_ALL_FEEDBACK_BY_LANG + getAllFeedbacksByLang
+                    : ResMessageRu.GET_ALL_FEEDBACK_BY_LANG + getAllFeedbacksByLang;
         }
+        userService.crudFeedbackState(superAdmin);
         sendMessage.setText(msg);
+        sendMessage.setReplyMarkup(generalService.crudFeedback());
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -734,10 +738,10 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                     ? ResMessageUz.REMOVE_FEEDBACK + getAllFeedbacksByLang
                     : ResMessageRu.REMOVE_FEEDBACK + getAllFeedbacksByLang;
+            sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(lang));
+            userService.changeStateRemoveFeedback(superAdmin);
         }
         sendMessage.setText(msg);
-        sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(lang));
-        userService.changeStateRemoveFeedback(superAdmin);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -747,10 +751,9 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     private void chooseLangForAdd(BotUser superAdmin, SendMessage sendMessage, AbsSender sender, boolean lang) {
         userService.changeStateAddFeedback(superAdmin, lang);
-        String getAllFeedbacksByLang = feedbackService.getAllFeedbackByLang(lang, superAdmin);
         String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                ? ResMessageUz.ENTER_NEW_FEEDBACK + getAllFeedbacksByLang
-                : ResMessageRu.ENTER_NEW_FEEDBACK + getAllFeedbacksByLang;
+                ? ResMessageUz.ENTER_NEW_FEEDBACK
+                : ResMessageRu.ENTER_NEW_FEEDBACK ;
         sendMessage.enableHtml(true);
         sendMessage.setChatId(superAdmin.getChatId());
         sendMessage.setText(msg);

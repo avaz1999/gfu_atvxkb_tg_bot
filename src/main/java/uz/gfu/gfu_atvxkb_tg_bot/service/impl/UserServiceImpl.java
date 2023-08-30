@@ -701,6 +701,18 @@ public class UserServiceImpl implements UserService {
         userRepository.save(superAdmin);
     }
 
+    @Override
+    public void changeStateChooseLangForGetAllFeedback(BotUser superAdmin) {
+    superAdmin.setState(UserState.CHOOSE_LANG_FOR_GET);
+    userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void crudFeedbackState(BotUser superAdmin) {
+        superAdmin.setState(UserState.CRUD_FEEDBACK);
+        userRepository.save(superAdmin);
+    }
+
     private void sendMessageToSuperAdmin(BotUser superAdmin, BotUser admin, BotUser client, Application application, SendMessage sendMessage, AbsSender sender) {
         Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());
         String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)

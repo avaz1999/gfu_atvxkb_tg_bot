@@ -339,8 +339,10 @@ public class ClientServiceImpl implements ClientService {
                 userService.sendMessageToAdmin(admins, client, application, sendMessage, sender);
             }
         } else {
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.DONE);
-            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.DONE);
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.DONE
+                    : ResMessageRu.DONE;
+            sendMessage.setText(msg);
             sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             userService.changStateFeedback(client);
             try {
@@ -361,9 +363,10 @@ public class ClientServiceImpl implements ClientService {
         if (message.hasText()) {
             String text = message.getText();
             if (text.equals(BotQuery.GET_SERVICE)) {
-                if (client.getLanguage().equals(BotQuery.UZ_SELECT))
-                    sendMessage.setText(ResMessageUz.CHOOSE_SERVICE);
-                else sendMessage.setText(ResMessageRu.CHOOSE_SERVICE);
+                String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                        ? ResMessageUz.CHOOSE_SERVICE
+                        : ResMessageRu.CHOOSE_SERVICE;
+               sendMessage.setText(msg);
                 sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
             } else {
                 feedbackService.saveFeedback(text, client, sendMessage);
@@ -388,8 +391,10 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-    private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
-        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-        else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+    private static void errorMessage(BotUser client, SendMessage sendMessage) {
+        String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ERROR_MESSAGE
+                : ResMessageRu.ERROR_MESSAGE;
+        sendMessage.setText(msg);
     }
 }

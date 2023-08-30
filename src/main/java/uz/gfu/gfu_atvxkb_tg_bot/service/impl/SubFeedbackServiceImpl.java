@@ -92,7 +92,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
             } else {
                 Application application =
                         applicationRepository.
-                                findByUserIdAndDoneAndDeletedFalseAndSubFeedbackName(client.getId(), State.CREATED,null);
+                                findByUserIdAndDoneAndDeletedFalseAndSubFeedbackName(client.getId(), State.CREATED, null);
                 if (application == null) {
                     errorMessage(client, sendMessage);
                 } else {
@@ -108,7 +108,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         client.setState(UserState.SAVE_SUB_FEEDBACK);
         userRepository.save(client);
         String doneService = client.getLanguage().equals(BotQuery.UZ_SELECT)
-                ? ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client,saveApplication)
+                ? ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client, saveApplication)
                 : ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client, saveApplication);
         sendMessage.setText(doneService);
         sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
@@ -133,8 +133,10 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     }
 
     private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
-        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-        else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+        String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ERROR_MESSAGE
+                : ResMessageRu.ERROR_MESSAGE;
+        sendMessage.setText(msg);
     }
 
 }

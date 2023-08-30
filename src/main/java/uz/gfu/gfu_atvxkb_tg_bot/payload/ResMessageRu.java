@@ -70,5 +70,7 @@ public interface ResMessageRu {
     String RATE_SUCCESS = "<b>Thank you for your rating\nIf you have any questions, send them</b>";
     String REMOVE_FEEDBACK_LANG = "<b>Выберите язык услуги, которую хотите изменить.</b>";
     String FEEDBACK_IS_EMPTY = "<b>Услуги в настоящее время недоступны</b>";
+    String GET_FEEDBACK_LANG = "<b>Выберите язык для просмотра услуг</b>";
+    String GET_ALL_FEEDBACK_BY_LANG = "<b>Все услуги на выбранном вами языке\n</b>";
 }
 

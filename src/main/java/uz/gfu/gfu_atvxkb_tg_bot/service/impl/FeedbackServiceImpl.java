@@ -239,18 +239,16 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public String getAllFeedbackByLang(boolean lang, BotUser superAdmin) {
         List<FeedBack> allFeedbackByLang = feedBackRepository.findAllByLangAndDeletedFalseOrderByCreatedAtDesc(lang);
-        StringBuilder sb = new StringBuilder();
-        byte i = 0;
         if (allFeedbackByLang.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
         for (FeedBack feedBack : allFeedbackByLang) {
             sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ?"<b>" + i + 1 + " \uD83D\uDD28 SERVICE: \n" +
-                    "ID: " + feedBack.getId() + "\n" +
-                    "NOMI:  " + feedBack.getName() + "\n</b>"
-                    :"<b> \uD83D\uDD28 SERVICE: \n" +
-                    "ИД: " + feedBack.getId() + "\n" +
-                    "ИМЯ: " + feedBack.getName() + "\n");
-            i++;
+                    ?"<b>ID: "+feedBack.getId()+"</b>\n"+
+                    "<b>NOMI: "+feedBack.getName()+"</b>\n"+
+                    "</b>+++++++++++++++++++++++++++</b>"
+                    :"<b>ИД: "+feedBack.getId()+"</b>\n"+
+                    "<b>ИМЯ: "+ feedBack.getName() +"</b>"+
+                    "<b>+++++++++++++++++++++++++++++</b>");
         }
         return sb.toString();
     }

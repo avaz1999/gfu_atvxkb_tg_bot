@@ -81,4 +81,6 @@ public interface ResMessageUz {
     String ERROR_START = "<b>Xizmatdan foydalanish uchun /start ni bosing</b>";
     String REMOVE_FEEDBACK_LANG = "<b>O'chirmoqchi  bo'lgan serviceingizni tilini tanlang</b>";
     String FEEDBACK_IS_EMPTY = "<b>Xozirda servicelar majud emas</b>";
+    String GET_FEEDBACK_LANG = "<b>Servicelarni ko'rish uchun tilni tanlang</b>";
+    String GET_ALL_FEEDBACK_BY_LANG = "<b>Tanlagan tilingizga tegishli barcha servicelar\n</b>";
 }
