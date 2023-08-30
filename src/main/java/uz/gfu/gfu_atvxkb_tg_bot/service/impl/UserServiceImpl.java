@@ -667,10 +667,10 @@ public class UserServiceImpl implements UserService {
         for (BotUser superAdmin : userRepository.findAllByRoleAndDeletedFalse(Role.SUPER_ADMIN)) {
             sendMessage.setChatId(superAdmin.getChatId());
             String msgToSuperAdmin = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ?"<b>Ariza beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() +
-                    "\n<b>Xodim: </b>"+admin.getFirstname() + " " + admin.getLastname() + "<b> ni\n </b>" + rate + "</b>: Baho bilan baholadi </b>"
-                    :"<b>Заявитель: </b>"+ client.getFirstname() + " " + client.getLastname() +
-                    "<b>Сотрудник: </b>"+admin.getFirstname() + " " + admin.getLastname() + "<b> тот\n</b>" + rate+ "<b>: Оценивается оценкой</b>";
+                    ? "<b>Ariza beruvchi: </b>" + client.getFirstname() + " " + client.getLastname() +
+                    "\n<b>Xodim: </b>" + admin.getFirstname() + " " + admin.getLastname() + "<b> ni\n </b>" + rate + "</b>: Baho bilan baholadi </b>"
+                    : "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() +
+                    "<b>Сотрудник: </b>" + admin.getFirstname() + " " + admin.getLastname() + "<b> тот\n</b>" + rate + "<b>: Оценивается оценкой</b>";
             sendMessage.setText(msgToSuperAdmin);
             sendMessage.setReplyMarkup(generalService.forAdmin());
             try {
@@ -703,13 +703,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeStateChooseLangForGetAllFeedback(BotUser superAdmin) {
-    superAdmin.setState(UserState.CHOOSE_LANG_FOR_GET);
-    userRepository.save(superAdmin);
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_GET);
+        userRepository.save(superAdmin);
     }
 
     @Override
     public void crudFeedbackState(BotUser superAdmin) {
         superAdmin.setState(UserState.CRUD_FEEDBACK);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForEditFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_EDIT);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForAddSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_SUB_FEEDBACK_ADD);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForEditSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_SUB_FEEDBACK_EDIT);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForGetSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_SUB_FEEDBACK_GET);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateChooseLangForRemoveSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.CHOOSE_LANG_FOR_SUB_FEEDBACK_REMOVE);
         userRepository.save(superAdmin);
     }
 

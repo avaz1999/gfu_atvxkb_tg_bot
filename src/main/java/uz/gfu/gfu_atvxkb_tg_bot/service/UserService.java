@@ -106,4 +106,14 @@ public interface UserService {
     void changeStateChooseLangForGetAllFeedback(BotUser superAdmin);
 
     void crudFeedbackState(BotUser superAdmin);
+
+    void changeStateChooseLangForEditFeedback(BotUser superAdmin);
+
+    void changeStateChooseLangForAddSubFeedback(BotUser superAdmin);
+
+    void changeStateChooseLangForEditSubFeedback(BotUser superAdmin);
+
+    void changeStateChooseLangForGetSubFeedback(BotUser superAdmin);
+
+    void changeStateChooseLangForRemoveSubFeedback(BotUser superAdmin);
 }

@@ -72,5 +72,11 @@ public interface ResMessageRu {
     String FEEDBACK_IS_EMPTY = "<b>Услуги в настоящее время недоступны</b>";
     String GET_FEEDBACK_LANG = "<b>Выберите язык для просмотра услуг</b>";
     String GET_ALL_FEEDBACK_BY_LANG = "<b>Все услуги на выбранном вами языке\n</b>";
+    String EDIT_SERVICE_LANG = "<b>Выберите язык услуги, которую хотите изменить\n</b>";
+    String ADD_NEW_SUB_FEEDBACK = "<b>Выберите язык проблемы, которую вы хотите создать.</b>";
+    String EDIT_NEW_SUB_FEEDBACK = "<b>Выберите язык проблемы, которую вы хотите изменить.</b>";
+    String GET_NEW_SUB_FEEDBACK = "<b>Выберите язык</b>";
+    String REMOVE_NEW_SUB_FEEDBACK = "<b>Выберите язык</b>";
+    String GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Все сервисы доступны для решения проблемы</b>";
 }
 

@@ -1,7 +1,6 @@
 package uz.gfu.gfu_atvxkb_tg_bot.service.impl;
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -97,10 +96,10 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         if (message.hasText()) {
             String text = message.getText();
             switch (text) {
-                case BotQuery.ADD_SUB_FEEDBACK -> addSubFeedback(superAdmin, sendMessage, sender);
-                case BotQuery.REMOVE_SUB_FEEDBACK -> removeSubFeedback(superAdmin, sendMessage, sender);
-                case BotQuery.ALL_SUB_FEEDBACK -> getAllSubFeedback(superAdmin, sendMessage, sender);
-                case BotQuery.UPDATE_SUB_FEEDBACK -> updateSubFeedback(superAdmin, sendMessage, sender);
+                case BotQuery.ADD_SUB_FEEDBACK -> addSubFeedback(message,superAdmin, sendMessage, sender);
+                case BotQuery.REMOVE_SUB_FEEDBACK -> removeSubFeedback(message,superAdmin, sendMessage, sender);
+                case BotQuery.ALL_SUB_FEEDBACK -> getAllSubFeedback(message,superAdmin, sendMessage, sender);
+                case BotQuery.UPDATE_SUB_FEEDBACK -> updateSubFeedback(message,superAdmin, sendMessage, sender);
                 case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
             }
         } else {
@@ -108,25 +107,67 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
     }
 
-    private void updateSubFeedback(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-
+    private void updateSubFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.EDIT_NEW_SUB_FEEDBACK
+                    : ResMessageRu.EDIT_NEW_SUB_FEEDBACK;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
+            userService.changeStateChooseLangForEditSubFeedback(superAdmin);
+        } else errorMessage(superAdmin, sendMessage);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void getAllSubFeedback(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    private void getAllSubFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.GET_NEW_SUB_FEEDBACK
+                    : ResMessageRu.GET_NEW_SUB_FEEDBACK;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
+            userService.changeStateChooseLangForGetSubFeedback(superAdmin);
+        } else errorMessage(superAdmin, sendMessage);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void removeSubFeedback(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+    private void removeSubFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.REMOVE_NEW_SUB_FEEDBACK
+                    : ResMessageRu.REMOVE_NEW_SUB_FEEDBACK;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
+            userService.changeStateChooseLangForRemoveSubFeedback(superAdmin);
+        } else errorMessage(superAdmin, sendMessage);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void addSubFeedback(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-        String getDtoFeedBack = feedbackService.getDtoFeedback(superAdmin, sendMessage);
-        sendMessage.setChatId(superAdmin.getChatId());
-        sendMessage.enableHtml(true);
-        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-            sendMessage.setText(ResMessageUz.SUB_FEEDBACK_WITH_FEEDBACK + getDtoFeedBack);
-        else sendMessage.setText(ResMessageRu.SUB_FEEDBACK_WITH_FEEDBACK + getDtoFeedBack);
-        sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(false));
-        userService.changeStateGetFeedbackWithSubFeedback(superAdmin);
+    private void addSubFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ADD_NEW_SUB_FEEDBACK
+                    : ResMessageRu.ADD_NEW_SUB_FEEDBACK;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
+            userService.changeStateChooseLangForAddSubFeedback(superAdmin);
+        } else errorMessage(superAdmin, sendMessage);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -171,7 +212,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
                 case BotQuery.ADD_FEEDBACK -> addNewFeedback(message, superAdmin, sendMessage, sender);
                 case BotQuery.REMOVE_FEEDBACK -> removeFeedback(message, superAdmin, sendMessage, sender);
                 case BotQuery.ALL_FEEDBACK -> allFeedback(message,superAdmin, sendMessage, sender);
-                case BotQuery.UPDATE_FEEDBACK -> updateFeedback(superAdmin, sendMessage, sender);
+                case BotQuery.UPDATE_FEEDBACK -> updateFeedback(message,superAdmin, sendMessage, sender);
                 case BotQuery.MENU -> menu(superAdmin, sendMessage, sender);
                 default -> {
                     if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
@@ -196,15 +237,16 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
     }
 
-    private void updateFeedback(BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
-        String getDtoFeedBack = feedbackService.getDtoFeedback(superAdmin, sendMessage);
-        sendMessage.setChatId(superAdmin.getChatId());
-        sendMessage.enableHtml(true);
-        if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-            sendMessage.setText(ResMessageUz.UPDATE_FEEDBACK + getDtoFeedBack);
-        else sendMessage.setText(ResMessageRu.UPDATE_FEEDBACK);
-        sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(false));
-        userService.changeStateUpdateFeedback(superAdmin);
+    private void updateFeedback(Message message, BotUser superAdmin, SendMessage sendMessage, AbsSender sender) {
+        if (message.hasText()) {
+            sendMessage.setChatId(superAdmin.getChatId());
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.EDIT_SERVICE_LANG
+                    : ResMessageRu.EDIT_SERVICE_LANG;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.getChooseLang());
+            userService.changeStateChooseLangForEditFeedback(superAdmin);
+        } else errorMessage(superAdmin, sendMessage);
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -673,8 +715,45 @@ public class SuperAdminServiceImpl implements SuperAdminService {
             case CHOOSE_LANG_FOR_REMOVE -> chooseLangForRemove(superAdmin, sendMessage, sender, lang);
             case CHOOSE_LANG_FOR_EDIT -> chooseLangForEdit(superAdmin, sendMessage, sender, lang);
             case CHOOSE_LANG_FOR_GET -> chooseLangForGet(superAdmin, sendMessage, sender, lang);
+            case CHOOSE_LANG_FOR_SUB_FEEDBACK_ADD -> chooseLangForSubFeedbackAdd(superAdmin, sendMessage, sender, lang);
+            case CHOOSE_LANG_FOR_SUB_FEEDBACK_EDIT -> chooseLangForSubFeedbackEdit(superAdmin, sendMessage, sender, lang);
+            case CHOOSE_LANG_FOR_SUB_FEEDBACK_REMOVE -> chooseLangForSubFeedbackRemove(superAdmin, sendMessage, sender, lang);
+            case CHOOSE_LANG_FOR_SUB_FEEDBACK_GET -> chooseLangForSubFeedbackGet(superAdmin, sendMessage, sender, lang);
             default -> errorMessage(superAdmin, sendMessage);
         }
+    }
+
+    private void chooseLangForSubFeedbackGet(BotUser superAdmin, SendMessage sendMessage, AbsSender sender, boolean lang) {
+        String getAllFeedbacksByLang = feedbackService.getAllFeedbackByLang(lang, superAdmin);
+        sendMessage.setChatId(superAdmin.getChatId());
+        sendMessage.enableHtml(true);
+        String msg = "";
+        if (getAllFeedbacksByLang.isEmpty()) {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.FEEDBACK_IS_EMPTY
+                    : ResMessageRu.FEEDBACK_IS_EMPTY;
+        } else {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG + getAllFeedbacksByLang
+                    : ResMessageRu.GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG + getAllFeedbacksByLang;
+        }
+        userService.crudFeedbackState(superAdmin);
+        sendMessage.setText(msg);
+        sendMessage.setReplyMarkup(generalService.crudFeedback());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void chooseLangForSubFeedbackRemove(BotUser superAdmin, SendMessage sendMessage, AbsSender sender, boolean lang) {
+    }
+
+    private void chooseLangForSubFeedbackEdit(BotUser superAdmin, SendMessage sendMessage, AbsSender sender, boolean lang) {
+    }
+
+    private void chooseLangForSubFeedbackAdd(BotUser superAdmin, SendMessage sendMessage, AbsSender sender, boolean lang) {
     }
 
     private void chooseLangForGet(BotUser superAdmin, SendMessage sendMessage, AbsSender sender, boolean lang) {
@@ -708,8 +787,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         String msg = "";
         if (getAllFeedbacksByLang.isEmpty()) {
             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ? ResMessageUz.UPDATE_FEEDBACK + getAllFeedbacksByLang
-                    : ResMessageRu.UPDATE_FEEDBACK + getAllFeedbacksByLang;
+                    ? ResMessageUz.FEEDBACK_IS_EMPTY + getAllFeedbacksByLang
+                    : ResMessageRu.FEEDBACK_IS_EMPTY + getAllFeedbacksByLang;
         } else {
             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                     ? ResMessageUz.UPDATE_FEEDBACK + getAllFeedbacksByLang

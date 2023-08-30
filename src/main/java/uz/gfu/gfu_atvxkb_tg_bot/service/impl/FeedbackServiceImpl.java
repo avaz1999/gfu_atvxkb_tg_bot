@@ -230,8 +230,10 @@ public class FeedbackServiceImpl implements FeedbackService {
             feedBackRepository.save(feedback);
             superAdmin.setState(UserState.CRUD_FEEDBACK);
             userRepository.save(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.SUCCESS_EDITED);
-            else sendMessage.setText(ResMessageRu.SUCCESS_EDITED);
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.SUCCESS_EDITED
+                    :ResMessageRu.SUCCESS_EDITED;
+            sendMessage.setText(msg);
             sendMessage.setReplyMarkup(generalService.crudFeedback());
         }
     }
@@ -239,16 +241,19 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public String getAllFeedbackByLang(boolean lang, BotUser superAdmin) {
         List<FeedBack> allFeedbackByLang = feedBackRepository.findAllByLangAndDeletedFalseOrderByCreatedAtDesc(lang);
-        if (allFeedbackByLang.isEmpty()) return "";
+        if (allFeedbackByLang.isEmpty()) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (FeedBack feedBack : allFeedbackByLang) {
-            sb.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ?"<b>ID: "+feedBack.getId()+"</b>\n"+
-                    "<b>NOMI: "+feedBack.getName()+"</b>\n"+
-                    "</b>+++++++++++++++++++++++++++</b>"
-                    :"<b>ИД: "+feedBack.getId()+"</b>\n"+
-                    "<b>ИМЯ: "+ feedBack.getName() +"</b>"+
-                    "<b>+++++++++++++++++++++++++++++</b>");
+            String feedbackString = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? "<b>ID:</b> " + feedBack.getId() + "\n" +
+                    "<b>NOMI:</b> " + feedBack.getName() + "\n" +
+                    "<b>+++++++++++++++++++++++++++++++++++++\n</b>"
+                    : "<b>ИД:</b> " + feedBack.getId() + "\n" +
+                    "<b>ИМЯ:</b> " + feedBack.getName() + "\n" +
+                    "<b>++++++++++++++++++++++++++++++++++++++\n</b>";
+            sb.append(feedbackString);
         }
         return sb.toString();
     }
