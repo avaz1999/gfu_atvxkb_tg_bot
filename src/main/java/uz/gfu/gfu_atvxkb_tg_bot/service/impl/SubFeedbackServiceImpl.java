@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
@@ -120,7 +121,6 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         SubFeedback subFeedback = subFeedbackRepository.findNameNull();
         subFeedback.setName(text);
         subFeedback.setCreatedBy(superAdmin.getId());
-        subFeedback.setLang(false);
         subFeedbackRepository.save(subFeedback);
         superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
         sendMessage.setReplyMarkup(generalService.crudSubFeedback());
@@ -141,14 +141,14 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         String msg = "";
         for (SubFeedback subFeedback : subFeedbackRepository.findAllByFeedBackAndDeletedFalseOrderByCreatedAt(feedback)) {
             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ?"<b>ID: </b>" + subFeedback.getId() +
+                    ? "<b>ID: </b>" + subFeedback.getId() +
                     "<b>NOMI: </b>" + subFeedback.getName() +
-                    "<b>SERVICE TURI: </b>"+feedback.getName() +
-                    "++++++++++++++++++++++++++++++++++++++++++++++"
-                    :"<b>ИД: </b>" + subFeedback.getId() +
+                    "<b>SERVICE TURI: </b>" + feedback.getName() +
+                    "________________________________________________________"
+                    : "<b>ИД: </b>" + subFeedback.getId() +
                     "<b>ИМЯ: </b>" + subFeedback.getName() +
                     "<b>ТИП ОБСЛУЖИВАНИЯ: </b>" + feedback.getName() +
-                    "++++++++++++++++++++++++++++++++++++++++++++++";
+                    "________________________________________________________";
             sendMessage.setText(msg);
         }
     }
@@ -156,19 +156,50 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     @Override
     public String getAllSubFeedbackByFeedbackByLang(boolean lang, BotUser superAdmin) {
         StringBuilder msg = new StringBuilder();
-        for (SubFeedback subFeedback : subFeedbackRepository.findAllByDeletedFalse()) {
+        for (SubFeedback subFeedback : subFeedbackRepository.findAllByLangAndDeletedFalse(lang)) {
             msg.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                     ? "ID: " + subFeedback.getId() + "\n" +
                     "НОМИ: " + subFeedback.getName() + "\n" +
                     "Сервис Тури: " + subFeedback.getFeedBack().getName() + "\n" +
-                    "________________________________________________________\n"
+                    "_______________________________________________\n"
                     : "ID: " + subFeedback.getId() + "\n" +
                     "ИМЯ: " + subFeedback.getName() + "\n" +
-                    "Тип Обслуживания" + subFeedback.getFeedBack().getName()+
-                    "________________________________________________________\n"
+                    "Тип Обслуживания" + subFeedback.getFeedBack().getName() + "\n" +
+                    "_______________________________________________\n"
             );
         }
         return msg.toString();
+    }
+
+    @Override
+    public List<SubFeedback> getAllSubFeedbackByLang(boolean lang) {
+        return subFeedbackRepository.findAllByLangAndDeletedFalse(lang);
+    }
+
+    @Override
+    public void getSubFeedbackByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
+        SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
+        sendMessage.enableHtml(true);
+        String msg = "";
+        if (subFeedback == null) {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.FEEDBACK_IS_EMPTY
+                    : ResMessageRu.FEEDBACK_IS_EMPTY;
+        } else {
+            subFeedback.setEdited(true);
+            subFeedbackRepository.save(subFeedback);
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ENTER_NEW_SUB_FEEDBACK
+                    : ResMessageRu.ENTER_NEW_SUB_FEEDBACK;
+        }
+        userService.changeStateSubFeedbackEdit1(superAdmin);
+        sendMessage.setText(msg);
+        sendMessage.setChatId(superAdmin.getChatId());
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
@@ -178,4 +209,36 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         sendMessage.setText(msg);
     }
 
+    @Override
+    public void editSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage) {
+        SubFeedback subFeedback = subFeedbackRepository.findByEditedTrueAndDeletedFalse();
+        String msg = "";
+        if (subFeedback == null) {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ERROR_MESSAGE
+                    : ResMessageRu.ERROR_MESSAGE;
+        } else if (subFeedbackRepository.existsByNameAndDeletedFalse(text)) {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.EXIST_SUB_FEEDBACK
+                    : ResMessageRu.EXIST_SUB_FEEDBACK;
+        } else {
+            subFeedback.setName(text);
+            subFeedback.setModifiedBy(superAdmin.getId());
+            subFeedbackRepository.save(subFeedback);
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.SUCCESS_EDITED
+                    : ResMessageRu.SUCCESS_EDITED;
+            sendMessage.setChatId(superAdmin.getChatId());
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.crudSubFeedback());
+        }
+    }
+
+    @Override
+    public void saveHalfSubFeedback(BotUser superAdmin, boolean lang) {
+        SubFeedback subFeedback = new SubFeedback();
+        subFeedback.setLang(lang);
+        subFeedback.setCreatedBy(superAdmin.getId());
+        subFeedbackRepository.save(subFeedback);
+    }
 }

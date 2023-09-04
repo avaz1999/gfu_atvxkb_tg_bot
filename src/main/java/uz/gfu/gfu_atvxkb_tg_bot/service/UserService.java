@@ -119,4 +119,10 @@ public interface UserService {
 
 
     void crudSubFeedbackState(BotUser superAdmin);
+
+    void changeStateAddSubFeedback(BotUser superAdmin);
+
+    void changeStateSubFeedbackEdit(BotUser superAdmin);
+
+    void changeStateSubFeedbackEdit1(BotUser superAdmin);
 }

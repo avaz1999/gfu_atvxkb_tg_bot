@@ -199,7 +199,7 @@ public class FeedbackServiceImpl implements FeedbackService {
             String newFeedbackMessage = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? ResMessageUz.ENTER_NEW_FEEDBACK : ResMessageRu.ENTER_NEW_FEEDBACK;
             sendMessage.setText(newFeedbackMessage);
         } else if (superAdmin.getState().equals(UserState.ADD_SUB_FEEDBACK_STATE)) {
-            SubFeedback subFeedback = new SubFeedback();
+            SubFeedback subFeedback = subFeedbackRepository.findByNameIsNullAndDeletedFalse();
             subFeedback.setFeedBack(feedback);
             subFeedbackRepository.save(subFeedback);
             superAdmin.setState(UserState.ADD_SUB_FEEDBACK_STATE_1);

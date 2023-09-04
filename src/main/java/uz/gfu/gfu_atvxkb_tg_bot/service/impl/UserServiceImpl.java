@@ -195,6 +195,10 @@ public class UserServiceImpl implements UserService {
                 superAdmin.setState(UserState.CRUD_FEEDBACK);
                 sendMessage.setReplyMarkup(generalService.crudFeedback());
             }
+            case EDIT_SUB_FEEDBACK_STATE -> {
+                superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
+                sendMessage.setReplyMarkup(generalService.crudSubFeedback());
+            }
         }
         userRepository.save(superAdmin);
     }
@@ -864,5 +868,23 @@ public class UserServiceImpl implements UserService {
     private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
         if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
         else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void changeStateAddSubFeedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.ADD_SUB_FEEDBACK_STATE);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateSubFeedbackEdit(BotUser superAdmin) {
+        superAdmin.setState(UserState.EDIT_SUB_FEEDBACK_STATE);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateSubFeedbackEdit1(BotUser superAdmin) {
+        superAdmin.setState(UserState.EDIT_SUB_FEEDBACK_STATE_1);
+        userRepository.save(superAdmin);
     }
 }

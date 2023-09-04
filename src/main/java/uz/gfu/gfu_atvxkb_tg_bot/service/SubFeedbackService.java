@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
 
 import java.util.List;
@@ -19,4 +20,12 @@ public interface SubFeedbackService {
     void getAllSubFeedbackByFeedback(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender);
 
     String getAllSubFeedbackByFeedbackByLang(boolean lang, BotUser superAdmin);
+
+    List<SubFeedback> getAllSubFeedbackByLang(boolean lang);
+
+    void getSubFeedbackByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender);
+
+    void editSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage);
+
+    void saveHalfSubFeedback(BotUser superAdmin, boolean lang);
 }

@@ -45,4 +45,6 @@ public interface GeneralService {
     ReplyKeyboard rateAdmin(BotUser admin, BotUser botUser);
 
     ReplyKeyboard forAdmin();
+
+    ReplyKeyboard getSubFeedbacksNumber(boolean lang);
 }
