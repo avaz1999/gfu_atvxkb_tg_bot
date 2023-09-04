@@ -12,6 +12,7 @@ public interface SubFeedbackRepository extends JpaRepository<SubFeedback,Long> {
     SubFeedback findByNameAndDeletedFalse(String name);
     List<SubFeedback> findAllByFeedBackAndDeletedFalseOrderByCreatedAt(FeedBack feedBack);
     SubFeedback findByIdAndDeletedFalse(Long id);
+    List<SubFeedback> findAllByDeletedFalse();
     @Query(nativeQuery = true,
             value = "SELECT * FROM sub_feedback where name is null ")
     SubFeedback findNameNull();

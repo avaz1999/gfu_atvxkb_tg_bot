@@ -709,7 +709,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void crudFeedbackState(BotUser superAdmin) {
-        superAdmin.setState(UserState.GET_ALL_SUB_FEEDBACK);
+        superAdmin.setState(UserState.CRUD_FEEDBACK);
         userRepository.save(superAdmin);
     }
 
@@ -744,10 +744,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void stateAddSubFedback(BotUser superAdmin) {
-        superAdmin.setState(UserState.ADD_SUB_FEEDBACK_STATE);
-        userRepository.save(superAdmin);
+    public void crudSubFeedbackState(BotUser superAdmin) {
+    superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
+    userRepository.save(superAdmin);
     }
+
 
     private void sendMessageToSuperAdmin(BotUser superAdmin, BotUser admin, BotUser client, Application application, SendMessage sendMessage, AbsSender sender) {
         Department department = departmentRepository.findByIdAndDeletedFalse(application.getDepartmentId());

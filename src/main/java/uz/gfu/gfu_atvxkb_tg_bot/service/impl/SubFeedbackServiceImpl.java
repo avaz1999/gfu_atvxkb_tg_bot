@@ -153,6 +153,24 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         }
     }
 
+    @Override
+    public String getAllSubFeedbackByFeedbackByLang(boolean lang, BotUser superAdmin) {
+        StringBuilder msg = new StringBuilder();
+        for (SubFeedback subFeedback : subFeedbackRepository.findAllByDeletedFalse()) {
+            msg.append(superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? "ID: " + subFeedback.getId() + "\n" +
+                    "НОМИ: " + subFeedback.getName() + "\n" +
+                    "Сервис Тури: " + subFeedback.getFeedBack().getName() + "\n" +
+                    "________________________________________________________\n"
+                    : "ID: " + subFeedback.getId() + "\n" +
+                    "ИМЯ: " + subFeedback.getName() + "\n" +
+                    "Тип Обслуживания" + subFeedback.getFeedBack().getName()+
+                    "________________________________________________________\n"
+            );
+        }
+        return msg.toString();
+    }
+
     private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {
         String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                 ? ResMessageUz.ERROR_MESSAGE

@@ -17,4 +17,6 @@ public interface SubFeedbackService {
     void addSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage);
 
     void getAllSubFeedbackByFeedback(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender);
+
+    String getAllSubFeedbackByFeedbackByLang(boolean lang, BotUser superAdmin);
 }
