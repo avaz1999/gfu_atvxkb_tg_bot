@@ -77,6 +77,7 @@ public interface ResMessageRu {
     String EDIT_NEW_SUB_FEEDBACK = "<b>Выберите язык проблемы, которую вы хотите изменить.</b>";
     String GET_NEW_SUB_FEEDBACK = "<b>Выберите язык</b>";
     String REMOVE_NEW_SUB_FEEDBACK = "<b>Выберите язык</b>";
-    String GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Все сервисы доступны для решения проблемы</b>";
+    String GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Все сервисы доступны для решения проблемы\n</b>";
+    String ADD_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Выберите услугу, которую хотите добавить\n</b>";
 }
 

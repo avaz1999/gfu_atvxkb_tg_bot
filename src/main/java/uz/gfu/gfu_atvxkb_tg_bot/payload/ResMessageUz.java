@@ -87,5 +87,6 @@ public interface ResMessageUz {
     String EDIT_NEW_SUB_FEEDBACK = "<b>Ўзгартирмоқчи бўлган муамо нинг тилини танланг</b>";
     String GET_NEW_SUB_FEEDBACK = "<b>Тилни танланг</b>";
     String REMOVE_NEW_SUB_FEEDBACK = "<b>Тилни танланг</b>";
-    String GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Муамо учун мавжуд бўлган ҳамма сервиcер</b>";
+    String GET_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Муамо учун мавжуд бўлган ҳамма сервиcер\n</b>";
+    String ADD_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Қўшмоқчи бўлган сервиcингизни танланг\n</b>";
 }

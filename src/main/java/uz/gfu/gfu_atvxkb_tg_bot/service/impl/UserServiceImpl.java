@@ -709,7 +709,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void crudFeedbackState(BotUser superAdmin) {
-        superAdmin.setState(UserState.CRUD_FEEDBACK);
+        superAdmin.setState(UserState.GET_ALL_SUB_FEEDBACK);
         userRepository.save(superAdmin);
     }
 
@@ -740,6 +740,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeStateChooseLangForRemoveSubFeedback(BotUser superAdmin) {
         superAdmin.setState(UserState.CHOOSE_LANG_FOR_SUB_FEEDBACK_REMOVE);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void stateAddSubFedback(BotUser superAdmin) {
+        superAdmin.setState(UserState.ADD_SUB_FEEDBACK_STATE);
         userRepository.save(superAdmin);
     }
 

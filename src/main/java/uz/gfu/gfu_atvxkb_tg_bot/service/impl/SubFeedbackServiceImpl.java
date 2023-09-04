@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
 import uz.gfu.gfu_atvxkb_tg_bot.dto.SubFeedDto;
 import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
@@ -130,6 +131,26 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
                 ? ResMessageUz.SUCCESS_ADD_SUB_FEEDBACK
                 : ResMessageRu.SUCCESS_ADD_SUB_FEEDBACK;
         sendMessage.setText(successAddSubFeedback);
+    }
+
+    @Override
+    public void getAllSubFeedbackByFeedback(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
+        FeedBack feedback = feedBackRepository.findByNameAndDeletedFalse(data);
+        sendMessage.setChatId(superAdmin.getChatId());
+        sendMessage.enableHtml(true);
+        String msg = "";
+        for (SubFeedback subFeedback : subFeedbackRepository.findAllByFeedBackAndDeletedFalseOrderByCreatedAt(feedback)) {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ?"<b>ID: </b>" + subFeedback.getId() +
+                    "<b>NOMI: </b>" + subFeedback.getName() +
+                    "<b>SERVICE TURI: </b>"+feedback.getName() +
+                    "++++++++++++++++++++++++++++++++++++++++++++++"
+                    :"<b>ИД: </b>" + subFeedback.getId() +
+                    "<b>ИМЯ: </b>" + subFeedback.getName() +
+                    "<b>ТИП ОБСЛУЖИВАНИЯ: </b>" + feedback.getName() +
+                    "++++++++++++++++++++++++++++++++++++++++++++++";
+            sendMessage.setText(msg);
+        }
     }
 
     private static void errorMessage(BotUser superAdmin, SendMessage sendMessage) {

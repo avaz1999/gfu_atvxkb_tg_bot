@@ -173,49 +173,49 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public void getFeedbackByName(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
         FeedBack feedback = feedBackRepository.findByNameAndDeletedFalse(data);
+
         sendMessage.setChatId(superAdmin.getChatId());
         sendMessage.enableHtml(true);
-        if (feedback == null){
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.ERROR_MESSAGE);
-            else sendMessage.setText(ResMessageRu.ERROR_MESSAGE);
-        }
-        else if (superAdmin.getState().equals(UserState.REMOVE_FEEDBACK_STATE)){
+
+        if (feedback == null) {
+            String errorMessage = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? ResMessageUz.ERROR_MESSAGE : ResMessageRu.ERROR_MESSAGE;
+            sendMessage.setText(errorMessage);
+        } else if (superAdmin.getState().equals(UserState.REMOVE_FEEDBACK_STATE)) {
             feedback.setDeleted(true);
             feedback.setDeletedBy(superAdmin.getId());
             feedBackRepository.save(feedback);
             superAdmin.setState(UserState.CRUD_FEEDBACK);
             userRepository.save(superAdmin);
-           String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                   ? ResMessageUz.DELETED_SUCCESS
-                   : ResMessageRu.DELETED_SUCCESS;
-                sendMessage.setText(msg);
+
+            String successMessage = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? ResMessageUz.DELETED_SUCCESS : ResMessageRu.DELETED_SUCCESS;
+            sendMessage.setText(successMessage);
             sendMessage.setReplyMarkup(generalService.crudFeedback());
-        }else if (superAdmin.getState().equals(UserState.EDIT_FEEDBACK_STATE)){
+        } else if (superAdmin.getState().equals(UserState.EDIT_FEEDBACK_STATE)) {
             feedback.setEdited(true);
             feedBackRepository.save(feedback);
             superAdmin.setState(UserState.EDIT_FEEDBACK_STATE_1);
             userRepository.save(superAdmin);
-            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                    ? ResMessageUz.ENTER_NEW_FEEDBACK
-                    : ResMessageRu.ENTER_NEW_FEEDBACK;
-            sendMessage.setText(msg);
+
+            String newFeedbackMessage = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? ResMessageUz.ENTER_NEW_FEEDBACK : ResMessageRu.ENTER_NEW_FEEDBACK;
+            sendMessage.setText(newFeedbackMessage);
         } else if (superAdmin.getState().equals(UserState.ADD_SUB_FEEDBACK_STATE)) {
             SubFeedback subFeedback = new SubFeedback();
             subFeedback.setFeedBack(feedback);
             subFeedbackRepository.save(subFeedback);
             superAdmin.setState(UserState.ADD_SUB_FEEDBACK_STATE_1);
             userRepository.save(superAdmin);
-            if (superAdmin.getLanguage().equals(BotQuery.UZ_SELECT))
-                sendMessage.setText(ResMessageUz.ENTER_NEW_SUB_FEEDBACK);
-            else sendMessage.setText(ResMessageRu.ENTER_NEW_SUB_FEEDBACK);
+
+            String newSubFeedbackMessage = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT) ? ResMessageUz.ENTER_NEW_SUB_FEEDBACK : ResMessageRu.ENTER_NEW_SUB_FEEDBACK;
+            sendMessage.setText(newSubFeedbackMessage);
         }
+
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public void editFeedback(String text, SendMessage sendMessage, BotUser superAdmin) {
