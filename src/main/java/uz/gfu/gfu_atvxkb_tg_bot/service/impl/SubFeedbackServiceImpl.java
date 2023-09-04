@@ -241,4 +241,32 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         subFeedback.setCreatedBy(superAdmin.getId());
         subFeedbackRepository.save(subFeedback);
     }
+
+    @Override
+    public void removerSubFeedback(BotUser superAdmin, SendMessage sendMessage, String data, AbsSender sender) {
+        SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
+        String msg = "";
+        sendMessage.setChatId(superAdmin.getChatId());
+        sendMessage.enableHtml(true);
+        if (subFeedback == null) {
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ERROR_MESSAGE
+                    : ResMessageRu.ERROR_MESSAGE;
+        } else {
+            subFeedback.setDeleted(true);
+            subFeedback.setDeletedBy(superAdmin.getId());
+            subFeedbackRepository.save(subFeedback);
+            userService.changeStateSubFeedback(superAdmin);
+            msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.DELETED_SUCCESS
+                    : ResMessageRu.DELETED_SUCCESS;
+            sendMessage.setText(msg);
+            sendMessage.setReplyMarkup(generalService.crudSubFeedback());
+        }
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

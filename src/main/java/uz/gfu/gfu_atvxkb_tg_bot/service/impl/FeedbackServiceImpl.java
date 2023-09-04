@@ -184,6 +184,12 @@ public class FeedbackServiceImpl implements FeedbackService {
             feedback.setDeleted(true);
             feedback.setDeletedBy(superAdmin.getId());
             feedBackRepository.save(feedback);
+            for (SubFeedback subFeedback : subFeedbackRepository.findAllByFeedBackAndDeletedFalse(feedback)) {
+                subFeedback.setDeleted(true);
+                subFeedback.setDeletedBy(superAdmin.getId());
+                subFeedbackRepository.save(subFeedback);
+            }
+
             superAdmin.setState(UserState.CRUD_FEEDBACK);
             userRepository.save(superAdmin);
 

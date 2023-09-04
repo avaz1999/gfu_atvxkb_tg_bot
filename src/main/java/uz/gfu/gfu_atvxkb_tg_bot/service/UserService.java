@@ -125,4 +125,7 @@ public interface UserService {
     void changeStateSubFeedbackEdit(BotUser superAdmin);
 
     void changeStateSubFeedbackEdit1(BotUser superAdmin);
+
+    void changeStateSubFeedbackRemove(BotUser superAdmin);
+
 }

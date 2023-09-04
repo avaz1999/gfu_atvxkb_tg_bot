@@ -81,5 +81,9 @@ public interface ResMessageRu {
     String ADD_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Выберите услугу, которую хотите добавить\n</b>";
     String CHOOSE_EDIT_SUB_FEEDBACK = "<b>Ўзгартирмоқчи бўлган сервиcингизни танланг\n</b>";
     String EXIST_SUB_FEEDBACK = "<b>Такая проблема существует\n</b>";
+    String CHOOSE_REMOVE_SUB_FEEDBACK = "<b>Выберите услугу, которую хотите удалить\n</b>";
+    String ADD_SUPER_ADMIN = "ADD SUPER ADMIN";
+    String ADD_ADMIN = "ADD ADMIN";
+    String STATISTIC_MONTH = "ЕЖЕМЕСЯЧНАЯ СТАТИСТИКА";
 }
 

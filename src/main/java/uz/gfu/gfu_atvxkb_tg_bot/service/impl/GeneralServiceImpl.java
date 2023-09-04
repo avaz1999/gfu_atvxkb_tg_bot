@@ -580,5 +580,31 @@ public class GeneralServiceImpl implements GeneralService {
         return new Result(inlineKeyboardMarkup, inlineKeyboardButtonList, lists, inlineKeyboardButtonSave);
     }
 
+    @Override
+    public ReplyKeyboard crudForDeveloper(BotUser developer) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
 
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+
+        KeyboardRow row = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+
+        String superAdmin = developer.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ADD_SUPER_ADMIN
+                : ResMessageRu.ADD_SUPER_ADMIN;
+        String admin = developer.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.ADD_ADMIN
+                : ResMessageRu.ADD_ADMIN;
+        row.add(superAdmin);
+        row.add(admin);
+        String statisticMonth = developer.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.STATISTIC_MONTH
+                : ResMessageRu.STATISTIC_MONTH;
+        row2.add(statisticMonth);
+        return replyKeyboardMarkup;
+    }
 }

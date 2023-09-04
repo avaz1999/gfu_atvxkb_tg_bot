@@ -91,4 +91,8 @@ public interface ResMessageUz {
     String ADD_ALL_FEEDBACK_FOR_SUB_FEEDBACK_BY_LANG = "<b>Қўшмоқчи бўлган сервиcингизни танланг\n</b>";
     String CHOOSE_EDIT_SUB_FEEDBACK = "<b>Ўзгартирмоқчи бўлган сервиcингизни танланг\n</b>";
     String EXIST_SUB_FEEDBACK = "<b>Бундай муамо тури мавжуд\n</b>";
+    String CHOOSE_REMOVE_SUB_FEEDBACK = "<b>Ўчирмоқчи бўлган сервисингизни танланг\n</b>";
+    String ADD_SUPER_ADMIN = "ADD SUPER ADMIN";
+    String ADD_ADMIN = "ADD ADMIN";
+    String STATISTIC_MONTH = "ОЙЛИК СТАТИСТИК";
 }

@@ -47,4 +47,7 @@ public interface GeneralService {
     ReplyKeyboard forAdmin();
 
     ReplyKeyboard getSubFeedbacksNumber(boolean lang);
+
+    ReplyKeyboard crudForDeveloper(BotUser developer);
+
 }

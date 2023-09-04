@@ -195,10 +195,12 @@ public class UserServiceImpl implements UserService {
                 superAdmin.setState(UserState.CRUD_FEEDBACK);
                 sendMessage.setReplyMarkup(generalService.crudFeedback());
             }
-            case EDIT_SUB_FEEDBACK_STATE -> {
+            case EDIT_SUB_FEEDBACK_STATE,
+                    REMOVE_SUB_FEEDBACK_STATE-> {
                 superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
                 sendMessage.setReplyMarkup(generalService.crudSubFeedback());
             }
+
         }
         userRepository.save(superAdmin);
     }
@@ -885,6 +887,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeStateSubFeedbackEdit1(BotUser superAdmin) {
         superAdmin.setState(UserState.EDIT_SUB_FEEDBACK_STATE_1);
+        userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateSubFeedbackRemove(BotUser superAdmin) {
+        superAdmin.setState(UserState.REMOVE_SUB_FEEDBACK_STATE);
         userRepository.save(superAdmin);
     }
 }
