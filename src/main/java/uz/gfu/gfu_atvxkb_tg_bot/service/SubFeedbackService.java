@@ -30,4 +30,6 @@ public interface SubFeedbackService {
     void saveHalfSubFeedback(BotUser superAdmin, boolean lang);
 
     void removerSubFeedback(BotUser superAdmin, SendMessage sendMessage, String data,AbsSender sender);
+
+    void clientEditSubFeedback(String data, BotUser client);
 }

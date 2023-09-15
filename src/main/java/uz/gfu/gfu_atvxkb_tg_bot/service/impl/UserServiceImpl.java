@@ -646,7 +646,7 @@ public class UserServiceImpl implements UserService {
     public void rateAdmin(BotUser client, Byte rate, Long adminId, SendMessage sendMessage, AbsSender sender) {
         BotUser admin = userRepository.findByIdAndDeletedFalse(adminId);
         Application rateApplication = applicationRepository
-                .findByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), adminId, State.DONE);
+                .findTopByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(client.getId(), adminId, State.DONE);
         rateApplication.setRate(rate);
         applicationRepository.save(rateApplication);
         List<Application> applicationOfAdmin = applicationRepository.findAllByAdminIdAndDeletedFalse(adminId);
@@ -795,7 +795,7 @@ public class UserServiceImpl implements UserService {
         if (client.getLanguage().equals(BotQuery.UZ_SELECT))
             sendMessage.setText(ResMessageUz.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
         else sendMessage.setText(ResMessageRu.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
-        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+        sendMessage.setReplyMarkup(generalService.getRegisterDone(client, new Application()));
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

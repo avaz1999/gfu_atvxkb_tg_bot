@@ -113,7 +113,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
                 ? ResMessageUz.DONE_SERVICE + userService.clientShowFeedback(client, saveApplication)
                 : ResMessageRu.DONE_SERVICE + userService.clientShowFeedback(client, saveApplication);
         sendMessage.setText(doneService);
-        sendMessage.setReplyMarkup(generalService.getRegisterDone(client));
+        sendMessage.setReplyMarkup(generalService.getRegisterDone(client,application));
     }
 
     @Override
@@ -268,5 +268,13 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void clientEditSubFeedback(String data, BotUser client) {
+        SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
+        subFeedbackRepository.delete(subFeedback);
+        client.setState(UserState.GET_FEEDBACK);
+        userRepository.save(client);
     }
 }

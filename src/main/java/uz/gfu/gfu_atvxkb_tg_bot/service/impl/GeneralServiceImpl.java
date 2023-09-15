@@ -10,10 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import uz.gfu.gfu_atvxkb_tg_bot.constant.BotQuery;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.BotUser;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.Building;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.FeedBack;
-import uz.gfu.gfu_atvxkb_tg_bot.entitiy.SubFeedback;
+import uz.gfu.gfu_atvxkb_tg_bot.entitiy.*;
 import uz.gfu.gfu_atvxkb_tg_bot.enums.UserState;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageRu;
 import uz.gfu.gfu_atvxkb_tg_bot.payload.ResMessageUz;
@@ -115,7 +112,7 @@ public class GeneralServiceImpl implements GeneralService {
 
 
     @Override
-    public ReplyKeyboard getRegisterDone(BotUser client) {
+    public ReplyKeyboard getRegisterDone(BotUser client, Application application) {
         Result result = getResult();
         String confirmText = "";
         String cancelText = "";
@@ -134,7 +131,7 @@ public class GeneralServiceImpl implements GeneralService {
 
         InlineKeyboardButton cancelButton = new InlineKeyboardButton();
         cancelButton.setText(cancelText);
-        cancelButton.setCallbackData(BotQuery.EDIT);
+        cancelButton.setCallbackData(application.getSubFeedbackName());
 
         result.inlineKeyboardButtonList().add(confirmButton);
         result.inlineKeyboardButtonList().add(cancelButton);

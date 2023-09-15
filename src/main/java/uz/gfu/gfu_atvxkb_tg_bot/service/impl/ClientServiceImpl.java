@@ -61,8 +61,10 @@ public class ClientServiceImpl implements ClientService {
 
     private void stateTextSubFeedback(BotUser client, Message message, SendMessage sendMessage, AbsSender sender) {
         if (message.hasText()) {
-            if (client.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_SERVICE);
-            else if (client.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_SERVICE);
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.ERROR_SERVICE
+                    : ResMessageRu.ERROR_SERVICE;
+            sendMessage.setText(msg);
         }
         try {
             sender.execute(sendMessage);
@@ -116,7 +118,7 @@ public class ClientServiceImpl implements ClientService {
                 client.getState().equals(UserState.SAVE_SUB_FEEDBACK)) {
             switch (data) {
                 case BotQuery.DONE -> stateDone(callbackQuery, sendMessage, client, sender);
-                case BotQuery.EDIT -> stateEdit(callbackQuery, sendMessage, client);
+                case BotQuery.EDIT -> stateEdit(callbackQuery, sendMessage, client,sender);
             }
         }
         if (client.getState().equals(UserState.GET_SUB_FEEDBACK)) {
@@ -354,8 +356,20 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void stateEdit(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client) {
-        sendMessage.setText(ResMessageUz.EDIT);
+    public void stateEdit(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client,AbsSender sender) {
+        String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                ? ResMessageUz.EDIT
+                : ResMessageRu.EDIT;
+        sendMessage.setText(msg);
+        sendMessage.setChatId(client.getChatId());
+        sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+        String data = callbackQuery.getData();
+        subFeedbackService.clientEditSubFeedback(data,client);
+        try {
+            sender.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

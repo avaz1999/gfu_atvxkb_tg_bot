@@ -85,5 +85,6 @@ public interface ResMessageRu {
     String ADD_SUPER_ADMIN = "ADD SUPER ADMIN";
     String ADD_ADMIN = "ADD ADMIN";
     String STATISTIC_MONTH = "ЕЖЕМЕСЯЧНАЯ СТАТИСТИКА";
+    String EDIT = "<b>Повторно введите тип проблемы</b>";
 }
 

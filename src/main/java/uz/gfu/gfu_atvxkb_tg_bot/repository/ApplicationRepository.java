@@ -28,11 +28,8 @@ public interface ApplicationRepository extends JpaRepository<Application,Long> {
 
     List<Application> findAllByAdminIdAndDeletedFalse(Long adminId);
 
-    @Query("""
-            select a from application a
-            where a.userId = ?1 and a.adminId = ?2 and a.done = ?3 and a.deleted = false
-            order by a.createdAt DESC""")
-    Application findByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(Long clientId,Long adminId,State state);
+
+    Application findTopByUserIdAndAdminIdAndDoneAndDeletedFalseOrderByCreatedAtDesc(Long clientId,Long adminId,State state);
 
     Application findTopByUserIdAndDoneAndDeletedFalseAndSubFeedbackNameIsNullOrderByCreatedAtDesc(
             Long userId,

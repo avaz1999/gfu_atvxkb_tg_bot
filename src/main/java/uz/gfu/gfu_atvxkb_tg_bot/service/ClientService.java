@@ -17,7 +17,7 @@ public interface ClientService {
     void stateRoomNumber(Message message, SendMessage sendMessage, BotUser client,AbsSender sender);
     void statePhoneNumber(Message message, SendMessage sendMessage, BotUser client,AbsSender sender);
     void stateDone(CallbackQuery callbackQuery,SendMessage sendMessage,BotUser client,AbsSender sender);
-    void stateEdit(CallbackQuery callbackQuery,SendMessage sendMessage,BotUser client);
+    void stateEdit(CallbackQuery callbackQuery,SendMessage sendMessage,BotUser client,AbsSender sender);
     void stateFeedback(Message message,SendMessage sendMessage,BotUser client,AbsSender sender);
     void stateSubFeedback(String data,SendMessage sendMessage,BotUser client,AbsSender sender);
 }
