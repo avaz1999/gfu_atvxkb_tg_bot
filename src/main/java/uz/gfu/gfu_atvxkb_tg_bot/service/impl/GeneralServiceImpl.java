@@ -113,17 +113,12 @@ public class GeneralServiceImpl implements GeneralService {
 
     @Override
     public ReplyKeyboard getRegisterDone(BotUser client, Application application) {
-        Result result = getResult();
-        String confirmText = "";
-        String cancelText = "";
+        String confirmText = client.getLanguage().equals(BotQuery.UZ_SELECT) ? "✅ Tasdiqlash" : "✅ Подтверждение";
+        String cancelText = client.getLanguage().equals(BotQuery.UZ_SELECT) ? "❌ Tahrirlash" : "❌ Редактирование";
 
-        if (client.getLanguage().equals(BotQuery.UZ_SELECT)) {
-            confirmText = "✅ Tasdiqlash";
-            cancelText = "❌ Tahrirlash";
-        } else if (client.getLanguage().equals(BotQuery.RU_SELECT)) {
-            confirmText = "✅ Подтверждение";
-            cancelText = "❌ Редактирование";
-        }
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
 
         InlineKeyboardButton confirmButton = new InlineKeyboardButton();
         confirmButton.setText(confirmText);
@@ -131,13 +126,15 @@ public class GeneralServiceImpl implements GeneralService {
 
         InlineKeyboardButton cancelButton = new InlineKeyboardButton();
         cancelButton.setText(cancelText);
-        cancelButton.setCallbackData(application.getSubFeedbackName());
+        cancelButton.setCallbackData(BotQuery.EDIT);
 
-        result.inlineKeyboardButtonList().add(confirmButton);
-        result.inlineKeyboardButtonList().add(cancelButton);
-        result.lists().add(result.inlineKeyboardButtonList());
+        row.add(confirmButton);
+        row.add(cancelButton);
+        keyboard.add(row);
 
-        return result.inlineKeyboardMarkup;
+        inlineKeyboardMarkup.setKeyboard(keyboard);
+
+        return inlineKeyboardMarkup;
     }
 
 

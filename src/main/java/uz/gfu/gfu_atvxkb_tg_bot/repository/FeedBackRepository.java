@@ -11,6 +11,8 @@ public interface FeedBackRepository extends JpaRepository<FeedBack,Long> {
     List<FeedBack> findAllByLangFalseAndDeletedFalse();
     List<FeedBack> findAllByLangTrueAndDeletedFalse();
     FeedBack findByNameAndDeletedFalse(String subTitle);
+    FeedBack findTopByNameAndDeletedFalse(String subTitle);
+
     FeedBack findByIdAndDeletedFalse(Long id);
     Boolean existsByNameAndDeletedFalse(String name);
     List<FeedBack> findAllByDeletedFalse();

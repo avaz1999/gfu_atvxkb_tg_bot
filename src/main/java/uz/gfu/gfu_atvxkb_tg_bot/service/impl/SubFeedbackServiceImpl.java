@@ -74,7 +74,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
 
     @Override
     public void saveSubFeedback(String data, BotUser client, SendMessage sendMessage) {
-        SubFeedback subFeedback = subFeedbackRepository.findByNameAndDeletedFalse(data);
+        SubFeedback subFeedback = subFeedbackRepository.findTopByNameAndDeletedFalseOrderByCreatedAt(data);
         if (subFeedback == null) {
             errorMessage(client, sendMessage);
         } else {

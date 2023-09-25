@@ -49,7 +49,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     @Transactional
     public void saveFeedback(String data, BotUser user, SendMessage sendMessage) {
-        FeedBack feedback = feedBackRepository.findByNameAndDeletedFalse(data);
+        FeedBack feedback = feedBackRepository.findTopByNameAndDeletedFalse(data);
         if (feedback == null) {
             if (user.getLanguage().equals(BotQuery.UZ_SELECT)) sendMessage.setText(ResMessageUz.ERROR_SERVICE);
             else if (user.getLanguage().equals(BotQuery.RU_SELECT)) sendMessage.setText(ResMessageRu.ERROR_SERVICE);
