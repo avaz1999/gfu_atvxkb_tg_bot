@@ -118,19 +118,40 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
 
     @Override
     public void addSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage) {
-        SubFeedback subFeedback = subFeedbackRepository.findNameNull();
-        subFeedback.setName(text);
-        subFeedback.setCreatedBy(superAdmin.getId());
-        subFeedbackRepository.save(subFeedback);
-        superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
-        sendMessage.setReplyMarkup(generalService.crudSubFeedback());
-        userRepository.save(superAdmin);
-        sendMessage.setChatId(superAdmin.getChatId());
-        sendMessage.enableHtml(true);
-        String successAddSubFeedback = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
-                ? ResMessageUz.SUCCESS_ADD_SUB_FEEDBACK
-                : ResMessageRu.SUCCESS_ADD_SUB_FEEDBACK;
-        sendMessage.setText(successAddSubFeedback);
+        SubFeedback dbSubFeedback = subFeedbackRepository.findByNameAndDeletedFalse(text);
+        if (dbSubFeedback != null) {
+            SubFeedback nameNull = subFeedbackRepository.findNameNull();
+            subFeedbackRepository.delete(nameNull);
+            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.WRONG_SUB_FEEDBACK
+                    : ResMessageRu.WRONG_SUB_FEEDBACK;
+            sendMessage.setText(msg);
+            boolean lang = false;
+            if (superAdmin.getLastname().equals(BotQuery.RU_SELECT))lang = true;
+            sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(lang));
+            sendMessage.setChatId(superAdmin.getChatId());
+        }else {
+            SubFeedback subFeedback = subFeedbackRepository.findNameNull();
+            sendMessage.enableHtml(true);
+            sendMessage.setChatId(superAdmin.getChatId());
+            if(subFeedback == null){
+                String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                        ? ResMessageUz.ERROR_MESSAGE
+                        : ResMessageRu.ERROR_MESSAGE;
+                sendMessage.setText(msg);
+            }else {
+                subFeedback.setName(text);
+                subFeedback.setCreatedBy(superAdmin.getId());
+                subFeedbackRepository.save(subFeedback);
+                superAdmin.setState(UserState.CRUD_SUB_FEEDBACK);
+                sendMessage.setReplyMarkup(generalService.crudSubFeedback());
+                userRepository.save(superAdmin);
+                String successAddSubFeedback = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+                        ? ResMessageUz.SUCCESS_ADD_SUB_FEEDBACK
+                        : ResMessageRu.SUCCESS_ADD_SUB_FEEDBACK;
+                sendMessage.setText(successAddSubFeedback);
+            }
+        }
     }
 
     @Override

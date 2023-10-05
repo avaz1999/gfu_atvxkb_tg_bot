@@ -357,14 +357,23 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void stateEdit(CallbackQuery callbackQuery, SendMessage sendMessage, BotUser client,AbsSender sender) {
-        String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
-                ? ResMessageUz.EDIT
-                : ResMessageRu.EDIT;
-        sendMessage.setText(msg);
-        sendMessage.setChatId(client.getChatId());
-        sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
-        String data = callbackQuery.getData();
-        subFeedbackService.clientEditSubFeedback(data,client);
+        if(client.getState().equals(UserState.REGISTER_DONE)){
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.EDIT_DATA
+                    : ResMessageRu.EDIT_DATA;
+            sendMessage.setText(msg);
+            sendMessage.setChatId(client.getChatId());
+            userService.changeStateEditData(client);
+        }else {
+            String msg = client.getLanguage().equals(BotQuery.UZ_SELECT)
+                    ? ResMessageUz.EDIT
+                    : ResMessageRu.EDIT;
+            sendMessage.setText(msg);
+            sendMessage.setChatId(client.getChatId());
+            sendMessage.setReplyMarkup(generalService.getFeedbacks(client));
+            String data = callbackQuery.getData();
+            subFeedbackService.clientEditSubFeedback(data,client);
+        }
         try {
             sender.execute(sendMessage);
         } catch (TelegramApiException e) {

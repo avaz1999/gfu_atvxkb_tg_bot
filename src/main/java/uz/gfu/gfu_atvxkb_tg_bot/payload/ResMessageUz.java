@@ -2,7 +2,7 @@ package uz.gfu.gfu_atvxkb_tg_bot.payload;
 
 public interface ResMessageUz {
     String START = "<b>Ассалому алейкум\nГеология фанлари университетининг\n" +
-            "Ахборота Техникаларига Хизмат Кўрсатиш\n" +
+            "Ахборот Техникаларига Хизмат Кўрсатиш\n" +
             "Бўтига хуш келибсиз</b>";
 
     String ERROR_MESSAGE = "<b>Хато хабар киритдингиз</b>";
@@ -95,4 +95,6 @@ public interface ResMessageUz {
     String ADD_SUPER_ADMIN = "ADD SUPER ADMIN";
     String ADD_ADMIN = "ADD ADMIN";
     String STATISTIC_MONTH = "ОЙЛИК СТАТИСТИК";
+    String WRONG_SUB_FEEDBACK = "<b>Сиз базада мавжуд номни киритдингиз\nҚайтадан киритинг</b>";
+    String EDIT_DATA = "<b>Фамилянгизни қайтадан киритинг</b>";
 }

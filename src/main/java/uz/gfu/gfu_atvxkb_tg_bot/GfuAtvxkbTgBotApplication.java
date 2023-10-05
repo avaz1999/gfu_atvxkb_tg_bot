@@ -11,5 +11,5 @@ public class GfuAtvxkbTgBotApplication {
         SpringApplication.run(GfuAtvxkbTgBotApplication.class, args);
 
     }
-
 }
+

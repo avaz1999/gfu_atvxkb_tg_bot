@@ -86,5 +86,7 @@ public interface ResMessageRu {
     String ADD_ADMIN = "ADD ADMIN";
     String STATISTIC_MONTH = "ЕЖЕМЕСЯЧНАЯ СТАТИСТИКА";
     String EDIT = "<b>Повторно введите тип проблемы</b>";
+    String WRONG_SUB_FEEDBACK = "<b>Вы ввели существующее имя в базу данных \nВведите еще раз</b>";
+    String EDIT_DATA = "<b>Повторно введите свою фамилию</b>";
 }
 

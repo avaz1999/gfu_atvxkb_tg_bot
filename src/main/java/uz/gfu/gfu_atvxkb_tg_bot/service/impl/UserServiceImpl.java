@@ -678,7 +678,7 @@ public class UserServiceImpl implements UserService {
                     : "<b>Заявитель: </b>" + client.getFirstname() + " " + client.getLastname() +
                     "<b>Сотрудник: </b>" + admin.getFirstname() + " " + admin.getLastname() + "<b> тот\n</b>" + rate + "<b>: Оценивается оценкой</b>";
             sendMessage.setText(msgToSuperAdmin);
-            sendMessage.setReplyMarkup(generalService.forAdmin());
+//            sendMessage.setReplyMarkup(generalService.forAdmin());
             try {
                 sender.execute(sendMessage);
             } catch (TelegramApiException e) {
@@ -792,6 +792,7 @@ public class UserServiceImpl implements UserService {
         department.setInnerPhoneNumber(contact);
         departmentRepository.save(department);
         userRepository.save(client);
+        sendMessage.setChatId(client.getChatId());
         if (client.getLanguage().equals(BotQuery.UZ_SELECT))
             sendMessage.setText(ResMessageUz.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
         else sendMessage.setText(ResMessageRu.SHOW_DATA + showUserData(client.getId(), client.getChatId()));
@@ -894,5 +895,11 @@ public class UserServiceImpl implements UserService {
     public void changeStateSubFeedbackRemove(BotUser superAdmin) {
         superAdmin.setState(UserState.REMOVE_SUB_FEEDBACK_STATE);
         userRepository.save(superAdmin);
+    }
+
+    @Override
+    public void changeStateEditData(BotUser client) {
+        client.setState(UserState.LAST_NAME);
+        userRepository.save(client);
     }
 }
