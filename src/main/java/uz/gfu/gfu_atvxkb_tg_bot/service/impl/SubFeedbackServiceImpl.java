@@ -20,6 +20,7 @@ import uz.gfu.gfu_atvxkb_tg_bot.repository.FeedBackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.ApplicationRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.SubFeedbackRepository;
 import uz.gfu.gfu_atvxkb_tg_bot.repository.UserRepository;
+import uz.gfu.gfu_atvxkb_tg_bot.service.FeedbackService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.GeneralService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.SubFeedbackService;
 import uz.gfu.gfu_atvxkb_tg_bot.service.UserService;
@@ -33,6 +34,7 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     private final UserRepository userRepository;
     private final SubFeedbackRepository subFeedbackRepository;
     private final ApplicationRepository applicationRepository;
+    private final FeedbackService feedbackService;
     @Autowired
     @Lazy
     UserService userService;
@@ -40,11 +42,12 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     @Lazy
     GeneralService generalService;
 
-    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, ApplicationRepository applicationRepository) {
+    public SubFeedbackServiceImpl(FeedBackRepository feedBackRepository, UserRepository userRepository, SubFeedbackRepository subFeedbackRepository, ApplicationRepository applicationRepository, FeedbackService feedbackService) {
         this.feedBackRepository = feedBackRepository;
         this.userRepository = userRepository;
         this.subFeedbackRepository = subFeedbackRepository;
         this.applicationRepository = applicationRepository;
+        this.feedbackService = feedbackService;
     }
 
     @Override
@@ -120,16 +123,12 @@ public class SubFeedbackServiceImpl implements SubFeedbackService {
     public void addSubFeedback(String text, BotUser superAdmin, SendMessage sendMessage) {
         SubFeedback dbSubFeedback = subFeedbackRepository.findByNameAndDeletedFalse(text);
         if (dbSubFeedback != null) {
-            SubFeedback nameNull = subFeedbackRepository.findNameNull();
-            subFeedbackRepository.delete(nameNull);
-            String msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
+            String msg = "";
+             msg = superAdmin.getLanguage().equals(BotQuery.UZ_SELECT)
                     ? ResMessageUz.WRONG_SUB_FEEDBACK
                     : ResMessageRu.WRONG_SUB_FEEDBACK;
-            sendMessage.setText(msg);
-            boolean lang = false;
-            if (superAdmin.getLastname().equals(BotQuery.RU_SELECT))lang = true;
-            sendMessage.setReplyMarkup(generalService.getFeedbacksNumber(lang));
             sendMessage.setChatId(superAdmin.getChatId());
+            sendMessage.setText(msg);
         }else {
             SubFeedback subFeedback = subFeedbackRepository.findNameNull();
             sendMessage.enableHtml(true);
